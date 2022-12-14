@@ -1,11 +1,10 @@
-import * as path from 'path'
-import * as lodash from 'lodash'
+import type {Preset} from '.'
+import generate from '@babel/generator'
+import {parse} from '@babel/parser'
 import * as glob from 'glob'
 import {match} from 'io-ts-extra'
-import {parse} from '@babel/parser'
-import generate from '@babel/generator'
-
-import type {Preset} from '.'
+import * as lodash from 'lodash'
+import * as path from 'path'
 
 /**
  * Bundle several modules into a single convenient one.
@@ -67,14 +66,14 @@ export const barrel: Preset<{
         .groupBy(info => info.identifier)
         .values()
         .flatMap(group =>
-          group.length === 1 ? group : group.map((info, i) => ({...info, identifier: `${info.identifier}_${i + 1}`}))
+          group.length === 1 ? group : group.map((info, i) => ({...info, identifier: `${info.identifier}_${i + 1}`})),
         )
         .value()
 
       const imports = withIdentifiers.map(i => `import ${importPrefix}${i.identifier} from '${i.file}'`).join('\n')
       const exportProps = match(opts.export)
         .case({name: String, keys: 'path'}, () =>
-          withIdentifiers.map(i => `${JSON.stringify(i.file)}: ${i.identifier}`)
+          withIdentifiers.map(i => `${JSON.stringify(i.file)}: ${i.identifier}`),
         )
         .default(() => withIdentifiers.map(i => i.identifier))
         .get()
@@ -103,7 +102,9 @@ export const barrel: Preset<{
     if (normalise(expectedContent) === normalise(meta.existingContent)) {
       return meta.existingContent
     }
-  } catch {}
+  } catch {
+    // fall back to return statement below
+  }
 
   return expectedContent
 }

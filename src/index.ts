@@ -1,21 +1,19 @@
-import * as path from 'path'
-import * as os from 'os'
-import * as jsYaml from 'js-yaml'
-import {tryCatch} from 'fp-ts/lib/Either'
-import * as eslint from 'eslint'
-import * as presetsModule from './presets'
+/* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
+import type * as eslint from 'eslint'
 import expect from 'expect'
+import {tryCatch} from 'fp-ts/lib/Either'
+import * as jsYaml from 'js-yaml'
+import * as os from 'os'
+import * as path from 'path'
+import * as presetsModule from './presets'
 
-// todo: run prettier on output, if found
-// todo: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
+// idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
 type MatchAll = (text: string, pattern: string | RegExp) => Iterable<NonNullable<ReturnType<string['match']>>>
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/no-require-imports
 const matchAll: MatchAll = require('string.prototype.matchall')
 
-export {Preset} from './presets'
-
-export {presetsModule as presets}
+export type {Preset} from './presets'
 
 const getPreprocessor = (): eslint.Linter.LintOptions => {
   return {
@@ -26,10 +24,11 @@ const getPreprocessor = (): eslint.Linter.LintOptions => {
         .join(os.EOL),
     ],
     postprocess: messageLists => ([] as eslint.Linter.LintMessage[]).concat(...messageLists),
-    // @ts-expect-error
+    // @ts-expect-error types are wrong
     supportsAutofix: true,
   }
 }
+
 export const processors: Record<string, eslint.Linter.LintOptions> = {
   '.md': getPreprocessor(),
   '.yml': getPreprocessor(),
@@ -37,9 +36,9 @@ export const processors: Record<string, eslint.Linter.LintOptions> = {
 }
 
 const codegen: eslint.Rule.RuleModule = {
-  // @ts-expect-error
+  // @ts-expect-error types are wrong?
   meta: {fixable: true},
-  create: (context: eslint.Rule.RuleContext) => {
+  create(context: eslint.Rule.RuleContext) {
     const validate = () => {
       const sourceCode = context
         .getSourceCode()
@@ -87,7 +86,7 @@ const codegen: eslint.Rule.RuleModule = {
         const searchForEndMarkerUpTo =
           startMatchesIndex === startMatches.length - 1 ? sourceCode.length : startMatches[startMatchesIndex + 1].index
         const endMatch = [...matchAll(sourceCode.slice(0, searchForEndMarkerUpTo), markers.end)].find(
-          e => e.index! > startMatch.index!
+          e => e.index! > startMatch.index!,
         )
         if (!endMatch) {
           const afterStartMatch = startIndex + startMatch[0].length
@@ -97,19 +96,21 @@ const codegen: eslint.Rule.RuleModule = {
             fix: fixer =>
               fixer.replaceTextRange(
                 [afterStartMatch, afterStartMatch],
-                os.EOL + markers.end.source.replace(/\\/g, '')
+                os.EOL + markers.end.source.replace(/\\/g, ''),
               ),
           })
           return
         }
+
         const maybeOptions = tryCatch(
           () => jsYaml.safeLoad(startMatch[1]) as Record<string, unknown>,
-          err => err
+          err => err,
         )
         if (maybeOptions._tag === 'Left') {
           context.report({message: `Error parsing options. ${maybeOptions.left}`, loc: startMarkerLoc})
           return
         }
+
         const opts = maybeOptions.right || {}
         const presets: Record<string, presetsModule.Preset<unknown> | undefined> = {
           ...presetsModule,
@@ -133,13 +134,14 @@ const codegen: eslint.Rule.RuleModule = {
             const meta = {filename: context.getFilename(), existingContent}
             return preset({meta, options: opts})
           },
-          err => `${err}`
+          err => `${err}`,
         )
 
         if (result._tag === 'Left') {
           context.report({message: result.left, loc: startMarkerLoc})
           return
         }
+
         const expected = result.right
         try {
           expect(normalise(existingContent)).toBe(normalise(expected))
@@ -153,9 +155,12 @@ const codegen: eslint.Rule.RuleModule = {
         }
       })
     }
+
     validate()
     return {}
   },
 }
 
 export const rules = {codegen}
+
+export * as presets from './presets'

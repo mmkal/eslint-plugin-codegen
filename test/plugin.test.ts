@@ -37,7 +37,6 @@ describe('markdown processor', () => {
   })
 
   test('postprocessor flattens message lists', () => {
-    // @ts-expect-error
     const postprocessed = markdownProcessor.postprocess!([[{line: 1}], [{line: 2}]])
 
     expect(postprocessed).toEqual([{line: 1}, {line: 2}])

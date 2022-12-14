@@ -1,8 +1,7 @@
-import * as fs from 'fs'
-import * as os from 'os'
-import * as lodash from 'lodash'
-
 import type {Preset} from '.'
+import * as fs from 'fs'
+import * as lodash from 'lodash'
+import * as os from 'os'
 
 /**
  * Generate a table of contents from the current markdown file, based on markdown headers (e.g. `### My section title`)
@@ -21,9 +20,9 @@ export const markdownTOC: Preset<{minDepth?: number; maxDepth?: number}> = ({met
     .split('\n')
     .map(line => line.trim())
   const headings = lines
-    .filter(line => line.match(/^#+ /))
+    .filter(line => /^#+ /.exec(line))
     .filter(line => line.startsWith('#'.repeat(options.minDepth || 1)))
-    .filter(line => line.split(' ')[0].length < (options.maxDepth || Infinity))
+    .filter(line => line.split(' ')[0].length < (options.maxDepth || Number.POSITIVE_INFINITY))
   const minHashes = lodash.min(headings.map(h => h.split(' ')[0].length))!
   return headings
     .map(h => {

@@ -1,7 +1,7 @@
-import {Preset} from '.'
-import {PackageGlobbable, getLeafPackages} from './util/monorepo'
+import type {Preset} from '.'
 import * as jsYaml from 'js-yaml'
-import * as lodash from 'lodash'
+import type {PackageGlobbable} from './util/monorepo'
+import {getLeafPackages} from './util/monorepo'
 
 /**
  * Generates a yaml config for the [GitHub Pull Request Labeler Action](https://github.com/actions/labeler).
@@ -26,6 +26,6 @@ import * as lodash from 'lodash'
 export const labeler: Preset<PackageGlobbable> = ({options, meta}) => {
   const packages = getLeafPackages(options.repoRoot, meta.filename)
   return jsYaml.dump(
-    lodash.fromPairs(packages.map(p => [p.packageJson.name, [p.path.replace(/package\.json$/, '**/*')]]))
+    Object.fromEntries(packages.map(p => [p.packageJson.name, [p.path.replace(/package\.json$/, '**/*')]])),
   )
 }

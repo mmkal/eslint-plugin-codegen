@@ -105,7 +105,7 @@ tester.run('codegen', codegen.rules.codegen, {
     {
       filename: __filename,
       code: dedent`
-        // codegen:start {preset: custom, source: ./presets/custom-preset.js, export: thrower}
+        // codegen:start {preset: custom, source: ./presets/custom-preset.cjs, export: thrower}
         // codegen:end
       `,
       errors: [{message: /Error: test error!/}],

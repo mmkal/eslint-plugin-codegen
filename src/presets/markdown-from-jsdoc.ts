@@ -1,9 +1,8 @@
-import * as path from 'path'
-import * as fs from 'fs'
-import * as os from 'os'
-import * as lodash from 'lodash'
-
 import type {Preset} from '.'
+import * as fs from 'fs'
+import * as lodash from 'lodash'
+import * as os from 'os'
+import * as path from 'path'
 
 /**
  * Convert jsdoc for an es export from a javascript/typescript file to markdown.
@@ -24,8 +23,9 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
   const lines = targetContent.split('\n').map(line => line.trim())
   const exportLineIndex = lines.findIndex(line => line.startsWith(`export const ${exportName}`))
   if (exportLineIndex < 2 || lines[exportLineIndex - 1] !== '*/') {
-    throw Error(`Couldn't find export in ${relativeFile} with jsdoc called ${exportName}`)
+    throw new Error(`Couldn't find export in ${relativeFile} with jsdoc called ${exportName}`)
   }
+
   const contentUpToExport = lines.slice(0, exportLineIndex).join('\n')
   const jsdoc = contentUpToExport
     .slice(contentUpToExport.lastIndexOf('/**'))
@@ -53,6 +53,7 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
     if (sec.type === 'example') {
       return ['##### Example', '', '```typescript', sec.content, '```'].join(os.EOL)
     }
+
     if (sec.type === 'param') {
       const allParams = arr.filter(other => other.type === sec.type)
       if (sec !== allParams[0]) {
@@ -60,8 +61,8 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
       }
 
       const rows = allParams.map((p): [string, string] => {
-        const whitespaceMatch = p.content.match(/\s/)
-        const firstSpace = whitespaceMatch ? whitespaceMatch.index! : p.content.length
+        const whitespaceMatch = /\s/.exec(p.content)
+        const firstSpace = whitespaceMatch ? whitespaceMatch.index : p.content.length
         const name = p.content.slice(0, firstSpace)
         const description = p.content
           .slice(firstSpace + 1)
@@ -85,13 +86,16 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
         ...rows.map(tuple => pad(tuple)),
       ].join(os.EOL)
     }
+
     if (sec.type === 'description') {
       // line breaks that run into letters aren't respected by jsdoc, so shouldn't be in markdown either
       return sec.content.replace(/\r?\n\s*([A-Za-z])/g, ' $1')
     }
+
     if (sec.type === 'see') {
       return null
     }
+
     return [`##### ${lodash.startCase(sec.type)}`, sec.content].join(os.EOL + os.EOL)
   })
   return [`#### [${exportName}](./${relativeFile}#L${exportLineIndex + 1})`, ...formatted]

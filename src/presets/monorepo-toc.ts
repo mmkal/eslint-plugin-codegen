@@ -1,9 +1,9 @@
-import * as path from 'path'
-import * as fs from 'fs'
-import * as os from 'os'
-import * as lodash from 'lodash'
-
 import type {Preset} from '.'
+import * as fs from 'fs'
+import * as lodash from 'lodash'
+import * as os from 'os'
+import * as path from 'path'
+
 import {getLeafPackages} from './util/monorepo'
 import {relative} from './util/path'
 
@@ -45,9 +45,12 @@ export const monorepoTOC: Preset<{
     })
     .filter(props => {
       const filter = typeof options.filter === 'object' ? options.filter : {'package.name': options.filter!}
-      return Object.keys(filter)
-        .filter(key => typeof filter[key] === 'string')
-        .every(key => new RegExp(lodash.get(filter, key)).test(lodash.get(props, key)))
+      return (
+        Object.keys(filter)
+          .filter(key => typeof filter[key] === 'string')
+          // eslint-disable-next-line mmkal/@rushstack/security/no-unsafe-regexp
+          .every(key => new RegExp(lodash.get(filter, key)).test(lodash.get(props, key)))
+      )
     })
     .sort((...args) => {
       const sort = options.sort || 'package.name'
@@ -64,12 +67,12 @@ export const monorepoTOC: Preset<{
           .split('\n')
           .map(line => line.trim())
           .filter(Boolean)
-          .find(line => line.match(/^[A-Za-z]/))
+          .find(line => /^[A-Za-z]/.exec(line))
       })()
-      const name = leafPkg.name
+      const {name} = leafPkg
       const homepage =
         leafPkg.homepage || relative(path.dirname(meta.filename), leafPath).replace(/\/package.json$/, '')
-      return [`- [${name}](${homepage})`, description].filter(Boolean).join(' - ').trim()
+      return [`- [${name as string}](${homepage as string})`, description].filter(Boolean).join(' - ').trim()
     })
 
   return leafPackages.join(os.EOL)

@@ -16,7 +16,7 @@ test('named export', () => {
   expect(
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
-      options: {source: './custom-preset.js', export: 'getText', input: 'abc'},
+      options: {source: './custom-preset.cjs', export: 'getText', input: 'abc'},
     }),
   ).toMatchInlineSnapshot(`"Named export with input: abc"`)
 })
@@ -25,7 +25,7 @@ test('whole module export', () => {
   expect(
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
-      options: {source: './custom-preset.js', input: 'def'},
+      options: {source: './custom-preset.cjs', input: 'def'},
     }),
   ).toMatchInlineSnapshot(`"Whole module export with input: def"`)
 })
@@ -43,7 +43,7 @@ test('dev mode, deletes require cache', () => {
   expect(
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
-      options: {source: './custom-preset.js', input: 'ghi', dev: true},
+      options: {source: './custom-preset.cjs', input: 'ghi', dev: true},
     }),
   ).toMatchInlineSnapshot(`"Whole module export with input: ghi"`)
 })
@@ -51,7 +51,7 @@ test('dev mode, deletes require cache', () => {
 test(`when source isn't specified, uses filename`, () => {
   expect(
     preset.custom({
-      meta: {filename: path.join(__dirname, 'custom-preset.js'), existingContent: ''},
+      meta: {filename: path.join(__dirname, 'custom-preset.cjs'), existingContent: ''},
       options: {input: 'abc'},
     }),
   ).toEqual('Whole module export with input: abc')
@@ -79,25 +79,25 @@ test('errors for non-existent export', () => {
   expect(() =>
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
-      options: {source: './custom-preset.js', export: 'doesNotExist', input: 'abc'},
+      options: {source: './custom-preset.cjs', export: 'doesNotExist', input: 'abc'},
     }),
-  ).toThrow(/Couldn't find export doesNotExist from .*custom-preset.js - got undefined/)
+  ).toThrow(/Couldn't find export doesNotExist from .*custom-preset.cjs - got undefined/)
 })
 
 test('errors for export with wrong type', () => {
   expect(() =>
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
-      options: {source: './invalid-custom-preset.js', input: 'abc'},
+      options: {source: './invalid-custom-preset.cjs', input: 'abc'},
     }),
-  ).toThrow(/Couldn't find export function from .*invalid-custom-preset.js - got object/)
+  ).toThrow(/Couldn't find export function from .*invalid-custom-preset.cjs - got object/)
 })
 
 test('can require module first', () => {
   expect(() =>
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
-      options: {source: './custom-preset.js', require: 'thismoduledoesnotexist'},
+      options: {source: './custom-preset.cjs', require: 'thismoduledoesnotexist'},
     }),
   ).toThrow(/Cannot find module 'thismoduledoesnotexist' from 'src\/presets\/custom.ts'/)
 })

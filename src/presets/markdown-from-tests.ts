@@ -1,11 +1,10 @@
-import * as path from 'path'
-import * as fs from 'fs'
-import * as os from 'os'
-import * as lodash from 'lodash'
+import type {Preset} from '.'
 import {parse} from '@babel/parser'
 import traverse from '@babel/traverse'
-
-import type {Preset} from '.'
+import * as fs from 'fs'
+import * as lodash from 'lodash'
+import * as os from 'os'
+import * as path from 'path'
 
 /**
  * Use a test file to generate library usage documentation.
@@ -31,6 +30,7 @@ export const markdownFromTests: Preset<{source: string; headerLevel?: number}> =
       if (!isSpec) {
         return
       }
+
       const hasArgs =
         identifier.arguments.length >= 2 &&
         identifier.arguments[0].type === 'StringLiteral' &&
@@ -38,6 +38,7 @@ export const markdownFromTests: Preset<{source: string; headerLevel?: number}> =
       if (!hasArgs) {
         return
       }
+
       const func = identifier.arguments[1]
       const lines = sourceCode.slice(func.start, func.end).split(/\r?\n/).slice(1, -1)
       const indent = lodash.min(lines.filter(Boolean).map(line => line.length - line.trim().length))!
@@ -48,7 +49,8 @@ export const markdownFromTests: Preset<{source: string; headerLevel?: number}> =
   return specs
     .map(s => {
       const lines = [
-        `${'#'.repeat(options.headerLevel || 0)} ${s.title}${lodash.get(s, 'suffix', ':')}${os.EOL}`.trimLeft(),
+        // eslint-disable-next-line mmkal/@typescript-eslint/restrict-template-expressions
+        `${'#'.repeat(options.headerLevel || 0)} ${s.title}${lodash.get(s, 'suffix', ':')}${os.EOL}`.trimStart(),
         '```typescript',
         s.code,
         '```',

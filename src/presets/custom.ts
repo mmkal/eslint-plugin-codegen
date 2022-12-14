@@ -1,7 +1,6 @@
-import * as path from 'path'
-import * as fs from 'fs'
-
 import type {Preset} from '.'
+import * as fs from 'fs'
+import * as path from 'path'
 
 /**
  * Define your own codegen function, which will receive all options specified.
@@ -35,24 +34,26 @@ export const custom: Preset<
 > = ({meta, options}) => {
   const sourcePath = options.source ? path.join(path.dirname(meta.filename), options.source) : meta.filename
   if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) {
-    throw Error(`Source path is not a file: ${sourcePath}`)
+    throw new Error(`Source path is not a file: ${sourcePath}`)
   }
 
   const requireFirst = options.require || (sourcePath.endsWith('.ts') ? 'ts-node/register/transpile-only' : undefined)
   if (requireFirst) {
+    // eslint-disable-next-line mmkal/@typescript-eslint/no-require-imports
     require(requireFirst)
   }
 
   if (options.dev) {
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
     delete require.cache[sourcePath]
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/no-require-imports
   const sourceModule = require(sourcePath)
   const func = options.export ? sourceModule[options.export] : sourceModule
   if (typeof func !== 'function') {
-    throw Error(`Couldn't find export ${options.export || 'function'} from ${sourcePath} - got ${typeof func}`)
+    throw new TypeError(`Couldn't find export ${options.export || 'function'} from ${sourcePath} - got ${typeof func}`)
   }
+
   return func({meta, options})
 }

@@ -137,7 +137,7 @@ Generate a table of contents for a monorepo.
 ![](./gifs/monorepoTOC.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/barrel.ts, export: barrel} -->
-#### [barrel](./src/presets/barrel.ts#L34)
+#### [barrel](./src/presets/barrel.ts#L33)
 
 Bundle several modules into a single convenient one.
 
@@ -166,7 +166,7 @@ export * from './some/path/module-c'
 ![](./gifs/barrel.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
-#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L18)
+#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L17)
 
 Convert jsdoc for an es export from a javascript/typescript file to markdown.
 
@@ -187,7 +187,7 @@ Convert jsdoc for an es export from a javascript/typescript file to markdown.
 ![](./gifs/markdownFromJsdoc.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-toc.ts, export: markdownTOC} -->
-#### [markdownTOC](./src/presets/markdown-toc.ts#L17)
+#### [markdownTOC](./src/presets/markdown-toc.ts#L16)
 
 Generate a table of contents from the current markdown file, based on markdown headers (e.g. `### My section title`)
 
@@ -208,7 +208,7 @@ Generate a table of contents from the current markdown file, based on markdown h
 ![](./gifs/markdownTOC.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
-#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L22)
+#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L21)
 
 Use a test file to generate library usage documentation. Note: this has been tested with jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested.
 
@@ -256,7 +256,7 @@ Generates a yaml config for the [GitHub Pull Request Labeler Action](https://git
 ![](./gifs/labeler.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L28)
+#### [custom](./src/presets/custom.ts#L27)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
 
