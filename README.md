@@ -378,3 +378,7 @@ _Rendered_:
 - [Section1](#section1)
 - [Section2](#section2)
 </details>
+
+___
+
+The code in this repository was moved from https://github.com/mmkal/ts
