@@ -4,6 +4,7 @@ import {match} from 'io-ts-extra'
 import * as lodash from 'lodash'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
+import type {PackageJson} from 'type-fest'
 import {inspect} from 'util'
 
 export interface PackageGlobbable {
@@ -27,6 +28,6 @@ export const getLeafPackages = (repoRoot: string | undefined, filename: string) 
 
   const packages = lodash
     .flatMap(packageGlobs, pattern => glob.sync(`${pattern}/package.json`, {cwd: contextDir}))
-    .map(p => ({path: p, packageJson: readJsonFile(p)}))
+    .map(p => ({path: p, packageJson: readJsonFile<PackageJson>(p)}))
   return lodash.compact(packages)
 }

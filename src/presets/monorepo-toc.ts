@@ -72,7 +72,7 @@ export const monorepoTOC: Preset<{
       const {name} = leafPkg
       const homepage =
         leafPkg.homepage || relative(path.dirname(meta.filename), leafPath).replace(/\/package.json$/, '')
-      return [`- [${name as string}](${homepage as string})`, description].filter(Boolean).join(' - ').trim()
+      return [`- [${name}](${homepage})`, description].filter(Boolean).join(' - ').trim()
     })
 
   return leafPackages.join(os.EOL)
