@@ -3,7 +3,7 @@
 An eslint plugin for inline codegen. Auto-fixes out of sync code, with presets for barrels, jsdoc to markdown and more.
 
 [![CI](https://github.com/mmkal/eslint-plugin-codegen/actions/workflows/ci.yml/badge.svg)](https://github.com/mmkal/eslint-plugin-codegen/actions/workflows/ci.yml)
-<!-- [![](https://byob.yarr.is/mmkal/eslint-plugin-codegen/coverage)](https://github.com/mmkal/eslint-plugin-codegen/actions/workflows/ci.yml) -->
+[![](https://byob.yarr.is/mmkal/eslint-plugin-codegen/coverage)](https://github.com/mmkal/eslint-plugin-codegen/actions/workflows/ci.yml)
 ![npm](https://img.shields.io/npm/dt/eslint-plugin-codegen)
 
 ## Motivation
