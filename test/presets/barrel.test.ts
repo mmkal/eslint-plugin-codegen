@@ -1,11 +1,11 @@
-import * as preset from '../../src/presets/barrel'
 import * as glob from 'glob'
 import minimatch from 'minimatch'
+import * as preset from '../../src/presets/barrel'
 
 const mockFs: any = {}
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
@@ -32,156 +32,156 @@ test('generates typescript', () => {
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "export * from './a'
-      export * from './b'
-      export * from './c'
-      export * from './a-util'
-      export * from './b-util'
-      export * from './util'"
-    `)
+    "export * from './a'
+    export * from './b'
+    export * from './c'
+    export * from './a-util'
+    export * from './b-util'
+    export * from './util'"
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}*'},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "export * from './a'
-      export * from './b'
-      export * from './a-util'
-      export * from './b-util'"
-    `)
+    "export * from './a'
+    export * from './b'
+    export * from './a-util'
+    export * from './b-util'"
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {exclude: '*'},
-    })
+    }),
   ).toMatchInlineSnapshot(`""`)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}*', exclude: ['*util*']},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "export * from './a'
-      export * from './b'"
-    `)
+    "export * from './a'
+    export * from './b'"
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}.ts', import: 'star'},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "import * as a from './a'
-      import * as b from './b'
+    "import * as a from './a'
+    import * as b from './b'
 
-      export {
-       a,
-       b
-      }
-      "
-    `)
+    export {
+     a,
+     b
+    }
+    "
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}.ts', import: 'default'},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "import a from './a'
-      import b from './b'
+    "import a from './a'
+    import b from './b'
 
-      export {
-       a,
-       b
-      }
-      "
-    `)
+    export {
+     a,
+     b
+    }
+    "
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}.ts', import: 'star', export: 'default'},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "import * as a from './a'
-      import * as b from './b'
+    "import * as a from './a'
+    import * as b from './b'
 
-      export default {
-       a,
-       b
-      }
-      "
-    `)
+    export default {
+     a,
+     b
+    }
+    "
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}.ts', import: 'star', export: 'foo'},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "import * as a from './a'
-      import * as b from './b'
+    "import * as a from './a'
+    import * as b from './b'
 
-      export const foo = {
-       a,
-       b
-      }
-      "
-    `)
+    export const foo = {
+     a,
+     b
+    }
+    "
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'foo', keys: 'path'}},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "import * as a from './a'
-      import * as b from './b'
+    "import * as a from './a'
+    import * as b from './b'
 
-      export const foo = {
-       \\"./a\\": a,
-       \\"./b\\": b
-      }
-      "
-    `)
+    export const foo = {
+     \\"./a\\": a,
+     \\"./b\\": b
+    }
+    "
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'foo', keys: 'camelCase'}},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "import * as a from './a'
-      import * as b from './b'
+    "import * as a from './a'
+    import * as b from './b'
 
-      export const foo = {
-       a,
-       b
-      }
-      "
-    `)
+    export const foo = {
+     a,
+     b
+    }
+    "
+  `)
 
   expect(
     preset.barrel({
       meta: {filename: 'index.ts', existingContent: ''},
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'default', keys: 'path'}},
-    })
+    }),
   ).toMatchInlineSnapshot(`
-      "import * as a from './a'
-      import * as b from './b'
+    "import * as a from './a'
+    import * as b from './b'
 
-      export default {
-       \\"./a\\": a,
-       \\"./b\\": b
-      }
-      "
-    `)
+    export default {
+     \\"./a\\": a,
+     \\"./b\\": b
+    }
+    "
+  `)
 })
 
 test('is unopinionated about formatting', () => {
@@ -205,7 +205,7 @@ test('is unopinionated about formatting', () => {
         existingContent: oldContent,
       },
       options: {},
-    })
+    }),
   ).toEqual(oldContent)
 })
 
@@ -225,7 +225,7 @@ test(`generates valid identifiers for filenames that don't start with letters`, 
       options: {
         import: 'star',
       },
-    })
+    }),
   ).toMatchInlineSnapshot(`
     "import * as _20000101One from './2000-01-01.one'
     import * as two from './~two'
@@ -255,7 +255,7 @@ test(`ambiguously named files get unique, valid identifiers`, () => {
       options: {
         import: 'star',
       },
-    })
+    }),
   ).toMatchInlineSnapshot(`
     "import * as ambiguousNaming_1 from './ambiguous-naming'
     import * as ambiguousNaming_2 from './ambiguous_naming'
@@ -284,7 +284,7 @@ test(`index files are sensibly-named`, () => {
         include: '*/*',
         import: 'star',
       },
-    })
+    }),
   ).toMatchInlineSnapshot(`
     "import * as foo from './foo/index'
     import * as bar from './bar/index'

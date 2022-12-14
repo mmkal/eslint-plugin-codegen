@@ -1,10 +1,10 @@
-import * as preset from '../../src/presets/custom'
 import * as path from 'path'
+import * as preset from '../../src/presets/custom'
 
 jest.mock('ts-node/register/transpile-only')
 
 test('custom preset validation', () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires
   const customPreset = require('./custom-preset')
 
   expect(Object.keys(customPreset)).toEqual(['getText', 'thrower'])
@@ -17,7 +17,7 @@ test('named export', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './custom-preset.js', export: 'getText', input: 'abc'},
-    })
+    }),
   ).toMatchInlineSnapshot(`"Named export with input: abc"`)
 })
 
@@ -26,7 +26,7 @@ test('whole module export', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './custom-preset.js', input: 'def'},
-    })
+    }),
   ).toMatchInlineSnapshot(`"Whole module export with input: def"`)
 })
 
@@ -35,7 +35,7 @@ test('load typescript with ts-node', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './custom-preset.ts', export: 'getText'},
-    })
+    }),
   ).toMatchInlineSnapshot(`"typescript text"`)
 })
 
@@ -44,7 +44,7 @@ test('dev mode, deletes require cache', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './custom-preset.js', input: 'ghi', dev: true},
-    })
+    }),
   ).toMatchInlineSnapshot(`"Whole module export with input: ghi"`)
 })
 
@@ -53,7 +53,7 @@ test(`when source isn't specified, uses filename`, () => {
     preset.custom({
       meta: {filename: path.join(__dirname, 'custom-preset.js'), existingContent: ''},
       options: {input: 'abc'},
-    })
+    }),
   ).toEqual('Whole module export with input: abc')
 })
 
@@ -62,8 +62,8 @@ test('errors for non-existent source file', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './does-not-exist.ts'},
-    })
-  ).toThrowError(/Source path is not a file: .*does-not-exist.ts/)
+    }),
+  ).toThrow(/Source path is not a file: .*does-not-exist.ts/)
 })
 
 test('errors if directory passed as source', () => {
@@ -71,8 +71,8 @@ test('errors if directory passed as source', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: '__tests__'},
-    })
-  ).toThrowError(/Source path is not a file: .*__tests__/)
+    }),
+  ).toThrow(/Source path is not a file: .*__tests__/)
 })
 
 test('errors for non-existent export', () => {
@@ -80,8 +80,8 @@ test('errors for non-existent export', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './custom-preset.js', export: 'doesNotExist', input: 'abc'},
-    })
-  ).toThrowError(/Couldn't find export doesNotExist from .*custom-preset.js - got undefined/)
+    }),
+  ).toThrow(/Couldn't find export doesNotExist from .*custom-preset.js - got undefined/)
 })
 
 test('errors for export with wrong type', () => {
@@ -89,8 +89,8 @@ test('errors for export with wrong type', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './invalid-custom-preset.js', input: 'abc'},
-    })
-  ).toThrowError(/Couldn't find export function from .*invalid-custom-preset.js - got object/)
+    }),
+  ).toThrow(/Couldn't find export function from .*invalid-custom-preset.js - got object/)
 })
 
 test('can require module first', () => {
@@ -98,6 +98,6 @@ test('can require module first', () => {
     preset.custom({
       meta: {filename: __filename, existingContent: ''},
       options: {source: './custom-preset.js', require: 'thismoduledoesnotexist'},
-    })
-  ).toThrowError(/Cannot find module 'thismoduledoesnotexist' from 'src\/presets\/custom.ts'/)
+    }),
+  ).toThrow(/Cannot find module 'thismoduledoesnotexist' from 'src\/presets\/custom.ts'/)
 })

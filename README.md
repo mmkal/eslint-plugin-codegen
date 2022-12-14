@@ -255,7 +255,6 @@ Generates a yaml config for the [GitHub Pull Request Labeler Action](https://git
 
 ![](./gifs/labeler.gif)
 
-
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
 #### [custom](./src/presets/custom.ts#L28)
 
@@ -289,7 +288,7 @@ This can be used with:
 
 ![](./gifs/custom.gif)
 
-Note: right now, this preset isn't smart enough to follow source maps or transpile code, so `source` should point at compiled javascript, not typescript. And VSCode's eslint plugin caches modules, so if you edit the custom preset, you may need to recompile and reload VSCode for it to work properly. 
+Note: right now, this preset isn't smart enough to follow source maps or transpile code, so `source` should point at compiled javascript, not typescript. And VSCode's eslint plugin caches modules, so if you edit the custom preset, you may need to recompile and reload VSCode for it to work properly.
 
 ### Customisation
 

@@ -1,23 +1,27 @@
-import * as preset from '../../src/presets/markdown-from-jsdoc'
 import dedent from 'dedent'
+import * as preset from '../../src/presets/markdown-from-jsdoc'
 
 const mockFs: any = {}
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
 jest.mock('fs', () => {
   const actual = jest.requireActual('fs')
-  const reader = (orig: string) => (...args: any[]) => {
-    const path = args[0].replace(/\\/g, '/')
-    // const fn = path in mockFs ? mockImpl : actual[orig]
-    if (path in mockFs) {
-      return mockFs[path]
+  const reader =
+    (orig: string) =>
+    (...args: any[]) => {
+      const path = args[0].replace(/\\/g, '/')
+      // const fn = path in mockFs ? mockImpl : actual[orig]
+      if (path in mockFs) {
+        return mockFs[path]
+      }
+
+      return actual[orig](...args)
     }
-    return actual[orig](...args)
-  }
+
   return {
     readFileSync: reader('readFileSync'),
     existsSync: reader('existsSync'),
@@ -30,51 +34,51 @@ const emptyReadme = {filename: 'readme.md', existingContent: ''}
 test('generate markdown', () => {
   Object.assign(mockFs, {
     'index.ts': dedent`
-        /**
-         * Adds two numbers
-         *
-         * @example const example1 = fn(1, 2) // returns 3
-         *
-         * @description Uses js \`+\` operator
-         *
-         * @example const example1 = fn(1, 20) // returns 21
-         *
-         * @see subtract for the converse
-         *
-         * @link http://google.com has a calculator in it too
-         *
-         * @param a {number} the first number
-         * @param b {number} the second number
-         */
-        export const add = (a: number, b: number) => a + b
+      /**
+       * Adds two numbers
+       *
+       * @example const example1 = fn(1, 2) // returns 3
+       *
+       * @description Uses js \`+\` operator
+       *
+       * @example const example1 = fn(1, 20) // returns 21
+       *
+       * @see subtract for the converse
+       *
+       * @link http://google.com has a calculator in it too
+       *
+       * @param a {number} the first number
+       * @param b {number} the second number
+       */
+      export const add = (a: number, b: number) => a + b
 
-        /**
-         * Subtracts two numbers
-         *
-         * @example const example1 = subtract(5, 3) // returns 2
-         *
-         * @description Uses js \`-\` operator
-         *
-         * @param a {number} the first number
-         * @param b {number} the second number
-         */
-        export const add = (a: number, b: number) => a - b
+      /**
+       * Subtracts two numbers
+       *
+       * @example const example1 = subtract(5, 3) // returns 2
+       *
+       * @description Uses js \`-\` operator
+       *
+       * @param a {number} the first number
+       * @param b {number} the second number
+       */
+      export const add = (a: number, b: number) => a - b
 
-        /**
-         * @param a
-         * @param b
-         * multi-line description
-         * for 'b'
-         */
-        export const multiply = (a: number, b: number) => a * b
-      `,
+      /**
+       * @param a
+       * @param b
+       * multi-line description
+       * for 'b'
+       */
+      export const multiply = (a: number, b: number) => a * b
+    `,
   })
 
   expect(
     preset.markdownFromJsdoc({
       meta: emptyReadme,
       options: {source: 'index.ts', export: 'add'},
-    })
+    }),
   ).toMatchInlineSnapshot(`
     "#### [add](./index.ts#L17)
 
@@ -110,7 +114,7 @@ test('generate markdown', () => {
     preset.markdownFromJsdoc({
       meta: emptyReadme,
       options: {source: 'index.ts', export: 'multiply'},
-    })
+    }),
   ).toMatchInlineSnapshot(`
     "#### [multiply](./index.ts#L37)
 
@@ -126,15 +130,15 @@ test('generate markdown', () => {
 test('not found export', () => {
   Object.assign(mockFs, {
     'index.ts': dedent`
-        /** docs */
-        export const add = (a: number, b: number) => a + b
-      `,
+      /** docs */
+      export const add = (a: number, b: number) => a + b
+    `,
   })
 
   expect(() =>
     preset.markdownFromJsdoc({
       meta: emptyReadme,
       options: {source: 'index.ts', export: 'subtract'},
-    })
-  ).toThrowError(/Couldn't find export in .*index.ts with jsdoc called subtract/)
+    }),
+  ).toThrow(/Couldn't find export in .*index.ts with jsdoc called subtract/)
 })

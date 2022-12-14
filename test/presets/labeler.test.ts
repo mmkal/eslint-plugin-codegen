@@ -1,25 +1,29 @@
-import * as preset from '../../src/presets/labeler'
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import readPkgUp from 'read-pkg-up'
+import * as preset from '../../src/presets/labeler'
 
 const mockFs: any = {}
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+  // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
 jest.mock('fs', () => {
   const actual = jest.requireActual('fs')
-  const reader = (orig: string) => (...args: any[]) => {
-    const path = args[0].replace(process.cwd() + '\\', '').replace(/\\/g, '/')
-    // const fn = path in mockFs ? mockImpl : actual[orig]
-    if (path in mockFs) {
-      return mockFs[path]
+  const reader =
+    (orig: string) =>
+    (...args: any[]) => {
+      const path = args[0].replace(process.cwd() + '\\', '').replace(/\\/g, '/')
+      // const fn = path in mockFs ? mockImpl : actual[orig]
+      if (path in mockFs) {
+        return mockFs[path]
+      }
+
+      return actual[orig](...args)
     }
-    return actual[orig](...args)
-  }
+
   return {
     ...actual,
     readFileSync: reader('readFileSync'),
@@ -45,7 +49,7 @@ jest.spyOn(readPkgUp, 'sync').mockImplementation(options =>
       path,
       packageJson: JSON.parse(content as string),
     }))
-    .find(p => options.cwd?.includes(p.path.replace('package.json', '')))
+    .find(p => options.cwd?.includes(p.path.replace('package.json', ''))),
 )
 
 const labelerDotYml = {filename: '.github/labeler.yml', existingContent: ''}
@@ -65,7 +69,7 @@ test('generate labels', () => {
     preset.labeler({
       meta: labelerDotYml,
       options: {},
-    })
+    }),
   ).toMatchInlineSnapshot(`
     "package1-aaa:
       - packages/package1/**/*

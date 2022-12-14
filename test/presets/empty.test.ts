@@ -7,6 +7,6 @@ test('generates nothing', () => {
     preset.empty({
       meta: emptyReadme,
       options: {},
-    })
+    }),
   ).toEqual('')
 })

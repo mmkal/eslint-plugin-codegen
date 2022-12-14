@@ -1,7 +1,7 @@
-import {RuleTester} from 'eslint'
-import * as codegen from '../src'
 import baseDedent from 'dedent'
+import {RuleTester} from 'eslint'
 import * as os from 'os'
+import * as codegen from '../src'
 
 jest.mock('glob', () => ({
   sync: () => ['foo.ts', 'bar.ts'],
@@ -14,11 +14,11 @@ const dedent = (...args: Parameters<typeof baseDedent>) => {
 }
 
 Object.assign(RuleTester, {
-  /* eslint-disable jest/expect-expect, jest/valid-title */
+  /* eslint-disable mmkal/jest/expect-expect, mmkal/jest/valid-title */
   it: (name: string, fn: any) => {
     test(name.replace(/\r?\n/g, ' \\n ').trim(), fn)
   },
-  /* eslint-enable jest/expect-expect, jest/valid-title */
+  /* eslint-enable mmkal/jest/expect-expect, mmkal/jest/valid-title */
 })
 
 const tester = new RuleTester()

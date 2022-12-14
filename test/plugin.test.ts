@@ -1,5 +1,5 @@
-import {processors} from '../src'
 import dedent from 'dedent'
+import {processors} from '../src'
 
 describe('markdown processor', () => {
   const markdownProcessor = processors['.md']
