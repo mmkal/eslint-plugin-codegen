@@ -15,6 +15,12 @@ jobs:
       - run: pnpm run build
       - run: pnpm run lint
       - run: pnpm test -- --coverage --coverageReporters="json-summary"
+      - uses: ArtiomTr/jest-coverage-report-action@v2
+        id: coveragemarkdown
+        with:
+          output: report-markdown
+          coverage-file: ./coverage/coverage-summary.json
+      - run: echo '${{ steps.coveragemarkdown.outputs.report }}' > $GITHUB_STEP_SUMMARY
       - uses: actions/github-script@v6
         id: coveragejson
         with:
