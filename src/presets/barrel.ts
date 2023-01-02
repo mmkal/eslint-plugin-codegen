@@ -39,30 +39,36 @@ export const barrel: Preset<{
   const cwd = path.dirname(meta.filename)
 
   const ext = meta.filename.split('.').slice(-1)[0]
-  const pattern = opts.include || `*.${ext}`
+  const pattern = opts.include || `*.{${ext},${ext}x}`
 
   const relativeFiles = glob
     .sync(pattern, {cwd, ignore: opts.exclude})
     .filter(f => path.resolve(cwd, f) !== path.resolve(meta.filename))
     .map(f => `./${f}`.replace(/(\.\/)+\./g, '.'))
-    .filter(file => ['.js', '.mjs', '.ts', '.tsx'].includes(path.extname(file)))
-    .map(f => f.replace(/\.\w+$/, ''))
+    .map(f => {
+      const base = f.replace(/\.\w+$/, '')
+
+      const firstLetter = /[a-z]/i.exec(f)?.[0]
+      const camelCase = lodash
+        .camelCase(base)
+        .replace(/^([^a-z])/, '_$1')
+        .replace(/Index$/, '')
+      const identifier = firstLetter === firstLetter?.toUpperCase() ? lodash.upperFirst(camelCase) : camelCase
+
+      return {
+        import: ['.js', '.mjs', '.ts', '.tsx'].includes(path.extname(f)) ? base : f,
+        identifier,
+      }
+    })
 
   const expectedContent = match(opts.import)
     .case(undefined, () => {
-      return relativeFiles.map(f => `export * from '${f}'`).join('\n')
+      return relativeFiles.map(f => `export * from '${f.import}'`).join('\n')
     })
     .case(String, s => {
       const importPrefix = s === 'default' ? '' : '* as '
       const withIdentifiers = lodash
         .chain(relativeFiles)
-        .map(f => ({
-          file: f,
-          identifier: lodash
-            .camelCase(f)
-            .replace(/^([^a-z])/, '_$1')
-            .replace(/Index$/, ''),
-        }))
         .groupBy(info => info.identifier)
         .values()
         .flatMap(group =>
@@ -70,10 +76,10 @@ export const barrel: Preset<{
         )
         .value()
 
-      const imports = withIdentifiers.map(i => `import ${importPrefix}${i.identifier} from '${i.file}'`).join('\n')
+      const imports = withIdentifiers.map(i => `import ${importPrefix}${i.identifier} from '${i.import}'`).join('\n')
       const exportProps = match(opts.export)
         .case({name: String, keys: 'path'}, () =>
-          withIdentifiers.map(i => `${JSON.stringify(i.file)}: ${i.identifier}`),
+          withIdentifiers.map(i => `${JSON.stringify(i.import)}: ${i.identifier}`),
         )
         .default(() => withIdentifiers.map(i => i.identifier))
         .get()
