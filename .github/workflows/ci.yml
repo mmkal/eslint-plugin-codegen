@@ -20,6 +20,7 @@ jobs:
         with:
           output: report-markdown
           coverage-file: ./coverage/coverage-summary.json
+          base-coverage-file: ./coverage/coverage-summary.json
       - run: echo '${{ steps.coveragemarkdown.outputs.report }}' > $GITHUB_STEP_SUMMARY
       - uses: actions/github-script@v6
         id: coveragejson
