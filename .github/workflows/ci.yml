@@ -25,7 +25,7 @@ jobs:
             const colors = {'00EE00': 98, '9b9b5f': 95, 'FFFF33': 90}
             return {
               pct,
-              color: Object.entries(colors).find(e => pct >= e[1])[0] || 'FF0000',
+              color: Object.entries(colors).find(e => pct >= e[1])?.[0] || 'FF0000',
             }
       - name: coverage badge
         if: github.ref_name == 'main'
