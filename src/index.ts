@@ -60,6 +60,8 @@ const codegen: eslint.Rule.RuleModule = {
           end: /# codegen:end/g,
         },
       }
+      markersByExtension['.cts'] = markersByExtension['.ts']
+      markersByExtension['.mts'] = markersByExtension['.ts']
       markersByExtension['.tsx'] = markersByExtension['.ts']
       markersByExtension['.js'] = markersByExtension['.ts']
       markersByExtension['.cjs'] = markersByExtension['.ts']
