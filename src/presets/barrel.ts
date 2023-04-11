@@ -35,8 +35,11 @@ export const barrel: Preset<{
   exclude?: string | string[]
   import?: 'default' | 'star'
   export?: string | {name: string; keys: 'path' | 'camelCase'}
+  extension?: boolean
 }> = ({meta, options: opts}) => {
   const cwd = path.dirname(meta.filename)
+
+  const extensions = opts.extension ? [] : ['.js', '.mjs', '.ts', '.tsx']
 
   const ext = meta.filename.split('.').slice(-1)[0]
   const pattern = opts.include || `*.{${ext},${ext}x}`
@@ -56,7 +59,7 @@ export const barrel: Preset<{
       const identifier = firstLetter === firstLetter?.toUpperCase() ? lodash.upperFirst(camelCase) : camelCase
 
       return {
-        import: ['.js', '.mjs', '.ts', '.tsx'].includes(path.extname(f)) ? base : f,
+        import: extensions.includes(path.extname(f)) ? base : f,
         identifier,
       }
     })
