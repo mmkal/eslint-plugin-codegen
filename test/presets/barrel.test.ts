@@ -342,3 +342,26 @@ test(`respects pascale case imports`, () => {
     "
   `)
 })
+
+test(`it support the extensions in the output`, () => {
+  Object.assign(mockFs, {
+    'AntHill.tsx': '',
+    'BeeHive.ts': '',
+  })
+
+  expect(
+    preset.barrel({
+      meta: {filename: 'index.ts', existingContent: ''},
+      options: {import: 'star', extension: true},
+    }),
+  ).toMatchInlineSnapshot(`
+    "import * as AntHill from './AntHill.tsx'
+    import * as BeeHive from './BeeHive.ts'
+
+    export {
+     AntHill,
+     BeeHive
+    }
+    "
+  `)
+})
