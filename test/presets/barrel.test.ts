@@ -365,3 +365,25 @@ test(`it support the extensions in the output`, () => {
     "
   `)
 })
+test(`it can change the extension in the output`, () => {
+  Object.assign(mockFs, {
+    'AntHill.tsx': '',
+    'BeeHive.ts': '',
+  })
+
+  expect(
+    preset.barrel({
+      meta: {filename: 'index.ts', existingContent: ''},
+      options: {import: 'star', extension: {ts: 'js'}},
+    }),
+  ).toMatchInlineSnapshot(`
+    "import * as AntHill from './AntHill.tsx'
+    import * as BeeHive from './BeeHive.js'
+
+    export {
+     AntHill,
+     BeeHive
+    }
+    "
+  `)
+})
