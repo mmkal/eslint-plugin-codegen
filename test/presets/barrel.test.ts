@@ -35,11 +35,11 @@ test('generates typescript', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "export * from './a'
+    "export * from './a-util'
+    export * from './a'
+    export * from './b-util'
     export * from './b'
     export * from './c'
-    export * from './a-util'
-    export * from './b-util'
     export * from './util'"
   `)
 
@@ -49,10 +49,10 @@ test('generates typescript', () => {
       options: {include: '{a,b}*'},
     }),
   ).toMatchInlineSnapshot(`
-    "export * from './a'
-    export * from './b'
-    export * from './a-util'
-    export * from './b-util'"
+    "export * from './a-util'
+    export * from './a'
+    export * from './b-util'
+    export * from './b'"
   `)
 
   expect(
@@ -225,14 +225,14 @@ test(`generates valid identifiers for filenames that don't start with letters`, 
       },
     }),
   ).toMatchInlineSnapshot(`
-    "import * as _20000101One from './2000-01-01.one'
+    "import * as three from './_three'
     import * as two from './~two'
-    import * as three from './_three'
+    import * as _20000101One from './2000-01-01.one'
 
     export {
-     _20000101One,
+     three,
      two,
-     three
+     _20000101One
     }
     "
   `)
@@ -252,8 +252,8 @@ test(`ambiguously named files get unique, valid identifiers`, () => {
       },
     }),
   ).toMatchInlineSnapshot(`
-    "import * as ambiguousNaming_1 from './ambiguous-naming'
-    import * as ambiguousNaming_2 from './ambiguous_naming'
+    "import * as ambiguousNaming_1 from './ambiguous_naming'
+    import * as ambiguousNaming_2 from './ambiguous-naming'
 
     export {
      ambiguousNaming_1,
@@ -278,12 +278,12 @@ test(`index files are sensibly-named`, () => {
       },
     }),
   ).toMatchInlineSnapshot(`
-    "import * as foo from './foo/index'
-    import * as bar from './bar/index'
+    "import * as bar from './bar/index'
+    import * as foo from './foo/index'
 
     export {
-     foo,
-     bar
+     bar,
+     foo
     }
     "
   `)
