@@ -1,4 +1,10 @@
-export type Preset<Options> = (params: {meta: {filename: string; existingContent: string}; options: Options}) => string
+export type PresetMeta = {
+  filename: string
+  existingContent: string
+  glob: (pattern: string, opts: any) => string[]
+}
+
+export type Preset<Options> = (params: {meta: PresetMeta; options: Options}) => string
 
 // codegen:start {preset: barrel}
 export * from './barrel'

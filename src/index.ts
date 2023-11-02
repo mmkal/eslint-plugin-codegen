@@ -2,6 +2,7 @@
 import type * as eslint from 'eslint'
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
+import {glob} from 'glob'
 import * as jsYaml from 'js-yaml'
 import * as os from 'os'
 import * as path from 'path'
@@ -133,7 +134,7 @@ const codegen: eslint.Rule.RuleModule = {
 
         const result = tryCatch(
           () => {
-            const meta = {filename: context.getFilename(), existingContent}
+            const meta: presetsModule.PresetMeta = {filename: context.getFilename(), existingContent, glob: glob.sync}
             return preset({meta, options: opts})
           },
           err => `${err}`,
