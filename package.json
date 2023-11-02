@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-codegen",
-  "version": "0.18.0-4",
+  "version": "0.18.0-5",
   "keywords": [
     "typescript",
     "type-check",
