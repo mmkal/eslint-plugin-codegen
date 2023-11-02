@@ -75,6 +75,7 @@ export const barrel: Preset<{
         .flatMap(group =>
           group.length === 1 ? group : group.map((info, i) => ({...info, identifier: `${info.identifier}_${i + 1}`})),
         )
+        .orderBy(val => val.import)
         .value()
 
       const imports = withIdentifiers.map(i => `import ${importPrefix}${i.identifier} from '${i.import}'`).join('\n')
