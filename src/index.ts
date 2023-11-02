@@ -2,6 +2,7 @@
 import type * as eslint from 'eslint'
 import expect from 'expect'
 import {tryCatch, toUnion} from 'fp-ts/lib/Either'
+import * as fs from 'fs'
 import {globSync} from 'glob'
 import * as jsYaml from 'js-yaml'
 import * as os from 'os'
@@ -134,11 +135,16 @@ const codegen: eslint.Rule.RuleModule = {
 
         const format = tryCatch(
           () => {
-            // eslint-disable-next-line mmkal/import/no-extraneous-dependencies, mmkal/@typescript-eslint/no-require-imports, mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/consistent-type-imports
+            // eslint-disable-next-line mmkal/import/no-extraneous-dependencies, mmkal/@typescript-eslint/no-require-imports, mmkal/@typescript-eslint/no-var-requires
             const prettier = require('prettier') as typeof import('prettier')
             return (input: string) => prettier.format(input, {filepath: context.getFilename()})
           },
-          () => undefined,
+          e => (input: string) => {
+            const msg = `Encountered error ${e} trying to format using prettier. No formatting will be applied. Try installing prettier, or live without auto-formatting`
+            // eslint-disable-next-line no-console
+            console.warn(msg)
+            return input
+          },
         )
 
         const result = tryCatch(
@@ -148,6 +154,8 @@ const codegen: eslint.Rule.RuleModule = {
               existingContent,
               glob: globSync,
               format: toUnion(format),
+              fs,
+              path,
             }
             return preset({meta, options: opts})
           },

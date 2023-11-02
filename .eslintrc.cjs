@@ -18,6 +18,7 @@ module.exports = {
     'mmkal/@typescript-eslint/no-unsafe-assignment': 'off',
     'mmkal/@typescript-eslint/no-unsafe-return': 'off',
     'mmkal/@rushstack/hoist-jest-mock': 'off',
+    'mmkal/@typescript-eslint/consistent-type-imports': 'off',
   },
 }
 
