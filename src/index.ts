@@ -1,7 +1,7 @@
 /* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
 import type * as eslint from 'eslint'
 import expect from 'expect'
-import {tryCatch, toUnion} from 'fp-ts/lib/Either'
+import {tryCatch} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
 import {globSync} from 'glob'
 import * as jsYaml from 'js-yaml'
@@ -141,8 +141,7 @@ const codegen: eslint.Rule.RuleModule = {
           },
           e => (input: string) => {
             const msg = `Encountered error ${e} trying to format using prettier. No formatting will be applied. Try installing prettier, or live without auto-formatting`
-            // eslint-disable-next-line no-console
-            console.warn(msg)
+            context.report({message: msg, loc: startMarkerLoc})
             return input
           },
         )
@@ -153,7 +152,7 @@ const codegen: eslint.Rule.RuleModule = {
               filename: context.getFilename(),
               existingContent,
               glob: globSync,
-              format: toUnion(format),
+              format: format._tag === 'Right' ? format.right : format.left,
               fs,
               path,
             }
