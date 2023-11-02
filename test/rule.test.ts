@@ -97,8 +97,8 @@ tester.run('codegen', codegen.rules.codegen, {
       errors: [{message: /content doesn't match/}],
       output: dedent`
         // codegen:start {preset: barrel}
-        export * from './foo'
         export * from './bar'
+        export * from './foo'
         // codegen:end
       `,
     },
