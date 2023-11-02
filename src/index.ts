@@ -1,7 +1,7 @@
 /* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
 import type * as eslint from 'eslint'
 import expect from 'expect'
-import {tryCatch} from 'fp-ts/lib/Either'
+import {tryCatch, toUnion} from 'fp-ts/lib/Either'
 import {globSync} from 'glob'
 import * as jsYaml from 'js-yaml'
 import * as os from 'os'
@@ -132,9 +132,23 @@ const codegen: eslint.Rule.RuleModule = {
         const existingContent = sourceCode.slice(...range)
         const normalise = (val: string) => val.trim().replace(/\r?\n/g, os.EOL)
 
+        const format = tryCatch(
+          () => {
+            // eslint-disable-next-line mmkal/import/no-extraneous-dependencies, mmkal/@typescript-eslint/no-require-imports, mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/consistent-type-imports
+            const prettier = require('prettier') as typeof import('prettier')
+            return (input: string) => prettier.format(input, {filepath: context.getFilename()})
+          },
+          () => undefined,
+        )
+
         const result = tryCatch(
           () => {
-            const meta: presetsModule.PresetMeta = {filename: context.getFilename(), existingContent, glob: globSync}
+            const meta: presetsModule.PresetMeta = {
+              filename: context.getFilename(),
+              existingContent,
+              glob: globSync,
+              format: toUnion(format),
+            }
             return preset({meta, options: opts})
           },
           err => `${err}`,

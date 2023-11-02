@@ -2,6 +2,7 @@ export type PresetMeta = {
   filename: string
   existingContent: string
   glob: (pattern: string, opts: any) => string[]
+  format: ((input: string) => string) | undefined
 }
 
 export type Preset<Options> = (params: {meta: PresetMeta; options: Options}) => string
