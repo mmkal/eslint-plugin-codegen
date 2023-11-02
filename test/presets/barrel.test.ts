@@ -1,6 +1,7 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/barrel'
+import {meta} from './meta'
 
 const mockFs: any = {}
 
@@ -11,9 +12,9 @@ beforeEach(() => {
 
 jest.mock('glob')
 
-jest.spyOn(glob, 'sync').mockImplementation((pattern, opts) => {
-  const found = Object.keys(mockFs).filter(k => minimatch(k, pattern))
-  const ignores = typeof opts?.ignore === 'string' ? [opts?.ignore] : opts?.ignore || []
+jest.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
+  const found = Object.keys(mockFs).filter(k => minimatch(k, pattern as string))
+  const ignores = (typeof opts?.ignore === 'string' ? [opts?.ignore] : opts?.ignore || []) as string[]
   return found.filter(f => ignores.every(i => !minimatch(f, i)))
 })
 
@@ -30,7 +31,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {},
     }),
   ).toMatchInlineSnapshot(`
@@ -44,7 +45,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}*'},
     }),
   ).toMatchInlineSnapshot(`
@@ -56,14 +57,14 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {exclude: '*'},
     }),
   ).toMatchInlineSnapshot(`""`)
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}*', exclude: ['*util*']},
     }),
   ).toMatchInlineSnapshot(`
@@ -73,7 +74,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}.ts', import: 'star'},
     }),
   ).toMatchInlineSnapshot(`
@@ -89,7 +90,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}.ts', import: 'default'},
     }),
   ).toMatchInlineSnapshot(`
@@ -105,7 +106,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}.ts', import: 'star', export: 'default'},
     }),
   ).toMatchInlineSnapshot(`
@@ -121,7 +122,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}.ts', import: 'star', export: 'foo'},
     }),
   ).toMatchInlineSnapshot(`
@@ -137,7 +138,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'foo', keys: 'path'}},
     }),
   ).toMatchInlineSnapshot(`
@@ -153,7 +154,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'foo', keys: 'camelCase'}},
     }),
   ).toMatchInlineSnapshot(`
@@ -169,7 +170,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'default', keys: 'path'}},
     }),
   ).toMatchInlineSnapshot(`
@@ -201,7 +202,7 @@ test('is unopinionated about formatting', () => {
   expect(
     preset.barrel({
       meta: {
-        filename: 'index.ts',
+        ...meta,
         existingContent: oldContent,
       },
       options: {},
@@ -218,10 +219,7 @@ test(`generates valid identifiers for filenames that don't start with letters`, 
 
   expect(
     preset.barrel({
-      meta: {
-        filename: 'index.ts',
-        existingContent: '',
-      },
+      meta,
       options: {
         import: 'star',
       },
@@ -248,10 +246,7 @@ test(`ambiguously named files get unique, valid identifiers`, () => {
 
   expect(
     preset.barrel({
-      meta: {
-        filename: 'index.ts',
-        existingContent: '',
-      },
+      meta,
       options: {
         import: 'star',
       },
@@ -276,10 +271,7 @@ test(`index files are sensibly-named`, () => {
 
   expect(
     preset.barrel({
-      meta: {
-        filename: 'barrel.ts',
-        existingContent: '',
-      },
+      meta,
       options: {
         include: '*/*',
         import: 'star',
@@ -305,7 +297,7 @@ test(`supports asset imports`, () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {include: '*.{jpg,png}', import: 'default'},
     }),
   ).toMatchInlineSnapshot(`
@@ -328,7 +320,7 @@ test(`respects pascale case imports`, () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {import: 'star'},
     }),
   ).toMatchInlineSnapshot(`

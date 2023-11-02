@@ -1,5 +1,6 @@
 import dedent from 'dedent'
 import * as preset from '../../src/presets/markdown-toc'
+import {meta} from './meta'
 
 const mockFs: any = {}
 
@@ -30,7 +31,7 @@ jest.mock('fs', () => {
   }
 })
 
-const emptyReadme = {filename: 'readme.md', existingContent: ''}
+const emptyReadme = {...meta, filename: 'readme.md', existingContent: ''}
 
 test('generate markdown', () => {
   Object.assign(mockFs, {

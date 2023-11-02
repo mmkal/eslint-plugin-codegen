@@ -4,7 +4,7 @@ import * as os from 'os'
 import * as codegen from '../src'
 
 jest.mock('glob', () => ({
-  sync: () => ['foo.ts', 'bar.ts'],
+  globSync: () => ['foo.ts', 'bar.ts'],
 }))
 
 /** wrapper for dedent which respects os.EOL */

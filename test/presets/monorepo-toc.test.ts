@@ -2,6 +2,7 @@ import dedent from 'dedent'
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/monorepo-toc'
+import {meta} from './meta'
 
 const mockFs: any = {}
 
@@ -38,13 +39,13 @@ jest.mock('fs', () => {
 
 jest.mock('glob')
 
-jest.spyOn(glob, 'sync').mockImplementation((pattern, opts) => {
-  const found = Object.keys(mockFs).filter(k => minimatch(k, pattern))
+jest.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
+  const found = Object.keys(mockFs).filter(k => minimatch(k, pattern as string))
   const ignores = typeof opts?.ignore === 'string' ? [opts?.ignore] : opts?.ignore || []
-  return found.filter(f => ignores.every(i => !minimatch(f, i)))
+  return found.filter(f => (ignores as string[]).every(i => !minimatch(f, i)))
 })
 
-const emptyReadme = {filename: 'readme.md', existingContent: ''}
+const emptyReadme = {...meta, filename: 'readme.md', existingContent: ''}
 
 beforeEach(() => {
   Object.assign(mockFs, {
@@ -140,7 +141,7 @@ test('generate markdown default to lerna to find packages', () => {
 test('generate markdown fails when no package.json exists', () => {
   expect(() =>
     preset.monorepoTOC({
-      meta: {filename: 'subdir/test.md', existingContent: ''},
+      meta: {...meta, filename: 'subdir/test.md', existingContent: ''},
       options: {},
     }),
   ).toThrow(/ENOENT: no such file or directory, open '.*subdir.*package.json'/)
@@ -149,7 +150,7 @@ test('generate markdown fails when no package.json exists', () => {
 test('generate markdown with separate rootDir', () => {
   expect(
     preset.monorepoTOC({
-      meta: {filename: 'subdir/test.md', existingContent: ''},
+      meta: {...meta, filename: 'subdir/test.md', existingContent: ''},
       options: {repoRoot: '..'},
     }),
   ).toMatchInlineSnapshot(`
