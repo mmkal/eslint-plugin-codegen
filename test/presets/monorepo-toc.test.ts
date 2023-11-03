@@ -2,7 +2,9 @@ import dedent from 'dedent'
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/monorepo-toc'
-import {meta} from './meta'
+import {getMeta} from './meta'
+
+const meta = getMeta(__filename)
 
 const mockFs: any = {}
 

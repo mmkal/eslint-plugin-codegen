@@ -2,7 +2,9 @@ import * as glob from 'glob'
 import minimatch from 'minimatch'
 import readPkgUp from 'read-pkg-up'
 import * as preset from '../../src/presets/labeler'
-import {meta} from './meta'
+import {getMeta} from './meta'
+
+const meta = getMeta(__filename)
 
 const mockFs: any = {}
 

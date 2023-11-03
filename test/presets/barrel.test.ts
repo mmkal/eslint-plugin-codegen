@@ -1,7 +1,9 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/barrel'
-import {meta} from './meta'
+import {getMeta} from './meta'
+
+const meta = getMeta(__filename)
 
 const mockFs: any = {}
 
@@ -35,11 +37,12 @@ test('generates typescript', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "export * from './a-util'
-    export * from './a'
-    export * from './b-util'
+    "export * from './a'
+    export * from './a-util'
     export * from './b'
+    export * from './b-util'
     export * from './c'
+    export * from './index'
     export * from './util'"
   `)
 
@@ -49,10 +52,10 @@ test('generates typescript', () => {
       options: {include: '{a,b}*'},
     }),
   ).toMatchInlineSnapshot(`
-    "export * from './a-util'
-    export * from './a'
-    export * from './b-util'
-    export * from './b'"
+    "export * from './a'
+    export * from './a-util'
+    export * from './b'
+    export * from './b-util'"
   `)
 
   expect(
@@ -187,7 +190,6 @@ test('generates typescript', () => {
 
 test('is unopinionated about formatting', () => {
   Object.assign(mockFs, {
-    'index.ts': '',
     'a.ts': '',
     'b.ts': '',
     'c.ts': '',

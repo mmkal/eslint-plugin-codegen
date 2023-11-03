@@ -1,6 +1,8 @@
 import * as path from 'path'
 import * as preset from '../../src/presets/custom'
-import {meta} from './meta'
+import {getMeta} from './meta'
+
+const meta = getMeta(__filename)
 
 jest.mock('ts-node/register/transpile-only')
 

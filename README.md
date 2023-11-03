@@ -256,7 +256,7 @@ Generates a yaml config for the [GitHub Pull Request Labeler Action](https://git
 ![](./gifs/labeler.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L27)
+#### [custom](./src/presets/custom.ts#L32)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
 
@@ -266,22 +266,23 @@ Define your own codegen function, which will receive all options specified. Impo
 import {Preset} from 'eslint-plugin-codegen'
 
 export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
-  return 'filename: ' + meta.filename + '\\ncustom prop: ' + options.myCustomProp
+  const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
+  return `filename: ${meta.filename}\ncustom prop: ${options.myCustomProp}\nComponent paths: ${components.join(', ')}`
 }
 ```
 
 This can be used with:
 
-`<!-- codegen:start {preset: custom, source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
+`<!-- codegen:start {preset: custom, source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}` Note that a `glob` helper method is passed to the preset via `meta`. This uses the `globSync` method of https://npm.im/glob. There are also `fs` and `path` helpers passed, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them being production dependencies.
 
 ##### Params
 
-|name   |description                                                                                                                       |
-|-------|----------------------------------------------------------------------------------------------------------------------------------|
-|source |Relative path to the module containing the custom preset.                                                                         |
-|export |The name of the export. If omitted, the module itself should be a preset function.                                                |
-|require|A module to load before `source`. If not set, defaults to `ts-node/register/transpile-only` for typescript sources.               |
-|dev    |Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload.|
+|name   |description                                                                                                                                                                                              |
+|-------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|source |Relative path to the module containing the custom preset. Default: the file being linted.                                                                                                                |
+|export |The name of the export. If omitted, the module's default export should be a preset function.                                                                                                             |
+|require|A module to load before `source`. If not set, defaults to `ts-node/register/transpile-only` for typescript sources.                                                                                      |
+|dev    |Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.|
 <!-- codegen:end -->
 
 ##### Demo

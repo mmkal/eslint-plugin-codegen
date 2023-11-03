@@ -1,5 +1,7 @@
 import * as preset from '../../src/presets/empty'
-import {meta} from './meta'
+import {getMeta} from './meta'
+
+const meta = getMeta(__filename)
 
 const emptyReadme = {filename: 'readme.md', existingContent: ''}
 

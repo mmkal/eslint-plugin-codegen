@@ -1,6 +1,8 @@
 import dedent from 'dedent'
 import * as preset from '../../src/presets/markdown-from-jsdoc'
-import {meta} from './meta'
+import {getMeta} from './meta'
+
+const meta = getMeta(__filename)
 
 const mockFs: any = {}
 
@@ -24,6 +26,7 @@ jest.mock('fs', () => {
     }
 
   return {
+    ...actual,
     readFileSync: reader('readFileSync'),
     existsSync: reader('existsSync'),
     readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
