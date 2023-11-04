@@ -11,7 +11,8 @@ import * as path from 'path'
  * import {Preset} from 'eslint-plugin-codegen'
  *
  * export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
- *   return 'filename: ' + meta.filename + '\\ncustom prop: ' + options.myCustomProp
+ *   const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
+ *   return `filename: ${meta.filename}\ncustom prop: ${options.myCustomProp}\nComponent paths: ${components.join(', ')}`
  * }
  *
  * @description
@@ -19,10 +20,14 @@ import * as path from 'path'
  *
  * `<!-- codegen:start {preset: custom, source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
  *
- * @param source Relative path to the module containing the custom preset.
- * @param export The name of the export. If omitted, the module itself should be a preset function.
+ * Note that a `glob` helper method is passed to the preset via `meta`. This uses the `globSync` method of https://npm.im/glob. There are also `fs`
+ * and `path` helpers passed, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them
+ * being production dependencies.
+ *
+ * @param source Relative path to the module containing the custom preset. Default: the file being linted.
+ * @param export The name of the export. If omitted, the module's default export should be a preset function.
  * @param require A module to load before `source`. If not set, defaults to `ts-node/register/transpile-only` for typescript sources.
- * @param dev Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload.
+ * @param dev Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.
  */
 export const custom: Preset<
   {
@@ -43,7 +48,7 @@ export const custom: Preset<
     require(requireFirst)
   }
 
-  if (options.dev) {
+  if (options.dev ?? !process.env.CI) {
     // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
     delete require.cache[sourcePath]
   }

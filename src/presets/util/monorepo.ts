@@ -1,5 +1,5 @@
 import * as fs from 'fs'
-import * as glob from 'glob'
+import {globSync} from 'glob'
 import {match} from 'io-ts-extra'
 import * as lodash from 'lodash'
 import * as path from 'path'
@@ -27,7 +27,7 @@ export const getLeafPackages = (repoRoot: string | undefined, filename: string) 
   }
 
   const packages = lodash
-    .flatMap(packageGlobs, pattern => glob.sync(`${pattern}/package.json`, {cwd: contextDir}))
+    .flatMap(packageGlobs, pattern => globSync(`${pattern}/package.json`, {cwd: contextDir}))
     .map(p => ({path: p, packageJson: readJsonFile<PackageJson>(p)}))
   return lodash.compact(packages)
 }

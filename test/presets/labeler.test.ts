@@ -2,6 +2,9 @@ import * as glob from 'glob'
 import minimatch from 'minimatch'
 import readPkgUp from 'read-pkg-up'
 import * as preset from '../../src/presets/labeler'
+import {getMeta} from './meta'
+
+const meta = getMeta(__filename)
 
 const mockFs: any = {}
 
@@ -35,10 +38,10 @@ jest.mock('fs', () => {
 
 jest.mock('glob')
 
-jest.spyOn(glob, 'sync').mockImplementation((pattern, opts) => {
-  const found = Object.keys(mockFs).filter(k => minimatch(k, pattern))
+jest.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
+  const found = Object.keys(mockFs).filter(k => minimatch(k, pattern as string))
   const ignores = typeof opts?.ignore === 'string' ? [opts?.ignore] : opts?.ignore || []
-  return found.filter(f => ignores.every(i => !minimatch(f, i)))
+  return found.filter(f => (ignores as string[]).every(i => !minimatch(f, i)))
 })
 
 jest.mock('read-pkg-up')
@@ -52,7 +55,7 @@ jest.spyOn(readPkgUp, 'sync').mockImplementation(options =>
     .find(p => options.cwd?.includes(p.path.replace('package.json', ''))),
 )
 
-const labelerDotYml = {filename: '.github/labeler.yml', existingContent: ''}
+const labelerDotYml = {...meta, filename: '.github/labeler.yml', existingContent: ''}
 
 beforeEach(() => {
   Object.assign(mockFs, {

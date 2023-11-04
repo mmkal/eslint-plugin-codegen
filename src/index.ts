@@ -2,6 +2,8 @@
 import type * as eslint from 'eslint'
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
+import * as fs from 'fs'
+import {globSync} from 'glob'
 import * as jsYaml from 'js-yaml'
 import * as os from 'os'
 import * as path from 'path'
@@ -131,9 +133,29 @@ const codegen: eslint.Rule.RuleModule = {
         const existingContent = sourceCode.slice(...range)
         const normalise = (val: string) => val.trim().replace(/\r?\n/g, os.EOL)
 
+        const format = tryCatch(
+          () => {
+            // eslint-disable-next-line mmkal/import/no-extraneous-dependencies, mmkal/@typescript-eslint/no-require-imports, mmkal/@typescript-eslint/no-var-requires
+            const prettier = require('prettier') as typeof import('prettier')
+            return (input: string) => prettier.format(input, {filepath: context.getFilename()})
+          },
+          e => (input: string) => {
+            const msg = `Encountered error ${e} trying to format using prettier. No formatting will be applied. Try installing prettier, or live without auto-formatting`
+            context.report({message: msg, loc: startMarkerLoc})
+            return input
+          },
+        )
+
         const result = tryCatch(
           () => {
-            const meta = {filename: context.getFilename(), existingContent}
+            const meta: presetsModule.PresetMeta = {
+              filename: context.getFilename(),
+              existingContent,
+              glob: globSync,
+              format: format._tag === 'Right' ? format.right : format.left,
+              fs,
+              path,
+            }
             return preset({meta, options: opts})
           },
           err => `${err}`,

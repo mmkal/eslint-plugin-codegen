@@ -42,7 +42,8 @@ export const barrel: Preset<{
   const pattern = opts.include || `*.{${ext},${ext}x}`
 
   const relativeFiles = glob
-    .sync(pattern, {cwd, ignore: opts.exclude})
+    .globSync(pattern, {cwd, ignore: opts.exclude})
+    .sort((a, b) => a.localeCompare(b))
     .filter(f => path.resolve(cwd, f) !== path.resolve(meta.filename))
     .map(f => `./${f}`.replace(/(\.\/)+\./g, '.'))
     .map(f => {
@@ -60,6 +61,7 @@ export const barrel: Preset<{
         identifier,
       }
     })
+    .sort((a, b) => a.import.localeCompare(b.import))
 
   const expectedContent = match(opts.import)
     .case(undefined, () => {
