@@ -4,7 +4,7 @@ import * as os from 'os'
 import * as codegen from '../src'
 
 jest.mock('glob', () => ({
-  sync: () => ['foo.ts', 'bar.ts'],
+  globSync: () => ['foo.ts', 'bar.ts'],
 }))
 
 /** wrapper for dedent which respects os.EOL */
@@ -97,8 +97,8 @@ tester.run('codegen', codegen.rules.codegen, {
       errors: [{message: /content doesn't match/}],
       output: dedent`
         // codegen:start {preset: barrel}
-        export * from './foo'
         export * from './bar'
+        export * from './foo'
         // codegen:end
       `,
     },
