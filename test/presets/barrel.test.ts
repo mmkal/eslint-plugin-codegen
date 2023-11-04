@@ -345,7 +345,7 @@ test(`it support the extensions in the output`, () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {import: 'star', extension: true},
     }),
   ).toMatchInlineSnapshot(`
@@ -367,7 +367,7 @@ test(`it can change the extension in the output`, () => {
 
   expect(
     preset.barrel({
-      meta: {filename: 'index.ts', existingContent: ''},
+      meta,
       options: {import: 'star', extension: {ts: 'js'}},
     }),
   ).toMatchInlineSnapshot(`
