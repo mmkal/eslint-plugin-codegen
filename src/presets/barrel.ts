@@ -6,6 +6,8 @@ import {match} from 'io-ts-extra'
 import * as lodash from 'lodash'
 import * as path from 'path'
 
+const defaultExtensions = ['.js', '.mjs', '.ts', '.tsx']
+const defaultExtensionsMap = Object.fromEntries(defaultExtensions.map(e => [e.replace('.', ''), e.replace('.', '')]))
 /**
  * Bundle several modules into a single convenient one.
  *
@@ -29,14 +31,22 @@ import * as path from 'path'
  * If specified, matching modules will be bundled into a const or default export based on this name. If set
  * to `{name: someName, keys: path}` the relative file paths will be used as keys. Otherwise the file paths
  * will be camel-cased to make them valid js identifiers.
+ * @param extension
+ * [optional] Useful for ESM modules. If set to true files will be imported with the file extension.
+ * If set to an object, extensions will be converted using this object.
  */
 export const barrel: Preset<{
   include?: string
   exclude?: string | string[]
   import?: 'default' | 'star'
   export?: string | {name: string; keys: 'path' | 'camelCase'}
+  extension?: boolean | Record<string, string>
 }> = ({meta, options: opts}) => {
   const cwd = path.dirname(meta.filename)
+
+  const extensionsToRemove = opts.extension ? [] : defaultExtensions
+
+  const extensionMap = typeof opts.extension === 'object' ? opts.extension : defaultExtensionsMap
 
   const ext = meta.filename.split('.').slice(-1)[0]
   const pattern = opts.include || `*.{${ext},${ext}x}`
@@ -49,6 +59,8 @@ export const barrel: Preset<{
     .map(f => {
       const base = f.replace(/\.\w+$/, '')
 
+      const replacedExtension = f.replace(`.${ext}`, `.${extensionMap[ext]}`)
+
       const firstLetter = /[a-z]/i.exec(f)?.[0]
       const camelCase = lodash
         .camelCase(base)
@@ -57,7 +69,7 @@ export const barrel: Preset<{
       const identifier = firstLetter === firstLetter?.toUpperCase() ? lodash.upperFirst(camelCase) : camelCase
 
       return {
-        import: ['.js', '.mjs', '.ts', '.tsx'].includes(path.extname(f)) ? base : f,
+        import: extensionsToRemove.includes(path.extname(f)) ? base : f.endsWith(ext) ? replacedExtension : f,
         identifier,
       }
     })
