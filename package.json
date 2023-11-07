@@ -30,6 +30,7 @@
     "cleanup": false
   },
   "scripts": {
+    "prepare": "pnpm build",
     "eslint": "eslint --ext '.ts,.js,.md'",
     "lint": "tsc && eslint .",
     "build": "tsc -p tsconfig.lib.json",
