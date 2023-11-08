@@ -6,3 +6,5 @@ coverage
 # ignore non-pnpm lockfiles
 package-lock.json
 yarn.lock
+
+*.tgz
