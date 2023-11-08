@@ -22,7 +22,7 @@ export type PresetParams<Options = {}> = {
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
 }
 
-export type Preset<Options extends Record<string, unknown> = {}> = (params: PresetParams<Options>) => string
+export type Preset<Options extends {} = {}> = (params: PresetParams<Options>) => string
 
 // codegen:start {preset: barrel}
 export * from './barrel'
