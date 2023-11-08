@@ -36,7 +36,7 @@ export const custom: Preset<
     require?: string
     dev?: boolean
   } & Record<string, unknown>
-> = ({meta, options}) => {
+> = ({meta, options, ...rest}) => {
   const sourcePath = options.source ? path.join(path.dirname(meta.filename), options.source) : meta.filename
   if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) {
     throw new Error(`Source path is not a file: ${sourcePath}`)
@@ -55,10 +55,10 @@ export const custom: Preset<
 
   // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/no-require-imports
   const sourceModule = require(sourcePath)
-  const func = options.export ? sourceModule[options.export] : sourceModule
+  const func: Preset<any> = options.export ? sourceModule[options.export] : sourceModule
   if (typeof func !== 'function') {
     throw new TypeError(`Couldn't find export ${options.export || 'function'} from ${sourcePath} - got ${typeof func}`)
   }
 
-  return func({meta, options})
+  return func({meta, options, ...rest})
 }
