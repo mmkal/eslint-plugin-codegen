@@ -1,6 +1,6 @@
 node_modules
 dist
-*ignoreme*
+**ignoreme*
 coverage
 
 # ignore non-pnpm lockfiles

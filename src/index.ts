@@ -1,13 +1,25 @@
 /* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
+import * as dedent from 'dedent'
 import type * as eslint from 'eslint'
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
 import {globSync} from 'glob'
+import * as glob from 'glob'
 import * as jsYaml from 'js-yaml'
+import lodash from 'lodash'
 import * as os from 'os'
 import * as path from 'path'
+import * as readPkgUp from 'read-pkg-up'
 import * as presetsModule from './presets'
+
+let prettier: typeof import('prettier') | undefined
+try {
+  // eslint-disable-next-line mmkal/import/no-extraneous-dependencies, mmkal/@typescript-eslint/no-require-imports
+  prettier = require('prettier')
+} catch {
+  // no prettier - that's ok
+}
 
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
@@ -116,7 +128,7 @@ const codegen: eslint.Rule.RuleModule = {
         }
 
         const opts = maybeOptions.right || {}
-        const presets: Record<string, presetsModule.Preset<unknown> | undefined> = {
+        const presets: Record<string, presetsModule.Preset | undefined> = {
           ...presetsModule,
           ...context.options[0]?.presets,
         }
@@ -133,30 +145,29 @@ const codegen: eslint.Rule.RuleModule = {
         const existingContent = sourceCode.slice(...range)
         const normalise = (val: string) => val.trim().replace(/\r?\n/g, os.EOL)
 
-        const format = tryCatch(
-          () => {
-            // eslint-disable-next-line mmkal/import/no-extraneous-dependencies, mmkal/@typescript-eslint/no-require-imports, mmkal/@typescript-eslint/no-var-requires
-            const prettier = require('prettier') as typeof import('prettier')
-            return (input: string) => prettier.format(input, {filepath: context.getFilename()})
-          },
-          e => (input: string) => {
-            const msg = `Encountered error ${e} trying to format using prettier. No formatting will be applied. Try installing prettier, or live without auto-formatting`
-            context.report({message: msg, loc: startMarkerLoc})
-            return input
-          },
-        )
-
         const result = tryCatch(
           () => {
             const meta: presetsModule.PresetMeta = {
               filename: context.getFilename(),
               existingContent,
               glob: globSync,
-              format: format._tag === 'Right' ? format.right : format.left,
+              format: (input: string) => prettier?.format(input) || input,
               fs,
               path,
             }
-            return preset({meta, options: opts})
+            return preset({
+              meta,
+              options: opts,
+              context,
+              dedent,
+              fs,
+              glob,
+              jsYaml,
+              lodash,
+              path,
+              prettier,
+              readPkgUp,
+            })
           },
           err => `${err}`,
         )
