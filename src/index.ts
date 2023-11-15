@@ -13,14 +13,6 @@ import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
 import * as presetsModule from './presets'
 
-let prettier: typeof import('prettier') | undefined
-try {
-  // eslint-disable-next-line mmkal/import/no-extraneous-dependencies, mmkal/@typescript-eslint/no-require-imports
-  prettier = require('prettier')
-} catch {
-  // no prettier - that's ok
-}
-
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
 type MatchAll = (text: string, pattern: string | RegExp) => Iterable<NonNullable<ReturnType<string['match']>>>
@@ -151,7 +143,6 @@ const codegen: eslint.Rule.RuleModule = {
               filename: context.getFilename(),
               existingContent,
               glob: globSync,
-              format: (input: string) => prettier?.format(input) || input,
               fs,
               path,
             }
@@ -165,7 +156,6 @@ const codegen: eslint.Rule.RuleModule = {
               jsYaml,
               lodash,
               path,
-              prettier,
               readPkgUp,
             })
           },

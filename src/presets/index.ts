@@ -2,7 +2,6 @@ export type PresetMeta = {
   filename: string
   existingContent: string
   glob: (pattern: string, opts: any) => string[]
-  format: (input: string) => string
   fs: typeof import('fs')
   path: typeof import('path')
 }
@@ -16,7 +15,6 @@ export type PresetParams<Options = {}> = {
   path: typeof import('path')
   lodash: typeof import('lodash')
   jsYaml: typeof import('js-yaml')
-  prettier?: typeof import('prettier')
   dedent: typeof import('dedent')
   glob: Pick<typeof import('glob'), 'globSync'>
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
