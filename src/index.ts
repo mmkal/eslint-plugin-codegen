@@ -1,5 +1,6 @@
 /* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
 import type * as eslint from 'eslint'
+
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
@@ -9,6 +10,9 @@ import * as os from 'os'
 import * as path from 'path'
 import * as presetsModule from './presets'
 
+// eslint-disable-next-line mmkal/@typescript-eslint/no-require-imports, mmkal/@typescript-eslint/no-var-requires
+const eslintPluginMarkdownProcessor: eslint.Linter.Processor = require('eslint-plugin-markdown/lib/processor')
+
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
 type MatchAll = (text: string, pattern: string | RegExp) => Iterable<NonNullable<ReturnType<string['match']>>>
@@ -17,21 +21,32 @@ const matchAll: MatchAll = require('string.prototype.matchall')
 
 export type {Preset} from './presets'
 
-const getPreprocessor = (): eslint.Linter.LintOptions => {
+const codegenMarkdownCommentedOutFile = 'codegen-commented-out.md'
+
+const getPreprocessor = (): eslint.Linter.Processor => {
   return {
-    preprocess: text => [
-      text
-        .split(/\r?\n/)
-        .map(line => line && `// eslint-plugin-codegen:trim${line}`)
-        .join(os.EOL),
+    preprocess: (text, filename) => [
+      ...eslintPluginMarkdownProcessor.preprocess!(text, filename),
+      {
+        filename: codegenMarkdownCommentedOutFile,
+        text: text
+          .split(/\r?\n/)
+          .map(line => line && `// eslint-plugin-codegen:trim${line}`)
+          .join(os.EOL),
+      },
     ],
-    postprocess: messageLists => ([] as eslint.Linter.LintMessage[]).concat(...messageLists),
-    // @ts-expect-error types are wrong
+    postprocess(messageLists, filename) {
+      if (filename === codegenMarkdownCommentedOutFile) {
+        return messageLists.flat()
+      }
+
+      return eslintPluginMarkdownProcessor.postprocess!(messageLists, filename)
+    },
     supportsAutofix: true,
   }
 }
 
-export const processors: Record<string, eslint.Linter.LintOptions> = {
+export const processors: Record<string, eslint.Linter.Processor> = {
   '.md': getPreprocessor(),
   '.yml': getPreprocessor(),
   '.yaml': getPreprocessor(),
@@ -42,9 +57,13 @@ const codegen: eslint.Rule.RuleModule = {
   meta: {fixable: true},
   create(context: eslint.Rule.RuleContext) {
     const validate = () => {
-      const sourceCode = context
-        .getSourceCode()
-        .text.split(os.EOL)
+      const basename = path.basename(context.getFilename())
+      if (basename !== codegenMarkdownCommentedOutFile) {
+        return
+      }
+
+      const sourceCode = context.sourceCode.text
+        .split(os.EOL)
         .map(line => `${line}`.replace('// eslint-plugin-codegen:trim', ''))
         .join(os.EOL)
 

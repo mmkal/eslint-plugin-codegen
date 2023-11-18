@@ -18,7 +18,7 @@ describe('markdown processor', () => {
       \`\`\`
     `
 
-    const preprocessed = markdownProcessor.preprocess!(markdown)
+    const preprocessed = markdownProcessor.preprocess!(markdown, 'test.md')
 
     expect(preprocessed).toMatchInlineSnapshot(`
       Array [
