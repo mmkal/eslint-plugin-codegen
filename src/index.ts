@@ -23,7 +23,7 @@ export type {Preset} from './presets'
 
 const codegenMarkdownCommentedOutFile = 'codegen-commented-out.md'
 
-const getPreprocessor = (): eslint.Linter.Processor => {
+const markdownProcessor = (): eslint.Linter.Processor => {
   return {
     preprocess: (text, filename) => [
       ...eslintPluginMarkdownProcessor.preprocess!(text, filename),
@@ -36,20 +36,22 @@ const getPreprocessor = (): eslint.Linter.Processor => {
       },
     ],
     postprocess(messageLists, filename) {
-      if (filename === codegenMarkdownCommentedOutFile) {
-        return messageLists.flat()
+      const file = path.parse(filename)
+      if (file.ext === '.md' && file.base !== codegenMarkdownCommentedOutFile) {
+        return eslintPluginMarkdownProcessor.postprocess!(messageLists, filename)
       }
 
-      return eslintPluginMarkdownProcessor.postprocess!(messageLists, filename)
+      return messageLists.flat()
     },
     supportsAutofix: true,
   }
 }
 
 export const processors: Record<string, eslint.Linter.Processor> = {
-  '.md': getPreprocessor(),
-  '.yml': getPreprocessor(),
-  '.yaml': getPreprocessor(),
+  '.md': markdownProcessor(),
+  '.yml': markdownProcessor(),
+  '.yaml': markdownProcessor(),
+  markdown: markdownProcessor(),
 }
 
 const codegen: eslint.Rule.RuleModule = {
@@ -57,9 +59,10 @@ const codegen: eslint.Rule.RuleModule = {
   meta: {fixable: true},
   create(context: eslint.Rule.RuleContext) {
     const validate = () => {
-      const basename = path.basename(context.getFilename())
-      if (basename !== codegenMarkdownCommentedOutFile) {
-        return
+      const file = path.parse(context.getFilename())
+      
+      if (file.ext === '.md' && context.physicalFilename !== context.filename && file.base !== codegenMarkdownCommentedOutFile) {
+        // return
       }
 
       const sourceCode = context.sourceCode.text
