@@ -22,7 +22,15 @@ describe('markdown processor', () => {
 
     expect(preprocessed).toMatchInlineSnapshot(`
       Array [
-        "// eslint-plugin-codegen:trim# Title
+        Object {
+          "filename": "0.js",
+          "text": "// some javascript
+      const x = 1
+      ",
+        },
+        Object {
+          "filename": "codegen-commented-out.md",
+          "text": "// eslint-plugin-codegen:trim# Title
 
       // eslint-plugin-codegen:trim<!-- comment -->
 
@@ -32,13 +40,14 @@ describe('markdown processor', () => {
       // eslint-plugin-codegen:trim// some javascript
       // eslint-plugin-codegen:trimconst x = 1
       // eslint-plugin-codegen:trim\`\`\`",
+        },
       ]
     `)
   })
 
   test('postprocessor flattens message lists', () => {
     // @ts-expect-error missing some properties but they happen not to be needed
-    const postprocessed = markdownProcessor.postprocess!([[{line: 1}], [{line: 2}]])
+    const postprocessed = markdownProcessor.postprocess!([[{line: 1}], [{line: 2}]], 'codegen-commented-out.md')
 
     expect(postprocessed).toEqual([{line: 1}, {line: 2}])
   })
