@@ -9,9 +9,7 @@ import * as jsYaml from 'js-yaml'
 import * as os from 'os'
 import * as path from 'path'
 import * as presetsModule from './presets'
-
-// eslint-disable-next-line mmkal/@typescript-eslint/no-require-imports, mmkal/@typescript-eslint/no-var-requires
-const eslintPluginMarkdownProcessor: eslint.Linter.Processor = require('eslint-plugin-markdown/lib/processor')
+import {createProcessor} from './processor'
 
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
@@ -21,37 +19,12 @@ const matchAll: MatchAll = require('string.prototype.matchall')
 
 export type {Preset} from './presets'
 
-const codegenMarkdownCommentedOutFile = 'codegen-commented-out.md'
-
-const markdownProcessor = (): eslint.Linter.Processor => {
-  return {
-    preprocess: (text, filename) => [
-      ...eslintPluginMarkdownProcessor.preprocess!(text, filename),
-      {
-        filename: codegenMarkdownCommentedOutFile,
-        text: text
-          .split(/\r?\n/)
-          .map(line => line && `// eslint-plugin-codegen:trim${line}`)
-          .join(os.EOL),
-      },
-    ],
-    postprocess(messageLists, filename) {
-      const file = path.parse(filename)
-      if (file.ext === '.md' && file.base !== codegenMarkdownCommentedOutFile) {
-        return eslintPluginMarkdownProcessor.postprocess!(messageLists, filename)
-      }
-
-      return messageLists.flat()
-    },
-    supportsAutofix: true,
-  }
-}
-
 export const processors = {
-  '.md': markdownProcessor(),
-  '.yml': markdownProcessor(),
-  '.yaml': markdownProcessor(),
-  markdown: markdownProcessor(),
+  '.md': createProcessor('.md'),
+  '.yml': createProcessor('.yml'),
+  '.yaml': createProcessor('.yaml'),
+  markdown: createProcessor('.md'),
+  yaml: createProcessor('.yml'),
 } satisfies eslint.ESLint.Plugin['processors']
 
 const codegen: eslint.Rule.RuleModule = {
