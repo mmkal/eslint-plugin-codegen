@@ -21,7 +21,7 @@ describe('markdown processor', () => {
     const preprocessed = markdownProcessor.preprocess!(markdown)
 
     expect(preprocessed).toMatchInlineSnapshot(`
-      Array [
+      [
         "// eslint-plugin-codegen:trim# Title
 
       // eslint-plugin-codegen:trim<!-- comment -->
