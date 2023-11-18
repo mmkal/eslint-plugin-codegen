@@ -46,7 +46,8 @@ describe('markdown processor', () => {
   })
 
   test('postprocessor flattens message lists', () => {
-    const postprocessed = markdownProcessor.postprocess!([[{line: 1}], [{line: 2}]], 'codegen-commented-out.md')
+    const messages = [[{line: 1}], [{line: 2}]] as Array<Array<import('eslint').Linter.LintMessage>>
+    const postprocessed = markdownProcessor.postprocess!(messages, 'codegen-commented-out.md')
 
     expect(postprocessed).toEqual([{line: 1}, {line: 2}])
   })
