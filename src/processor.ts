@@ -29,4 +29,4 @@ export const createProcessor = <Ext extends `.${string}`>(ext: Ext): eslint.Lint
   }
 }
 
-const codegenMarkdownCommentedOutFile = <Ext extends `.${string}`>(ext: Ext) => 'codegen-commented-out' + ext
+const codegenMarkdownCommentedOutFile = <Ext extends `.${string}`>(ext: Ext) => `codegen-commented-out${ext}.js`

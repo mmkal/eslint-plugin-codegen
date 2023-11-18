@@ -37,7 +37,7 @@ const codegen: eslint.Rule.RuleModule = {
         .map(line => `${line}`.replace('// eslint-plugin-codegen:trim', ''))
         .join(os.EOL)
 
-      const markersByExtension: Record<string, {start: RegExp; end: RegExp}> = {
+      const baseMarkersByExtension = {
         '.md': {
           start: /<!-- codegen:start (.*?) ?-->/g,
           end: /<!-- codegen:end -->/g,
@@ -50,17 +50,28 @@ const codegen: eslint.Rule.RuleModule = {
           start: /# codegen:start ?(.*)/g,
           end: /# codegen:end/g,
         },
-      }
-      markersByExtension['.cts'] = markersByExtension['.ts']
-      markersByExtension['.mts'] = markersByExtension['.ts']
-      markersByExtension['.tsx'] = markersByExtension['.ts']
-      markersByExtension['.js'] = markersByExtension['.ts']
-      markersByExtension['.cjs'] = markersByExtension['.ts']
-      markersByExtension['.mjs'] = markersByExtension['.ts']
-      markersByExtension['.jsx'] = markersByExtension['.ts']
-      markersByExtension['.yaml'] = markersByExtension['.yml']
+      } satisfies Record<string, {start: RegExp; end: RegExp}>
 
-      const markers = markersByExtension[path.extname(context.getFilename())]
+      const markersByExtension: Record<string, {start: RegExp; end: RegExp}> = {
+        ...baseMarkersByExtension,
+        '.tsx': baseMarkersByExtension['.ts'],
+        '.cts': baseMarkersByExtension['.ts'],
+        '.mts': baseMarkersByExtension['.ts'],
+        '.js': baseMarkersByExtension['.ts'],
+        '.cjs': baseMarkersByExtension['.ts'],
+        '.mjs': baseMarkersByExtension['.ts'],
+        '.jsx': baseMarkersByExtension['.ts'],
+        '.yaml': baseMarkersByExtension['.yml'],
+        '.mdx': baseMarkersByExtension['.md'],
+        '.txt': baseMarkersByExtension['.yml'],
+        '.sh': baseMarkersByExtension['.yml'],
+      }
+
+      const markers = markersByExtension[path.extname(context.physicalFilename)]
+      if (!markers) {
+        throw new Error(`codegen doesn't support ${context.physicalFilename}`)
+      }
+
       const position = (index: number) => {
         const stringUpToPosition = sourceCode.slice(0, index)
         const lines = stringUpToPosition.split(os.EOL)
@@ -124,7 +135,7 @@ const codegen: eslint.Rule.RuleModule = {
         const result = tryCatch(
           () => {
             const meta: presetsModule.PresetMeta = {
-              filename: context.getFilename(),
+              filename: context.physicalFilename,
               existingContent,
               glob: globSync,
               fs,
