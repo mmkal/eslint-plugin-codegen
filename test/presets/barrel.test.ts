@@ -149,8 +149,8 @@ test('generates typescript', () => {
     import * as b from './b'
 
     export const foo = {
-     \\"./a\\": a,
-     \\"./b\\": b
+     "./a": a,
+     "./b": b
     }
     "
   `)
@@ -181,8 +181,8 @@ test('generates typescript', () => {
     import * as b from './b'
 
     export default {
-     \\"./a\\": a,
-     \\"./b\\": b
+     "./a": a,
+     "./b": b
     }
     "
   `)

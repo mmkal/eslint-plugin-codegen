@@ -2,7 +2,6 @@ export type PresetMeta = {
   filename: string
   existingContent: string
   glob: (pattern: string, opts: any) => string[]
-  format: (input: string) => string
   fs: typeof import('fs')
   path: typeof import('path')
 }
