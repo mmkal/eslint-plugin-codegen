@@ -29,7 +29,7 @@ describe('markdown processor', () => {
       ",
         },
         {
-          "filename": "codegen-commented-out.md",
+          "filename": "codegen-commented-out.js",
           "text": "// eslint-plugin-codegen:trim# Title
 
       // eslint-plugin-codegen:trim<!-- comment -->
@@ -47,7 +47,7 @@ describe('markdown processor', () => {
 
   test('postprocessor flattens message lists', () => {
     const messages = [[{line: 1}], [{line: 2}]] as Array<Array<import('eslint').Linter.LintMessage>>
-    const postprocessed = markdownProcessor.postprocess!(messages, 'codegen-commented-out.md')
+    const postprocessed = markdownProcessor.postprocess!(messages, 'codegen-commented-out.js')
 
     expect(postprocessed).toEqual([{line: 1}, {line: 2}])
   })

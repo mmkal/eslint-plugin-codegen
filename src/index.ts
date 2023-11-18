@@ -20,11 +20,11 @@ const matchAll: MatchAll = require('string.prototype.matchall')
 export type {Preset} from './presets'
 
 export const processors = {
-  '.md': createProcessor('.md'),
-  '.yml': createProcessor('.yml'),
-  '.yaml': createProcessor('.yaml'),
-  markdown: createProcessor('.md'),
-  yaml: createProcessor('.yml'),
+  '.md': createProcessor(),
+  '.yml': createProcessor(),
+  '.yaml': createProcessor(),
+  markdown: createProcessor(),
+  yaml: createProcessor(),
 } satisfies eslint.ESLint.Plugin['processors']
 
 const codegen: eslint.Rule.RuleModule = {

@@ -5,12 +5,12 @@ import * as path from 'path'
 // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/no-require-imports
 const eslintPluginMarkdownProcessor: eslint.Linter.Processor = require('eslint-plugin-markdown/lib/processor')
 
-export const createProcessor = <Ext extends `.${string}`>(ext: Ext): eslint.Linter.Processor => {
+export const createProcessor = (): eslint.Linter.Processor => {
   return {
     preprocess: (text, filename) => [
       ...eslintPluginMarkdownProcessor.preprocess!(text, filename),
       {
-        filename: codegenMarkdownCommentedOutFile(ext),
+        filename: codegenMarkdownCommentedOutFile,
         text: text
           .split(/\r?\n/)
           .map(line => line && `// eslint-plugin-codegen:trim${line}`)
@@ -18,15 +18,14 @@ export const createProcessor = <Ext extends `.${string}`>(ext: Ext): eslint.Lint
       },
     ],
     postprocess(messageLists, filename) {
-      const file = path.parse(filename)
-      if (file.ext === '.md' && file.base !== codegenMarkdownCommentedOutFile(ext)) {
-        return eslintPluginMarkdownProcessor.postprocess!(messageLists, filename)
+      if (path.basename(filename) === codegenMarkdownCommentedOutFile) {
+        return messageLists.flat()
       }
 
-      return messageLists.flat()
+      return eslintPluginMarkdownProcessor.postprocess!(messageLists, filename)
     },
     supportsAutofix: true,
   }
 }
 
-const codegenMarkdownCommentedOutFile = <Ext extends `.${string}`>(ext: Ext) => `codegen-commented-out${ext}.js`
+const codegenMarkdownCommentedOutFile = `codegen-commented-out.js`
