@@ -19,7 +19,6 @@ module.exports = {
     'mmkal/@typescript-eslint/no-unsafe-return': 'off',
     'mmkal/@rushstack/hoist-jest-mock': 'off',
     'mmkal/@typescript-eslint/consistent-type-imports': 'off',
+    'mmkal/unicorn/expiring-todo-comments': 'off',
   },
 }
-
-// console.dir(module.exports, {depth: 100})

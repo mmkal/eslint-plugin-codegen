@@ -47,24 +47,18 @@ const markdownProcessor = (): eslint.Linter.Processor => {
   }
 }
 
-export const processors: Record<string, eslint.Linter.Processor> = {
+export const processors = {
   '.md': markdownProcessor(),
   '.yml': markdownProcessor(),
   '.yaml': markdownProcessor(),
   markdown: markdownProcessor(),
-}
+} satisfies eslint.ESLint.Plugin['processors']
 
 const codegen: eslint.Rule.RuleModule = {
   // @ts-expect-error types are wrong?
   meta: {fixable: true},
   create(context: eslint.Rule.RuleContext) {
     const validate = () => {
-      const file = path.parse(context.getFilename())
-      
-      if (file.ext === '.md' && context.physicalFilename !== context.filename && file.base !== codegenMarkdownCommentedOutFile) {
-        // return
-      }
-
       const sourceCode = context.sourceCode.text
         .split(os.EOL)
         .map(line => `${line}`.replace('// eslint-plugin-codegen:trim', ''))
@@ -207,6 +201,18 @@ const codegen: eslint.Rule.RuleModule = {
   },
 }
 
-export const rules = {codegen}
+export const rules = {codegen} satisfies eslint.ESLint.Plugin['rules']
+
+export const configs: eslint.ESLint.Plugin['configs'] = {
+  recommended: {
+    plugins: ['codegen'],
+    overrides: [
+      {
+        files: ['*.md'],
+        processor: 'codegen/markdown',
+      },
+    ],
+  },
+}
 
 export * as presets from './presets'
