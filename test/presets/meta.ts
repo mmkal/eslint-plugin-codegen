@@ -7,7 +7,6 @@ export const getMeta = (filename: string): PresetMeta => ({
   filename,
   existingContent: fs.readFileSync(__filename).toString(),
   glob: glob.globSync,
-  format: (s: string) => s,
   fs,
   path,
 })

@@ -1,6 +1,7 @@
 /* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
 import * as dedent from 'dedent'
 import type * as eslint from 'eslint'
+
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
@@ -12,6 +13,7 @@ import * as os from 'os'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
 import * as presetsModule from './presets'
+import {createProcessor} from './processor'
 
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
@@ -21,38 +23,26 @@ const matchAll: MatchAll = require('string.prototype.matchall')
 
 export type {Preset} from './presets'
 
-const getPreprocessor = (): eslint.Linter.LintOptions => {
-  return {
-    preprocess: text => [
-      text
-        .split(/\r?\n/)
-        .map(line => line && `// eslint-plugin-codegen:trim${line}`)
-        .join(os.EOL),
-    ],
-    postprocess: messageLists => ([] as eslint.Linter.LintMessage[]).concat(...messageLists),
-    // @ts-expect-error types are wrong
-    supportsAutofix: true,
-  }
-}
+const processor = createProcessor()
 
-export const processors: Record<string, eslint.Linter.LintOptions> = {
-  '.md': getPreprocessor(),
-  '.yml': getPreprocessor(),
-  '.yaml': getPreprocessor(),
-}
+export const processors = {
+  '.md': processor,
+  '.yml': processor,
+  '.yaml': processor,
+  processor,
+} satisfies eslint.ESLint.Plugin['processors']
 
 const codegen: eslint.Rule.RuleModule = {
   // @ts-expect-error types are wrong?
   meta: {fixable: true},
   create(context: eslint.Rule.RuleContext) {
     const validate = () => {
-      const sourceCode = context
-        .getSourceCode()
-        .text.split(os.EOL)
+      const sourceCode = context.sourceCode.text
+        .split(os.EOL)
         .map(line => `${line}`.replace('// eslint-plugin-codegen:trim', ''))
         .join(os.EOL)
 
-      const markersByExtension: Record<string, {start: RegExp; end: RegExp}> = {
+      const baseMarkersByExtension = {
         '.md': {
           start: /<!-- codegen:start (.*?) ?-->/g,
           end: /<!-- codegen:end -->/g,
@@ -65,17 +55,28 @@ const codegen: eslint.Rule.RuleModule = {
           start: /# codegen:start ?(.*)/g,
           end: /# codegen:end/g,
         },
-      }
-      markersByExtension['.cts'] = markersByExtension['.ts']
-      markersByExtension['.mts'] = markersByExtension['.ts']
-      markersByExtension['.tsx'] = markersByExtension['.ts']
-      markersByExtension['.js'] = markersByExtension['.ts']
-      markersByExtension['.cjs'] = markersByExtension['.ts']
-      markersByExtension['.mjs'] = markersByExtension['.ts']
-      markersByExtension['.jsx'] = markersByExtension['.ts']
-      markersByExtension['.yaml'] = markersByExtension['.yml']
+      } satisfies Record<string, {start: RegExp; end: RegExp}>
 
-      const markers = markersByExtension[path.extname(context.getFilename())]
+      const markersByExtension: Record<string, {start: RegExp; end: RegExp}> = {
+        ...baseMarkersByExtension,
+        '.tsx': baseMarkersByExtension['.ts'],
+        '.cts': baseMarkersByExtension['.ts'],
+        '.mts': baseMarkersByExtension['.ts'],
+        '.js': baseMarkersByExtension['.ts'],
+        '.cjs': baseMarkersByExtension['.ts'],
+        '.mjs': baseMarkersByExtension['.ts'],
+        '.jsx': baseMarkersByExtension['.ts'],
+        '.yaml': baseMarkersByExtension['.yml'],
+        '.mdx': baseMarkersByExtension['.md'],
+        '.txt': baseMarkersByExtension['.yml'],
+        '.sh': baseMarkersByExtension['.yml'],
+      }
+
+      const markers = markersByExtension[path.extname(context.physicalFilename)]
+      if (!markers) {
+        throw new Error(`codegen doesn't support ${context.physicalFilename}`)
+      }
+
       const position = (index: number) => {
         const stringUpToPosition = sourceCode.slice(0, index)
         const lines = stringUpToPosition.split(os.EOL)
@@ -136,11 +137,10 @@ const codegen: eslint.Rule.RuleModule = {
         const range: eslint.AST.Range = [startIndex + startMatch[0].length + os.EOL.length, endMatch.index!]
         const existingContent = sourceCode.slice(...range)
         const normalise = (val: string) => val.trim().replace(/\r?\n/g, os.EOL)
-
         const result = tryCatch(
           () => {
             const meta: presetsModule.PresetMeta = {
-              filename: context.getFilename(),
+              filename: context.physicalFilename,
               existingContent,
               glob: globSync,
               fs,
@@ -186,6 +186,21 @@ const codegen: eslint.Rule.RuleModule = {
   },
 }
 
-export const rules = {codegen}
+export const rules = {codegen} satisfies eslint.ESLint.Plugin['rules']
+
+export const configs: eslint.ESLint.Plugin['configs'] = {
+  recommended: {
+    plugins: ['codegen'],
+    rules: {
+      'codegen/codegen': 'warn',
+    },
+    overrides: [
+      {
+        files: ['*.md'],
+        processor: 'codegen/processor',
+      },
+    ],
+  },
+}
 
 export * as presets from './presets'

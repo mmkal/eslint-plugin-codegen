@@ -23,6 +23,7 @@ Here's an example of it being used along with VSCode's eslint plugin, with auto-
 - [Contents](#contents)
 - [How to use](#how-to-use)
    - [Setup](#setup)
+      - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
    - [Presets](#presets)
       - [monorepoTOC](#monorepotoc)
       - [barrel](#barrel)
@@ -107,6 +108,36 @@ Where `{{ OPTIONS }}` are an inline object in the format:
 Where `key1` and `key2` are options passed to the codegen preset. yaml is used to parse the object, So any valid yaml that fits on one line can be passed as options. In practise, the one-line restriction means using [yaml's "flow style"](https://yaml.org/spec/1.2/spec.html#id2759963) for collections.
 
 See below for documentation. This repo also has [lots of usage examples](https://github.com/mmkal/ts/search?q=%22codegen%3Astart%22&unscoped_q=%22codegen%3Astart%22).
+
+#### Usage with eslint-plugin-markdown
+
+This plugin uses an [ESLint processor](https://eslint.org/docs/latest/extend/custom-processors) to handle markdown and YAML files. ESLint [only allows one processor per file type](https://github.com/eslint/eslint/issues/17724), so the processor from this plugin is designed to be compatible with `eslint-plugin-markdown`. But to use both plugins, you need to use the process for `eslint-plugin-codegen`, not `eslint-plugin-markdown`. You can do this by adding the recommended config for `eslint-plugin-codegen` second, e.g.
+
+```js
+module.exports = {
+  plugins: ['markdown', 'codegen'],
+  extends: [
+    'plugin:markdown/recommended',
+    'plugin:codegen/recommended',
+  ]
+}
+```
+
+Or specify the processor explicitly - when you switch to [flat config this will be required](https://eslint.org/docs/latest/extend/custom-processors#specifying-processor-in-config-files):
+
+```js
+module.exports = {
+    // 1. Add the plugin.
+    plugins: ['markdown'],
+    overrides: [
+        {
+            // 2. Enable the Markdown processor for all .md files.
+            files: ['**/*.md'],
+            processor: 'codegen/processor', // NOT 'markdown/markdown'
+        },
+    ],
+}
+```
 
 ### Presets
 
