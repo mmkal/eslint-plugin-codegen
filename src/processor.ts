@@ -26,7 +26,9 @@ export const createProcessor = (): eslint.Linter.Processor => {
         .filter(list => list.length)
 
       return [
-        ...eslintPluginMarkdownProcessor.postprocess!(messageListsWithoutCodegen, filename),
+        ...(messageListsWithoutCodegen.length > 0
+          ? eslintPluginMarkdownProcessor.postprocess!(messageListsWithoutCodegen, filename)
+          : []),
         ...messageListsWithCodegen.flat(),
       ]
     },
