@@ -18,11 +18,19 @@ describe('markdown processor', () => {
       \`\`\`
     `
 
-    const preprocessed = markdownProcessor.preprocess!(markdown)
+    const preprocessed = markdownProcessor.preprocess!(markdown, 'test.md')
 
     expect(preprocessed).toMatchInlineSnapshot(`
       [
-        "// eslint-plugin-codegen:trim# Title
+        {
+          "filename": "0.js",
+          "text": "// some javascript
+      const x = 1
+      ",
+        },
+        {
+          "filename": "codegen-commented-out.js",
+          "text": "// eslint-plugin-codegen:trim# Title
 
       // eslint-plugin-codegen:trim<!-- comment -->
 
@@ -32,14 +40,20 @@ describe('markdown processor', () => {
       // eslint-plugin-codegen:trim// some javascript
       // eslint-plugin-codegen:trimconst x = 1
       // eslint-plugin-codegen:trim\`\`\`",
+        },
       ]
     `)
   })
 
   test('postprocessor flattens message lists', () => {
-    // @ts-expect-error missing some properties but they happen not to be needed
-    const postprocessed = markdownProcessor.postprocess!([[{line: 1}], [{line: 2}]])
+    const messages = [[{line: 1, ruleId: 'codegen/codegen'}], [{line: 2, ruleId: 'codegen/codegen'}]] as Array<
+      Array<import('eslint').Linter.LintMessage>
+    >
+    const postprocessed = markdownProcessor.postprocess!(messages, 'codegen-commented-out.js')
 
-    expect(postprocessed).toEqual([{line: 1}, {line: 2}])
+    expect(postprocessed).toEqual([
+      {line: 1, ruleId: 'codegen/codegen'},
+      {line: 2, ruleId: 'codegen/codegen'},
+    ])
   })
 })
