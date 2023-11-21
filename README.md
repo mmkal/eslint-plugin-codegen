@@ -115,6 +115,7 @@ This plugin uses an [ESLint processor](https://eslint.org/docs/latest/extend/cus
 
 ```js
 module.exports = {
+  plugins: ['markdown', 'codegen'],
   extends: [
     'plugin:markdown/recommended',
     'plugin:codegen/recommended',
@@ -122,7 +123,7 @@ module.exports = {
 }
 ```
 
-Or if not using the recommended config, specify the processor explicitly:
+Or specify the processor explicitly - when you switch to [flat config this will be required](https://eslint.org/docs/latest/extend/custom-processors#specifying-processor-in-config-files):
 
 ```js
 module.exports = {
