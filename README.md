@@ -132,7 +132,7 @@ module.exports = {
         {
             // 2. Enable the Markdown processor for all .md files.
             files: ['**/*.md'],
-            processor: 'codegen/markdown', // NOT 'markdown/markdown'
+            processor: 'codegen/processor', // NOT 'markdown/markdown'
         },
     ],
 }

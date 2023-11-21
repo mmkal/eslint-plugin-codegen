@@ -176,10 +176,13 @@ export const rules = {codegen} satisfies eslint.ESLint.Plugin['rules']
 export const configs: eslint.ESLint.Plugin['configs'] = {
   recommended: {
     plugins: ['codegen'],
+    rules: {
+      'codegen/codegen': 'warn',
+    },
     overrides: [
       {
         files: ['*.md'],
-        processor: 'codegen/markdown',
+        processor: 'codegen/processor',
       },
     ],
   },
