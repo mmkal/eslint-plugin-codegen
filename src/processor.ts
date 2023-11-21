@@ -1,6 +1,5 @@
 import type * as eslint from 'eslint'
 import * as os from 'os'
-import * as path from 'path'
 
 // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/no-require-imports
 const eslintPluginMarkdownProcessor: eslint.Linter.Processor = require('eslint-plugin-markdown/lib/processor')
@@ -18,11 +17,18 @@ export const createProcessor = (): eslint.Linter.Processor => {
       },
     ],
     postprocess(messageLists, filename) {
-      if (path.basename(filename) === codegenMarkdownCommentedOutFile) {
-        return messageLists.flat()
-      }
+      const messageListsWithCodegen = messageLists
+        .map(list => list.filter(rule => rule.ruleId?.endsWith('codegen/codegen')))
+        .filter(list => list.length)
 
-      return eslintPluginMarkdownProcessor.postprocess!(messageLists, filename)
+      const messageListsWithoutCodegen = messageLists
+        .map(list => list.filter(rule => !rule.ruleId?.endsWith('codegen/codegen')))
+        .filter(list => list.length)
+
+      return [
+        ...eslintPluginMarkdownProcessor.postprocess!(messageListsWithoutCodegen, filename),
+        ...messageListsWithCodegen.flat(),
+      ]
     },
     supportsAutofix: true,
   }
