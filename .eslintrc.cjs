@@ -23,5 +23,6 @@ module.exports = {
     // todo: enable
     'mmkal/unicorn/prefer-string-replace-all': 'off',
     'mmkal/@typescript-eslint/no-unsafe-argument': 'off',
+    'mmkal/unicorn/prefer-at': 'off',
   },
 }

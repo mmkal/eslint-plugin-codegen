@@ -76,7 +76,7 @@ const codegen: eslint.Rule.RuleModule = {
       const position = (index: number) => {
         const stringUpToPosition = sourceCode.slice(0, index)
         const lines = stringUpToPosition.split(os.EOL)
-        return {line: lines.length, column: lines.at(-1)!.length}
+        return {line: lines.length, column: lines[lines.length - 1].length}
       }
 
       const startMatches = [...matchAll(sourceCode, markers.start)].filter(startMatch => {
@@ -101,7 +101,7 @@ const codegen: eslint.Rule.RuleModule = {
             fix: fixer =>
               fixer.replaceTextRange(
                 [afterStartMatch, afterStartMatch],
-                os.EOL + markers.end.source.replaceAll('\\', ''),
+                os.EOL + markers.end.source.replace(/\\/g, ''),
               ),
           })
           return
@@ -132,7 +132,7 @@ const codegen: eslint.Rule.RuleModule = {
 
         const range: eslint.AST.Range = [startIndex + startMatch[0].length + os.EOL.length, endMatch.index!]
         const existingContent = sourceCode.slice(...range)
-        const normalise = (val: string) => val.trim().replaceAll(/\r?\n/g, os.EOL)
+        const normalise = (val: string) => val.trim().replace(/\r?\n/g, os.EOL)
         const result = tryCatch(
           () => {
             const meta: presetsModule.PresetMeta = {
