@@ -25,13 +25,14 @@ Here's an example of it being used along with VSCode's eslint plugin, with auto-
    - [Setup](#setup)
       - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
    - [Presets](#presets)
-      - [monorepoTOC](#monorepotoc)
       - [barrel](#barrel)
+      - [custom](#custom)
       - [markdownFromJsdoc](#markdownfromjsdoc)
+      - [monorepoTOC](#monorepotoc)
+      - [markdownFromJsdoc](#markdownfromjsdoc-1)
       - [markdownTOC](#markdowntoc)
       - [markdownFromTests](#markdownfromtests)
-      - [labeler](#labeler)
-      - [custom](#custom)
+      - [GitHub Actions labeler](#github-actions-labeler)
    - [Customisation](#customisation)
 <!-- codegen:end -->
 
@@ -140,33 +141,6 @@ module.exports = {
 ```
 
 ### Presets
-
-<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/monorepo-toc.ts, export: monorepoTOC} -->
-#### [monorepoTOC](./src/presets/monorepo-toc.ts#L30)
-
-Generate a table of contents for a monorepo.
-
-##### Example (basic)
-
-`<!-- codegen:start {preset: monorepoTOC} -->`
-
-##### Example (using config options)
-
-`<!-- codegen:start {preset: monorepoTOC, repoRoot: .., workspaces: lerna, filter: {package.name: foo}, sort: -readme.length} -->`
-
-##### Params
-
-|name    |description                                                                                                                                                                                |
-|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|repoRoot|[optional] the relative path to the root of the git repository. By default, searches parent directories for a package.json to find the "root".                                             |
-|filter  |[optional] a dictionary of filter rules to whitelist packages. Filters can be applied based on package.json keys,<br />e.g. `filter: { package.name: someRegex, path: some/relative/path }`|
-|sort    |[optional] sort based on package properties (see `filter`), or readme length. Use `-` as a prefix to sort descending.<br />e.g. `sort: -readme.length`                                     |
-<!-- codegen:end -->
-
-##### Demo
-
-![](./gifs/monorepoTOC.gif)
-
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/barrel.ts, export: barrel} -->
 #### [barrel](./src/presets/barrel.ts#L38)
 
@@ -197,7 +171,79 @@ export * from './some/path/module-c'
 
 ![](./gifs/barrel.gif)
 
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
+#### [custom](./src/presets/custom.ts#L32)
+
+Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
+
+##### Example
+
+```typescript
+import {Preset} from 'eslint-plugin-codegen'
+
+export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
+  const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
+  return `filename: ${meta.filename}\ncustom prop: ${options.myCustomProp}\nComponent paths: ${components.join(', ')}`
+}
+```
+
+This can be used with:
+
+`<!-- codegen:start {preset: custom, source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}` Note that a `glob` helper method is passed to the preset via `meta`. This uses the `globSync` method of https://npm.im/glob. There are also `fs` and `path` helpers passed, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them being production dependencies.
+
+##### Params
+
+|name   |description                                                                                                                                                                                              |
+|-------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|source |Relative path to the module containing the custom preset. Default: the file being linted.                                                                                                                |
+|export |The name of the export. If omitted, the module's default export should be a preset function.                                                                                                             |
+|require|A module to load before `source`. If not set, defaults to `ts-node/register/transpile-only` for typescript sources.                                                                                      |
+|dev    |Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.|
+<!-- codegen:end -->
+
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
+#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L17)
+
+Convert jsdoc for an es export from a javascript/typescript file to markdown.
+
+##### Example
+
+`<!-- codegen:start {preset: markdownFromJsdoc, source: src/foo.ts, export: bar} -->`
+
+##### Params
+
+|name  |description                                                                                   |
+|------|----------------------------------------------------------------------------------------------|
+|source|{string} relative file path containing the export with jsdoc that should be copied to markdown|
+|export|{string} the name of the export                                                               |
+<!-- codegen:end -->
+
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/monorepo-toc.ts, export: monorepoTOC} -->
+#### [monorepoTOC](./src/presets/monorepo-toc.ts#L30)
+
+Generate a table of contents for a monorepo.
+
+##### Example (basic)
+
+`<!-- codegen:start {preset: monorepoTOC} -->`
+
+##### Example (using config options)
+
+`<!-- codegen:start {preset: monorepoTOC, repoRoot: .., workspaces: lerna, filter: {package.name: foo}, sort: -readme.length} -->`
+
+##### Params
+
+|name    |description                                                                                                                                                                                |
+|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|repoRoot|[optional] the relative path to the root of the git repository. By default, searches parent directories for a package.json to find the "root".                                             |
+|filter  |[optional] a dictionary of filter rules to whitelist packages. Filters can be applied based on package.json keys,<br />e.g. `filter: { package.name: someRegex, path: some/relative/path }`|
+|sort    |[optional] sort based on package properties (see `filter`), or readme length. Use `-` as a prefix to sort descending.<br />e.g. `sort: -readme.length`                                     |
+<!-- codegen:end -->
+
+##### Demo
+
+![](./gifs/monorepoTOC.gif)
+
 #### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L17)
 
 Convert jsdoc for an es export from a javascript/typescript file to markdown.
@@ -286,36 +332,6 @@ Generates a yaml config for the [GitHub Pull Request Labeler Action](https://git
 ##### Demo
 
 ![](./gifs/labeler.gif)
-
-<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L32)
-
-Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
-
-##### Example
-
-```typescript
-import {Preset} from 'eslint-plugin-codegen'
-
-export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
-  const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
-  return `filename: ${meta.filename}\ncustom prop: ${options.myCustomProp}\nComponent paths: ${components.join(', ')}`
-}
-```
-
-This can be used with:
-
-`<!-- codegen:start {preset: custom, source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}` Note that a `glob` helper method is passed to the preset via `meta`. This uses the `globSync` method of https://npm.im/glob. There are also `fs` and `path` helpers passed, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them being production dependencies.
-
-##### Params
-
-|name   |description                                                                                                                                                                                              |
-|-------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|source |Relative path to the module containing the custom preset. Default: the file being linted.                                                                                                                |
-|export |The name of the export. If omitted, the module's default export should be a preset function.                                                                                                             |
-|require|A module to load before `source`. If not set, defaults to `ts-node/register/transpile-only` for typescript sources.                                                                                      |
-|dev    |Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.|
-<!-- codegen:end -->
 
 ##### Demo
 
@@ -414,4 +430,4 @@ _Rendered_:
 
 ___
 
-The code in this repository was moved from https://github.com/mmkal/ts
+<sub>The code in this repository was moved from https://github.com/mmkal/ts</sub>
