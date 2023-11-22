@@ -1,8 +1,10 @@
 // eslint-disable-next-line mmkal/import/no-extraneous-dependencies
 const recommended = require('eslint-plugin-mmkal').getRecommended()
 
+/** @type {import('eslint').Linter.Config} */
 module.exports = {
   ...recommended,
+  ignorePatterns: [...recommended.ignorePatterns, 'test-results/**'],
   overrides: [
     ...recommended.overrides,
     {
@@ -10,6 +12,7 @@ module.exports = {
       rules: {
         'mmkal/unicorn/filename-case': 'off',
         'mmkal/prettier/prettier': 'off',
+        'no-trailing-spaces': 'off',
       },
     },
   ],
