@@ -1,8 +1,6 @@
 import dedent from 'dedent'
 import * as preset from '../../src/presets/markdown-toc'
-import {getMeta} from './meta'
-
-const meta = getMeta(__filename)
+import {buildPresetParams} from './meta'
 
 const mockFs: any = {}
 
@@ -34,7 +32,7 @@ jest.mock('fs', () => {
   }
 })
 
-const emptyReadme = {...meta, filename: 'readme.md', existingContent: ''}
+const params = buildPresetParams('readme.md')
 
 test('generate markdown', () => {
   Object.assign(mockFs, {
@@ -58,7 +56,7 @@ test('generate markdown', () => {
 
   expect(
     preset.markdownTOC({
-      meta: emptyReadme,
+      ...params,
       options: {},
     }),
   ).toMatchInlineSnapshot(`
@@ -75,7 +73,7 @@ test('generate markdown', () => {
 
   expect(
     preset.markdownTOC({
-      meta: emptyReadme,
+      ...params,
       options: {
         minDepth: 2,
         maxDepth: 3,
@@ -100,7 +98,7 @@ test('calculates min hashes', () => {
 
   expect(
     preset.markdownTOC({
-      meta: emptyReadme,
+      ...params,
       options: {},
     }),
   ).toMatchInlineSnapshot(`
@@ -113,7 +111,7 @@ test('calculates min hashes', () => {
 
   expect(
     preset.markdownTOC({
-      meta: emptyReadme,
+      ...params,
       options: {
         minDepth: 2,
         maxDepth: 3,

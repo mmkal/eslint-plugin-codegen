@@ -2,9 +2,7 @@ import dedent from 'dedent'
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/monorepo-toc'
-import {getMeta} from './meta'
-
-const meta = getMeta(__filename)
+import {buildPresetParams} from './meta'
 
 const mockFs: any = {}
 
@@ -47,7 +45,7 @@ jest.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
   return found.filter(f => (ignores as string[]).every(i => !minimatch(f, i)))
 })
 
-const emptyReadme = {...meta, filename: 'readme.md', existingContent: ''}
+const params = buildPresetParams('readme.md')
 
 beforeEach(() => {
   Object.assign(mockFs, {
@@ -90,7 +88,7 @@ beforeEach(() => {
 test('generate markdown', () => {
   expect(
     preset.monorepoTOC({
-      meta: emptyReadme,
+      ...params,
       options: {},
     }),
   ).toMatchInlineSnapshot(`
@@ -104,7 +102,7 @@ test('generate markdown', () => {
 test('generate markdown with filter', () => {
   expect(
     preset.monorepoTOC({
-      meta: emptyReadme,
+      ...params,
       options: {filter: {'package.name': 'package1|package3'}},
     }),
   ).toMatchInlineSnapshot(`
@@ -116,7 +114,7 @@ test('generate markdown with filter', () => {
 test('generate markdown with sorting', () => {
   expect(
     preset.monorepoTOC({
-      meta: emptyReadme,
+      ...params,
       options: {sort: '-readme.length'},
     }),
   ).toMatchInlineSnapshot(`
@@ -131,7 +129,7 @@ test('generate markdown default to lerna to find packages', () => {
   mockFs['package.json'] = '{}'
   expect(
     preset.monorepoTOC({
-      meta: emptyReadme,
+      ...params,
       options: {},
     }),
   ).toMatchInlineSnapshot(`
@@ -143,7 +141,7 @@ test('generate markdown default to lerna to find packages', () => {
 test('generate markdown fails when no package.json exists', () => {
   expect(() =>
     preset.monorepoTOC({
-      meta: {...meta, filename: 'subdir/test.md', existingContent: ''},
+      ...buildPresetParams('subdir/test.md'),
       options: {},
     }),
   ).toThrow(/ENOENT: no such file or directory, open '.*subdir.*package.json'/)
@@ -152,7 +150,7 @@ test('generate markdown fails when no package.json exists', () => {
 test('generate markdown with separate rootDir', () => {
   expect(
     preset.monorepoTOC({
-      meta: {...meta, filename: 'subdir/test.md', existingContent: ''},
+      ...buildPresetParams('subdir/test.md'),
       options: {repoRoot: '..'},
     }),
   ).toMatchInlineSnapshot(`
@@ -171,7 +169,7 @@ test('invalid workspaces', () => {
 
   expect(() =>
     preset.monorepoTOC({
-      meta: emptyReadme,
+      ...params,
       options: {},
     }),
   ).toThrow(/Expected to find workspaces array, got 'package.json - not an array'/)

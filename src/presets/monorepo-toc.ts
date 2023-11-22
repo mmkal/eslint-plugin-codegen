@@ -31,8 +31,8 @@ export const monorepoTOC: Preset<{
   repoRoot?: string
   filter?: string | Record<string, string>
   sort?: string
-}> = ({meta, options}) => {
-  const packages = getLeafPackages(options.repoRoot, meta.filename)
+}> = ({options, context}) => {
+  const packages = getLeafPackages(options.repoRoot, context.physicalFilename)
 
   const leafPackages = packages
     .map(({path: leafPath, packageJson: leafPkg}) => {
@@ -71,7 +71,7 @@ export const monorepoTOC: Preset<{
       })()
       const {name} = leafPkg
       const homepage =
-        leafPkg.homepage || relative(path.dirname(meta.filename), leafPath).replace(/\/package.json$/, '')
+        leafPkg.homepage || relative(path.dirname(context.physicalFilename), leafPath).replace(/\/package.json$/, '')
       return [`- [${name}](${homepage})`, description].filter(Boolean).join(' - ').trim()
     })
 

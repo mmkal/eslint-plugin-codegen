@@ -1,15 +1,21 @@
 /* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
+import * as dedent from 'dedent'
 import type * as eslint from 'eslint'
 
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
 import * as fs from 'fs'
 import {globSync} from 'glob'
+import * as glob from 'glob'
 import * as jsYaml from 'js-yaml'
+import lodash from 'lodash'
 import * as os from 'os'
 import * as path from 'path'
+import * as readPkgUp from 'read-pkg-up'
 import * as presetsModule from './presets'
 import {createProcessor} from './processor'
+
+export const dependencies: presetsModule.PresetDependencies = {dedent, fs, glob, jsYaml, lodash, path, readPkgUp}
 
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
@@ -117,7 +123,7 @@ const codegen: eslint.Rule.RuleModule = {
         }
 
         const opts = maybeOptions.right || {}
-        const presets: Record<string, presetsModule.Preset<unknown> | undefined> = {
+        const presets: Record<string, presetsModule.Preset | undefined> = {
           ...presetsModule,
           ...context.options[0]?.presets,
         }
@@ -142,7 +148,7 @@ const codegen: eslint.Rule.RuleModule = {
               fs,
               path,
             }
-            return preset({meta, options: opts})
+            return preset({meta, options: opts, context, dependencies})
           },
           err => `${err}`,
         )

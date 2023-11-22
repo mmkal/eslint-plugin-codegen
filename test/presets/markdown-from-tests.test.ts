@@ -1,8 +1,8 @@
 import dedent from 'dedent'
 import * as preset from '../../src/presets/markdown-from-tests'
-import {getMeta} from './meta'
+import {buildPresetParams} from './meta'
 
-const meta = getMeta(__filename)
+const params = buildPresetParams(__dirname + '/test.ts')
 
 const mockFs: any = {}
 
@@ -34,11 +34,9 @@ jest.mock('fs', () => {
   }
 })
 
-const emptyReadme = {...meta, filename: 'readme.md', existingContent: ''}
-
 test('generate markdown', () => {
   Object.assign(mockFs, {
-    'test.ts': dedent`
+    [params.context.physicalFilename]: dedent`
       import {calculator} from '..'
 
       beforeEach(() => {
@@ -69,7 +67,7 @@ test('generate markdown', () => {
   })
 
   const withHeaders = preset.markdownFromTests({
-    meta: emptyReadme,
+    ...params,
     options: {source: 'test.ts', headerLevel: 4},
   })
   expect(withHeaders).toMatchInlineSnapshot(`
@@ -92,7 +90,7 @@ test('generate markdown', () => {
     \`\`\`"
   `)
   const withoutHeaders = preset.markdownFromTests({
-    meta: emptyReadme,
+    ...params,
     options: {source: 'test.ts'},
   })
 
