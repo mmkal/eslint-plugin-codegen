@@ -38,7 +38,7 @@ type TestFixtures = TestOptions & {
 
 export const test = base.extend<TestFixtures>({
   vscodeVersion: ['insiders', {option: true}],
-  async workbox({vscodeVersion, createProject, createTempDir}, use) {
+  async workbox({vscodeVersion, createProject, createTempDir}, use, testInfo) {
     const defaultCachePath = await createTempDir()
     const vscodePath = await downloadAndUnzipVSCode(vscodeVersion)
     await fs.promises.cp(
@@ -76,6 +76,7 @@ export const test = base.extend<TestFixtures>({
     test.info().attachments.push({name: 'trace', path: tracePath, contentType: 'application/zip'})
     await electronApp.close()
     const logPath = path.join(defaultCachePath, 'user-data')
+    await workbox.video()?.saveAs(path.join(process.cwd(), 'videos', slugify(test.info().title) + '.webm'))
     if (fs.existsSync(logPath)) {
       const logOutputPath = test.info().outputPath('vscode-logs')
       await fs.promises.cp(logPath, logOutputPath, {recursive: true})
@@ -139,3 +140,5 @@ export const test = base.extend<TestFixtures>({
     for (const tempDir of tempDirs) await fs.promises.rm(tempDir, {recursive: true})
   },
 })
+
+const slugify = (string: string) => string.replace(/\W+/g, ' ').trim().replace(/\s+/g, '-')
