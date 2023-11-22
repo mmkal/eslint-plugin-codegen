@@ -51,7 +51,7 @@ const codegen = async (page: Page, params: {file: string; type: () => Promise<vo
 test('barrel', async ({workbox: page}) => {
   await codegen(page, {
     file: 'index.ts',
-    type: async () => page.keyboard.type('// codegen:start {preset: barrel}', {delay: 100}),
+    type: async () => page.keyboard.type('// codegen:start {preset: barrel}', {delay: 50}),
     result: dedent`
       // codegen:start {preset: barrel}
       export * from './a'
@@ -101,7 +101,7 @@ test('markdownTOC', async ({workbox: page}) => {
       await page.getByText('Table of contents').click()
       await page.keyboard.press('Meta+ArrowRight')
       await page.keyboard.press('Enter')
-      await page.keyboard.type('<!-- codegen:start {preset: markdownTOC} -->', {delay: 100})
+      await page.keyboard.type('<!-- codegen:start {preset: markdownTOC} -->', {delay: 50})
       await new Promise(r => setTimeout(r, 500))
     },
     result: '#installation',

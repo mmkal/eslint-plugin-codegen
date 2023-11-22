@@ -46,6 +46,7 @@ export const test = base.extend<TestFixtures>({
       path.join(defaultCachePath, 'extensions', 'dbaeumer.vscode-eslint-2.4.2'),
       {recursive: true},
     )
+    const projectPath = await createProject()
     const electronApp = await _electron.launch({
       executablePath: vscodePath,
       args: [
@@ -63,8 +64,7 @@ export const test = base.extend<TestFixtures>({
         `--extensions-dir=${path.join(defaultCachePath, 'extensions')}`,
         // `--extensions-dir=/Users/mmkal/.vscode/extensions`,
         `--user-data-dir=${path.join(defaultCachePath, 'user-data')}`,
-        // `--install-extension=dbaeumer.vscode-eslint`,
-        await createProject(),
+        projectPath,
       ],
       recordVideo: {dir: 'test-results/videos'},
     })
@@ -76,7 +76,13 @@ export const test = base.extend<TestFixtures>({
     test.info().attachments.push({name: 'trace', path: tracePath, contentType: 'application/zip'})
     await electronApp.close()
     const logPath = path.join(defaultCachePath, 'user-data')
-    await workbox.video()?.saveAs(path.join(process.cwd(), 'videos', slugify(test.info().title) + '.webm'))
+    const video = workbox.video()
+    if (video) {
+      // await workbox.video()?.saveAs(path.join(process.cwd(), 'videos', slugify(test.info().title) + '.webm'))
+      const exec = (command: string) => spawnSync(command, {cwd: projectPath, stdio: 'inherit', shell: true})
+      exec(`ffmpeg -y -i ${await video.path()} -pix_fmt rgb24 ${process.cwd()}/gifs/${slugify(test.info().title)}.gif`)
+    }
+
     if (fs.existsSync(logPath)) {
       const logOutputPath = test.info().outputPath('vscode-logs')
       await fs.promises.cp(logPath, logOutputPath, {recursive: true})

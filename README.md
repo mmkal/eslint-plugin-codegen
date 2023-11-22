@@ -169,7 +169,7 @@ export * from './some/path/module-c'
 
 ##### Demo
 
-![](./gifs/barrel.gif)
+![](./gifs/b.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
 #### [custom](./src/presets/custom.ts#L32)
