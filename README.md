@@ -32,7 +32,7 @@ Here's an example of it being used along with VSCode's eslint plugin, with auto-
       - [markdownFromJsdoc](#markdownfromjsdoc-1)
       - [markdownTOC](#markdowntoc)
       - [markdownFromTests](#markdownfromtests)
-      - [GitHub Actions labeler](#github-actions-labeler)
+      - [labeler](#labeler)
    - [Customisation](#customisation)
 <!-- codegen:end -->
 
