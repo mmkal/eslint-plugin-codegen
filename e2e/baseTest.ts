@@ -104,7 +104,7 @@ export const test = base.extend<TestFixtures>({
 
       // exec(`npm init playwright@latest --yes -- --quiet --browser=chromium --gha --install-deps`)
       exec('npm init -y')
-      exec(`pnpm install eslint eslint-plugin-codegen eslint-plugin-mmkal --save-dev`)
+      exec(`pnpm install eslint eslint-plugin-codegen eslint-plugin-mmkal typescript ts-node --save-dev`)
 
       write('tsconfig.json', fs.readFileSync(path.join(__dirname, '..', 'tsconfig.json'), 'utf8'))
       write(
@@ -125,10 +125,10 @@ export const test = base.extend<TestFixtures>({
         `,
       )
 
-      write('src/a.ts', 'export const a = 1')
-      write('src/b.ts', 'export const b = 1')
-      write('src/index.ts', '')
-      write('src/custom.js', '')
+      write('src/barrel/a.ts', 'export const a = 1')
+      write('src/barrel/b.ts', 'export const b = 1')
+      write('src/barrel/index.ts', '')
+      write('src/custom/index.ts', '')
       write('README.md', '')
 
       write(

@@ -50,7 +50,7 @@ const codegen = async (page: Page, params: {file: string; type: () => Promise<vo
 
 test('barrel', async ({workbox: page}) => {
   await codegen(page, {
-    file: 'index.ts',
+    file: 'barrel/index.ts',
     type: async () => page.keyboard.type('// codegen:start {preset: barrel}', {delay: 50}),
     result: dedent`
       // codegen:start {preset: barrel}
@@ -110,22 +110,19 @@ test('markdownTOC', async ({workbox: page}) => {
 
 test('custom', async ({workbox: page}) => {
   await codegen(page, {
-    file: 'custom.js',
+    file: 'custom/index.ts',
     async type() {
       await page.keyboard.type(
         dedent`
-          /** @type {import('eslint-plugin-codegen').Preset} */
-          exports.findEslintDependencies = ({dependencies: {glob, path}}) => {
+          export const findEslintDependencies: import('eslint-plugin-codegen').Preset = ({dependencies: {glob}}) => {
             const packages = glob.globSync('node_modules/eslint*/package.json', {cwd: process.cwd()})
-            const folders = packages.map(p => path.dirname(p)).map(p => path.basename(p))
-            return \`exports.eslintDependencies = \${JSON.stringify(folders, null, 2)}\`
+            const folders = packages.map(p => p.split('/').at(-2))
+            return \`export const eslintDependencies = \${JSON.stringify(folders, null, 2)}\`
           }
         `,
       )
 
       await page.keyboard.press('Enter')
-      await page.keyboard.press('Meta+Shift+ArrowDown')
-      await page.keyboard.press('Backspace')
       await page.keyboard.press('Enter')
       await page.keyboard.press('Meta+s')
       await new Promise(r => setTimeout(r, 500))
