@@ -128,9 +128,18 @@ export const test = base.extend<TestFixtures>({
       write('src/a.ts', 'export const a = 1')
       write('src/b.ts', 'export const b = 1')
       write('src/index.ts', '')
+      write('src/custom.js', '')
       write('README.md', '')
 
-      write('.vscode/settings.json', fs.readFileSync(path.join(__dirname, '../.vscode/settings.json')).toString())
+      write(
+        '.vscode/settings.json',
+        fs
+          .readFileSync(path.join(__dirname, '../.vscode/settings.json'))
+          .toString()
+          .replace('{', '{\n  "editor.autoClosingBrackets": "never",')
+          .replace('{', '{\n  "editor.autoIndent": "none",')
+          .replace('{', '{\n  "editor.insertSpaces": false,'),
+      )
 
       return projectPath
     })

@@ -107,3 +107,34 @@ test('markdownTOC', async ({workbox: page}) => {
     result: '#installation',
   })
 })
+
+test('custom', async ({workbox: page}) => {
+  await codegen(page, {
+    file: 'custom.js',
+    async type() {
+      await page.keyboard.type(
+        dedent`
+          /** @type {import('eslint-plugin-codegen').Preset} */
+          exports.findEslintDependencies = ({dependencies: {glob, path}}) => {
+            const packages = glob.globSync('node_modules/eslint*/package.json', {cwd: process.cwd()})
+            const folders = packages.map(p => path.dirname(p)).map(p => path.basename(p))
+            return \`exports.eslintDependencies = \${JSON.stringify(folders, null, 2)}\`
+          }
+        `,
+      )
+
+      await page.keyboard.press('Enter')
+      await page.keyboard.press('Meta+Shift+ArrowDown')
+      await page.keyboard.press('Backspace')
+      await page.keyboard.press('Enter')
+      await page.keyboard.press('Meta+s')
+      await new Promise(r => setTimeout(r, 500))
+
+      await page.keyboard.type(dedent`
+        // codegen:start {preset: custom, export: findEslintDependencies}
+      `)
+      await page.keyboard.press('Meta+Shift+Tab')
+    },
+    result: '"eslint-plugin-codegen"',
+  })
+})
