@@ -4,4 +4,5 @@ module.exports = {
   testEnvironment: 'node',
   prettierPath: require.resolve('prettier-2'),
   modulePathIgnorePatterns: ['<rootDir>/.vscode-test'],
+  testPathIgnorePatterns: ['<rootDir>/e2e'],
 }

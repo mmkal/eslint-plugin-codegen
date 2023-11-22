@@ -171,7 +171,7 @@ export * from './some/path/module-c'
 
 ![](./gifs/barrel.gif)
 
-<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} --> 
 #### [custom](./src/presets/custom.ts#L32)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
