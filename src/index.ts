@@ -15,6 +15,8 @@ import * as readPkgUp from 'read-pkg-up'
 import * as presetsModule from './presets'
 import {createProcessor} from './processor'
 
+export const dependencies: presetsModule.PresetDependencies = {dedent, fs, glob, jsYaml, lodash, path, readPkgUp}
+
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
 type MatchAll = (text: string, pattern: string | RegExp) => Iterable<NonNullable<ReturnType<string['match']>>>
@@ -146,18 +148,7 @@ const codegen: eslint.Rule.RuleModule = {
               fs,
               path,
             }
-            return preset({
-              meta,
-              options: opts,
-              context,
-              dedent,
-              fs,
-              glob,
-              jsYaml,
-              lodash,
-              path,
-              readPkgUp,
-            })
+            return preset({meta, options: opts, context, dependencies})
           },
           err => `${err}`,
         )

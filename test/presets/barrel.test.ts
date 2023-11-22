@@ -1,9 +1,9 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/barrel'
-import {getMeta} from './meta'
+import {buildPresetParams} from './meta'
 
-const meta = getMeta(__filename)
+const params = buildPresetParams(__filename)
 
 const mockFs: any = {}
 
@@ -33,7 +33,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {},
     }),
   ).toMatchInlineSnapshot(`
@@ -48,7 +48,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}*'},
     }),
   ).toMatchInlineSnapshot(`
@@ -60,14 +60,14 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {exclude: '*'},
     }),
   ).toMatchInlineSnapshot(`""`)
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}*', exclude: ['*util*']},
     }),
   ).toMatchInlineSnapshot(`
@@ -77,7 +77,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}.ts', import: 'star'},
     }),
   ).toMatchInlineSnapshot(`
@@ -93,7 +93,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}.ts', import: 'default'},
     }),
   ).toMatchInlineSnapshot(`
@@ -109,7 +109,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}.ts', import: 'star', export: 'default'},
     }),
   ).toMatchInlineSnapshot(`
@@ -125,7 +125,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}.ts', import: 'star', export: 'foo'},
     }),
   ).toMatchInlineSnapshot(`
@@ -141,7 +141,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'foo', keys: 'path'}},
     }),
   ).toMatchInlineSnapshot(`
@@ -157,7 +157,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'foo', keys: 'camelCase'}},
     }),
   ).toMatchInlineSnapshot(`
@@ -173,7 +173,7 @@ test('generates typescript', () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '{a,b}.ts', import: 'star', export: {name: 'default', keys: 'path'}},
     }),
   ).toMatchInlineSnapshot(`
@@ -203,8 +203,9 @@ test('is unopinionated about formatting', () => {
 
   expect(
     preset.barrel({
+      ...params,
       meta: {
-        ...meta,
+        ...params.meta,
         existingContent: oldContent,
       },
       options: {},
@@ -221,7 +222,7 @@ test(`generates valid identifiers for filenames that don't start with letters`, 
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {
         import: 'star',
       },
@@ -248,7 +249,7 @@ test(`ambiguously named files get unique, valid identifiers`, () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {
         import: 'star',
       },
@@ -273,7 +274,7 @@ test(`index files are sensibly-named`, () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {
         include: '*/*',
         import: 'star',
@@ -299,7 +300,7 @@ test(`supports asset imports`, () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {include: '*.{jpg,png}', import: 'default'},
     }),
   ).toMatchInlineSnapshot(`
@@ -322,7 +323,7 @@ test(`respects pascale case imports`, () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {import: 'star'},
     }),
   ).toMatchInlineSnapshot(`
@@ -345,7 +346,7 @@ test(`it support the extensions in the output`, () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {import: 'star', extension: true},
     }),
   ).toMatchInlineSnapshot(`
@@ -367,7 +368,7 @@ test(`it can change the extension in the output`, () => {
 
   expect(
     preset.barrel({
-      meta,
+      ...params,
       options: {import: 'star', extension: {ts: 'js'}},
     }),
   ).toMatchInlineSnapshot(`

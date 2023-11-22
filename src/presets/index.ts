@@ -6,11 +6,7 @@ export type PresetMeta = {
   path: typeof import('path')
 }
 
-export type PresetParams<Options = {}> = {
-  options: Options
-  /** @deprecated use top-level properties of `PresetParams` */
-  meta: PresetMeta
-  context: import('eslint').Rule.RuleContext
+export interface PresetDependencies {
   fs: typeof import('fs')
   path: typeof import('path')
   lodash: typeof import('lodash')
@@ -18,6 +14,13 @@ export type PresetParams<Options = {}> = {
   dedent: typeof import('dedent')
   glob: Pick<typeof import('glob'), 'globSync'>
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
+}
+
+export type PresetParams<Options = {}> = {
+  options: Options
+  meta: PresetMeta
+  context: import('eslint').Rule.RuleContext
+  dependencies: PresetDependencies
 }
 
 export type Preset<Options extends {} = {}> = (params: PresetParams<Options>) => string

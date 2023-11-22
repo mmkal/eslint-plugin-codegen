@@ -1,8 +1,8 @@
 import dedent from 'dedent'
 import * as preset from '../../src/presets/markdown-from-jsdoc'
-import {getMeta} from './meta'
+import {buildPresetParams} from './meta'
 
-const meta = getMeta(__filename)
+const params = buildPresetParams(__dirname + '/index.ts')
 
 const mockFs: any = {}
 
@@ -22,7 +22,17 @@ jest.mock('fs', () => {
         return mockFs[path]
       }
 
-      return actual[orig](...args)
+      try {
+        return actual[orig](...args)
+      } catch (e) {
+        throw new Error(
+          `Failed calling ${orig} with args ${JSON.stringify(args)}: ${e}. Mock fs: ${JSON.stringify(
+            mockFs,
+            null,
+            2,
+          )}}`,
+        )
+      }
     }
 
   return {
@@ -34,10 +44,9 @@ jest.mock('fs', () => {
   }
 })
 
-const emptyReadme = {...meta, filename: 'readme.md', existingContent: ''}
 test('generate markdown', () => {
   Object.assign(mockFs, {
-    'index.ts': dedent`
+    [params.context.physicalFilename]: dedent`
       /**
        * Adds two numbers
        *
@@ -80,7 +89,7 @@ test('generate markdown', () => {
 
   expect(
     preset.markdownFromJsdoc({
-      meta: emptyReadme,
+      ...params,
       options: {source: 'index.ts', export: 'add'},
     }),
   ).toMatchInlineSnapshot(`
@@ -116,7 +125,7 @@ test('generate markdown', () => {
 
   expect(
     preset.markdownFromJsdoc({
-      meta: emptyReadme,
+      ...params,
       options: {source: 'index.ts', export: 'multiply'},
     }),
   ).toMatchInlineSnapshot(`
@@ -133,7 +142,7 @@ test('generate markdown', () => {
 
 test('not found export', () => {
   Object.assign(mockFs, {
-    'index.ts': dedent`
+    [params.context.physicalFilename]: dedent`
       /** docs */
       export const add = (a: number, b: number) => a + b
     `,
@@ -141,7 +150,7 @@ test('not found export', () => {
 
   expect(() =>
     preset.markdownFromJsdoc({
-      meta: emptyReadme,
+      ...params,
       options: {source: 'index.ts', export: 'subtract'},
     }),
   ).toThrow(/Couldn't find export in .*index.ts with jsdoc called subtract/)

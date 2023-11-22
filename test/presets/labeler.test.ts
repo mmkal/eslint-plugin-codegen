@@ -2,9 +2,7 @@ import * as glob from 'glob'
 import minimatch from 'minimatch'
 import readPkgUp from 'read-pkg-up'
 import * as preset from '../../src/presets/labeler'
-import {getMeta} from './meta'
-
-const meta = getMeta(__filename)
+import {buildPresetParams} from './meta'
 
 const mockFs: any = {}
 
@@ -55,8 +53,6 @@ jest.spyOn(readPkgUp, 'sync').mockImplementation(options =>
     .find(p => options.cwd?.includes(p.path.replace('package.json', ''))),
 )
 
-const labelerDotYml = {...meta, filename: '.github/labeler.yml', existingContent: ''}
-
 beforeEach(() => {
   Object.assign(mockFs, {
     'package.json': '{ "workspaces": ["packages/*"] }',
@@ -70,7 +66,7 @@ beforeEach(() => {
 test('generate labels', () => {
   expect(
     preset.labeler({
-      meta: labelerDotYml,
+      ...buildPresetParams('.github/labeler.yml'),
       options: {},
     }),
   ).toMatchInlineSnapshot(`
