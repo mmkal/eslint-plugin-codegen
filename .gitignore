@@ -8,3 +8,5 @@ package-lock.json
 yarn.lock
 
 *.tgz
+.vscode-test
+test-results

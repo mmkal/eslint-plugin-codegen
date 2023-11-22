@@ -10,5 +10,5 @@
         "noUnusedParameters": false,
         "esModuleInterop": true
     },
-    "include": ["src", "test", "*.js", ".*.*js", "*.md"]
+    "include": ["src", "test", "*.js", ".*.*js", "*.md", "*.ts", "e2e"]
 }
