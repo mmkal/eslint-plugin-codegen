@@ -4,7 +4,8 @@
     },
     "eslint.validate": [
         "javascript",
-        "typescript"
+        "typescript",
+        "markdown"
     ],
     "typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -6,7 +6,7 @@ module.exports = {
   overrides: [
     ...recommended.overrides,
     {
-      files: ['*.md'],
+      files: ['*.mad'],
       rules: {
         'mmkal/unicorn/filename-case': 'off',
         'mmkal/prettier/prettier': 'off',

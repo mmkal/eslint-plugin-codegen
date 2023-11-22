@@ -19,12 +19,12 @@ import {TestOptions} from './e2e/baseTest'
 
 export default defineConfig<void, TestOptions>({
   reporter: process.env.CI ? 'html' : 'list',
-  timeout: 120_000,
+  timeout: 60_000,
   workers: 1,
-  expect: {
-    timeout: 30_000,
-  },
   globalSetup: './globalSetup',
+  use: {
+    video: 'on',
+  },
   projects: [
     {
       testDir: './e2e',
