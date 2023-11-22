@@ -17,17 +17,21 @@ export const createProcessor = (): eslint.Linter.Processor => {
       },
     ],
     postprocess(messageLists, filename) {
-      const messageListsWithCodegen = messageLists
-        .map(list => list.filter(rule => rule.ruleId?.endsWith('codegen/codegen')))
+      const shouldProcessHere = (message: eslint.Linter.LintMessage) => {
+        return message.ruleId?.endsWith('codegen/codegen') || message.fatal
+      }
+
+      const messageListsToProcessWithoutMarkdownPlugin = messageLists
+        .map(list => list.filter(rule => shouldProcessHere(rule)))
         .filter(list => list.length)
 
-      const messageListsWithoutCodegen = messageLists
-        .map(list => list.filter(rule => !rule.ruleId?.endsWith('codegen/codegen')))
+      const messageListsToProcessWithMarkdownPlugin = messageLists
+        .map(list => list.filter(rule => !shouldProcessHere(rule)))
         .filter(list => list.length)
 
       return [
-        ...eslintPluginMarkdownProcessor.postprocess!(messageListsWithoutCodegen, filename),
-        ...messageListsWithCodegen.flat(),
+        ...eslintPluginMarkdownProcessor.postprocess!(messageListsToProcessWithMarkdownPlugin, filename),
+        ...messageListsToProcessWithoutMarkdownPlugin.flat(),
       ]
     },
     supportsAutofix: true,
