@@ -15,13 +15,13 @@
  */
 // eslint-disable-next-line mmkal/import/no-extraneous-dependencies
 import {defineConfig} from '@playwright/test'
-import {TestOptions} from './e2e/baseTest'
+import {TestOptions} from './e2e/base'
 
 export default defineConfig<void, TestOptions>({
   reporter: process.env.CI ? 'html' : 'list',
   timeout: 60_000,
   workers: 1,
-  globalSetup: './globalSetup',
+  globalSetup: './playwright-setup',
   use: {
     video: 'on',
   },

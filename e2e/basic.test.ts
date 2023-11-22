@@ -1,6 +1,6 @@
 import {Page} from '@playwright/test'
 import dedent from 'dedent'
-import {test} from './baseTest'
+import {test} from './base'
 
 test.describe.configure({mode: 'serial'})
 

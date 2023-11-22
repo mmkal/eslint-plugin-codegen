@@ -14,7 +14,7 @@ This allows generating code in a project using eslint, without having to incorpo
 
 Here's an example of it being used along with VSCode's eslint plugin, with auto-fix-on-save:
 
-![](./videos/barrel.webm)
+![](./gifs/barrel.gif)
 
 ## Contents
 
@@ -169,9 +169,9 @@ export * from './some/path/module-c'
 
 ##### Demo
 
-![](./gifs/b.gif)
+![](./gifs/barrel.gif)
 
-<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} --> 
 #### [custom](./src/presets/custom.ts#L32)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
