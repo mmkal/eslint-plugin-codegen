@@ -34,7 +34,7 @@
     "eslint": "eslint --ext '.ts,.js,.md'",
     "lint": "tsc && eslint .",
     "build": "tsc -p tsconfig.lib.json",
-    "test": "jest",
+    "test": "pnpm build && jest",
     "e2e": "playwright test"
   },
   "dependencies": {
