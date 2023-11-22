@@ -14,7 +14,7 @@ This allows generating code in a project using eslint, without having to incorpo
 
 Here's an example of it being used along with VSCode's eslint plugin, with auto-fix-on-save:
 
-![](./gifs/barrel.gif)
+![](./videos/barrel.webm)
 
 ## Contents
 
