@@ -48,33 +48,6 @@ const codegen = async (page: Page, params: {file: string; type: () => Promise<vo
   await new Promise(r => setTimeout(r, 1500))
 }
 
-// test('barrel', async ({workbox: page}) => {
-//   await new Promise(r => setTimeout(r, 500))
-//   await page.keyboard.press('Meta+p')
-//   await new Promise(r => setTimeout(r, 500))
-//   await page.keyboard.type('index.ts')
-//   await new Promise(r => setTimeout(r, 500))
-//   await page.keyboard.press('Enter')
-
-//   await new Promise(r => setTimeout(r, 500))
-//   await page.keyboard.press('Meta+1')
-//   await page.keyboard.type('// codegen:start {preset: barrel}', {delay: 100})
-//   await page.getByTitle('Show Code Actions. Preferred').click()
-//   await new Promise(r => setTimeout(r, 500))
-//   // await page.getByText('Fix all auto-fixable problems').click() // didn't work - loses focus somehow, so use Down-Down-Down-Enter instead 🤷‍♂️
-//   await page.keyboard.press('ArrowDown')
-//   await page.keyboard.press('ArrowDown')
-//   await page.keyboard.press('ArrowDown')
-//   await new Promise(r => setTimeout(r, 1000))
-//   await page.keyboard.press('Enter')
-
-//   await page.getByText('// codegen:start').waitFor()
-//   await page.getByText(`export * from './a'`).waitFor()
-//   await page.getByText(`export * from './b'`).waitFor()
-//   await page.getByText('// codegen:end').waitFor()
-//   await new Promise(r => setTimeout(r, 1500))
-// })
-
 test('barrel', async ({workbox: page}) => {
   await codegen(page, {
     file: 'index.ts',
