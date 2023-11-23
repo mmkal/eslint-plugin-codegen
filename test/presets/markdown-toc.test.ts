@@ -60,15 +60,14 @@ test('generate markdown', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "- [H1](#h1)
-       - [H2](#h2)
-          - [H3](#h3)
-          - [Another H3](#another-h3)
-             - [H4 duplicate](#h4-duplicate)
-                - [H5](#h5)
-                - [H5](#h5-1)
-             - [H4 duplicate](#h4-duplicate-1)
-       - [Another H2](#another-h2)"
+    "- [H2](#h2)
+       - [H3](#h3)
+       - [Another H3](#another-h3)
+          - [H4 duplicate](#h4-duplicate)
+             - [H5](#h5)
+             - [H5](#h5-1)
+          - [H4 duplicate](#h4-duplicate-1)
+    - [Another H2](#another-h2)"
   `)
 
   expect(

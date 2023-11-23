@@ -10,8 +10,8 @@ import * as os from 'os'
  *
  * `<!-- codegen:start {preset: markdownTOC, minDepth: 2, maxDepth: 5} -->`
  *
- * @param minDepth exclude headers with lower "depth". e.g. if set to 2, `# H1` would be excluded but `## H2` would be included.
- * @param maxDepth exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included.
+ * @param minDepth exclude headers with lower "depth". e.g. if set to 2, `# H1` would be excluded but `## H2` would be included. @default 2
+ * @param maxDepth exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included.p
  */
 export const markdownTOC: Preset<{minDepth?: number; maxDepth?: number}> = ({meta, options}) => {
   const lines = fs
@@ -21,7 +21,7 @@ export const markdownTOC: Preset<{minDepth?: number; maxDepth?: number}> = ({met
     .map(line => line.trim())
   const headings = lines
     .filter(line => /^#+ /.exec(line))
-    .filter(line => line.startsWith('#'.repeat(options.minDepth || 1)))
+    .filter(line => line.startsWith('#'.repeat(options.minDepth || 2)))
     .filter(line => line.split(' ')[0].length < (options.maxDepth || Number.POSITIVE_INFINITY))
   const minHashes = lodash.min(headings.map(h => h.split(' ')[0].length))!
   return headings
