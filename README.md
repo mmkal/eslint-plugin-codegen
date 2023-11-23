@@ -201,6 +201,10 @@ This can be used with:
 |dev    |Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.|
 <!-- codegen:end -->
 
+##### Demo
+
+![](./gifs/custom.gif)
+
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
 #### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L17)
 
@@ -332,12 +336,6 @@ Generates a yaml config for the [GitHub Pull Request Labeler Action](https://git
 ##### Demo
 
 ![](./gifs/labeler.gif)
-
-##### Demo
-
-![](./gifs/custom.gif)
-
-Note: right now, this preset isn't smart enough to follow source maps or transpile code, so `source` should point at compiled javascript, not typescript. And VSCode's eslint plugin caches modules, so if you edit the custom preset, you may need to recompile and reload VSCode for it to work properly.
 
 ### Customisation
 
