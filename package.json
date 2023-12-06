@@ -71,7 +71,7 @@
     "@types/jest": "29.5.8",
     "@types/js-yaml": "3.12.5",
     "@types/minimatch": "3.0.3",
-    "@vscode/test-electron": "^2.3.6",
+    "@vscode/test-electron": "^2.3.8",
     "eslint": "8.54.0",
     "eslint-plugin-mmkal": "0.2.0",
     "expect-type2": "npm:expect-type@0.14.0",
