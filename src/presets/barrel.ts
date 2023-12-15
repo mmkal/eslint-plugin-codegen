@@ -50,9 +50,11 @@ export const barrel: Preset<{
 
   const ext = meta.filename.split('.').slice(-1)[0]
   const pattern = opts.include || `*.{${ext},${ext}x}`
+  const exclude = Array.isArray(opts.exclude) ? opts.exclude : opts.exclude ? [opts.exclude] : undefined
 
   const relativeFiles = glob
-    .globSync(pattern, {cwd, ignore: opts.exclude})
+    // todo[glob>10.3.10]: use exclude directly when https://github.com/isaacs/node-glob/issues/570 is fixed
+    .globSync(pattern, {cwd, ignore: exclude?.map(e => e.replace(/^\.\//, ''))})
     .sort((a, b) => a.localeCompare(b))
     .filter(f => path.resolve(cwd, f) !== path.resolve(meta.filename))
     .map(f => `./${f}`.replace(/(\.\/)+\./g, '.'))
