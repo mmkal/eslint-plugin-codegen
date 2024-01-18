@@ -78,6 +78,19 @@ test('generates typescript', () => {
   expect(
     preset.barrel({
       ...params,
+      options: {exclude: ['./a.ts', './b.ts']},
+    }),
+  ).toMatchInlineSnapshot(`
+    "export * from './a-util'
+    export * from './b-util'
+    export * from './c'
+    export * from './index'
+    export * from './util'"
+  `)
+
+  expect(
+    preset.barrel({
+      ...params,
       options: {include: '{a,b}.ts', import: 'star'},
     }),
   ).toMatchInlineSnapshot(`
