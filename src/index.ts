@@ -1,4 +1,5 @@
 /* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
+import * as child_process from 'child_process'
 import * as dedent from 'dedent'
 import type * as eslint from 'eslint'
 
@@ -15,7 +16,16 @@ import * as readPkgUp from 'read-pkg-up'
 import * as presetsModule from './presets'
 import {createProcessor} from './processor'
 
-export const dependencies: presetsModule.PresetDependencies = {dedent, fs, glob, jsYaml, lodash, path, readPkgUp}
+export const dependencies: presetsModule.PresetDependencies = {
+  dedent,
+  fs,
+  glob,
+  jsYaml,
+  lodash,
+  path,
+  readPkgUp,
+  child_process,
+}
 
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 

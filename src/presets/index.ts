@@ -13,6 +13,7 @@ export type PresetMeta = {
 export interface PresetDependencies {
   fs: typeof import('fs')
   path: typeof import('path')
+  child_process: typeof import('child_process')
   lodash: typeof import('lodash')
   jsYaml: typeof import('js-yaml')
   dedent: typeof import('dedent')
