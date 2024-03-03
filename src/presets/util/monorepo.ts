@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import {globSync} from 'glob'
 import {match} from 'io-ts-extra'
+import * as jsYaml from 'js-yaml'
 import * as lodash from 'lodash'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
@@ -17,10 +18,20 @@ export const getLeafPackages = (repoRoot: string | undefined, filename: string) 
     .default(() => path.dirname(readPkgUp.sync({cwd: path.dirname(filename)})!.path))
     .get()
 
-  const readJsonFile = <T>(f: string) => JSON.parse(fs.readFileSync(path.join(contextDir, f)).toString()) as T
+  const maybeReadFile = (f: string) => {
+    const filepath = path.join(contextDir, f)
+    return fs.existsSync(filepath) ? fs.readFileSync(filepath).toString() : null
+  }
+
+  const readJsonFile = <T>(f: string) => JSON.parse(maybeReadFile(f) || 'null') as T
+  const readYamlFile = <T>(f: string) => jsYaml.load(maybeReadFile(f) || 'null') as T
+
   const parseLernaJson = () => readJsonFile<{packages: string[]}>('lerna.json').packages
+  const parsePnpmWorkspace = () =>
+    readYamlFile<{packages: string[]}>(path.join(contextDir, 'pnpm-workspace.yaml')).packages
+
   const pkg = readJsonFile<{workspaces?: {packages?: string[]}}>('package.json')
-  const packageGlobs = pkg.workspaces?.packages || pkg.workspaces || parseLernaJson()
+  const packageGlobs = pkg.workspaces?.packages || pkg.workspaces || parseLernaJson() || parsePnpmWorkspace()
 
   if (!Array.isArray(packageGlobs)) {
     throw new TypeError(`Expected to find workspaces array, got ${inspect(packageGlobs)}`)

@@ -1,5 +1,6 @@
 import dedent from 'dedent'
 import * as glob from 'glob'
+import * as jsYaml from 'js-yaml'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/monorepo-toc'
 import {buildPresetParams} from './meta'
@@ -86,6 +87,24 @@ beforeEach(() => {
 })
 
 test('generate markdown', () => {
+  expect(
+    preset.monorepoTOC({
+      ...params,
+      options: {},
+    }),
+  ).toMatchInlineSnapshot(`
+    "- [package1](./packages/package1) - first package with an inline package.json description. Quite a long inline description, in fact.
+    - [package2](./packages/package2) - Readme for package 2
+    - [package3](./packages/package3) - Readme for package 3
+    - [package4](./packages/package4) - More details about package 4. Package 4 has a detailed readme, with multiple sections"
+  `)
+})
+
+test('handle pnpm-workspace.yaml', () => {
+  delete mockFs['lerna.json']
+  mockFs['pnpm-workspace.yaml'] = jsYaml.dump({
+    packages: 'packages/*',
+  })
   expect(
     preset.monorepoTOC({
       ...params,
