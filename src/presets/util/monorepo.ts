@@ -26,9 +26,9 @@ export const getLeafPackages = (repoRoot: string | undefined, filename: string) 
   const readJsonFile = <T>(f: string) => JSON.parse(maybeReadFile(f) || 'null') as T
   const readYamlFile = <T>(f: string) => jsYaml.load(maybeReadFile(f) || 'null') as T
 
-  const parseLernaJson = () => readJsonFile<{packages: string[]}>('lerna.json').packages
+  const parseLernaJson = () => readJsonFile<{packages: string[]}>('lerna.json')?.packages
   const parsePnpmWorkspace = () =>
-    readYamlFile<{packages: string[]}>(path.join(contextDir, 'pnpm-workspace.yaml')).packages
+    readYamlFile<{packages: string[]}>(path.join(contextDir, 'pnpm-workspace.yaml'))?.packages
 
   const pkg = readJsonFile<{workspaces?: {packages?: string[]}}>('package.json')
   const packageGlobs = pkg.workspaces?.packages || pkg.workspaces || parseLernaJson() || parsePnpmWorkspace()
