@@ -289,10 +289,11 @@ Generate a table of contents from the current markdown file, based on markdown h
 
 ![](./gifs/markdownTOC.gif)
 
-<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
-#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L21)
 
-Use a test file to generate library usage documentation. Note: this has been tested with jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested.
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
+#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L23)
+
+Use a test file to generate library usage documentation. Note: this has been tested with vitest and jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested. JSDoc/inline comments above tests will be added as a "preamble", making this a decent way to quickly document API usage of a library, and to be sure that the usage is real and accurate.
 
 ##### Example
 

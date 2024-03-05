@@ -56,11 +56,25 @@ test('generate markdown', () => {
         expect(calculator.subtract(1, 1)).toEqual(0)
       })
 
+      /**
+       * multiplication is
+       * like addition but _more so_.
+       */
+      // The following works, but is not recommended, it's too dangerous. Stick to adding instead if possible.
       test('multiplication', () => {
         expect(calculator.multiply(2, 3)).toEqual(6)
       })
 
-      test.skip('division', () => {
+      /**
+       * dividing numbers is an advanced use case
+       * 
+       * Note that javascript can do weird things with floats.
+       */
+      test('division', () => {
+        expect(calculator.divide(1, 2)).toEqual(0.5)
+      })
+
+      test.skip('division by zero', () => {
         expect(calculator.divide(1, 0)).toEqual(Infinity)
       })
     `,
@@ -71,22 +85,36 @@ test('generate markdown', () => {
     options: {source: 'test.ts', headerLevel: 4},
   })
   expect(withHeaders).toMatchInlineSnapshot(`
-    "#### addition:
+    "#### addition
 
     \`\`\`typescript
     expect(calculator.add(1, 1)).toEqual(2)
     \`\`\`
 
-    #### subtraction:
+    #### subtraction
 
     \`\`\`typescript
     expect(calculator.subtract(1, 1)).toEqual(0)
     \`\`\`
 
-    #### multiplication:
+    #### multiplication
+
+    multiplication is like addition but _more so_.
+
+    The following works, but is not recommended, it's too dangerous. Stick to adding instead if possible.
 
     \`\`\`typescript
     expect(calculator.multiply(2, 3)).toEqual(6)
+    \`\`\`
+
+    #### division
+
+    dividing numbers is an advanced use case
+
+    Note that javascript can do weird things with floats.
+
+    \`\`\`typescript
+    expect(calculator.divide(1, 2)).toEqual(0.5)
     \`\`\`"
   `)
   const withoutHeaders = preset.markdownFromTests({
@@ -94,5 +122,5 @@ test('generate markdown', () => {
     options: {source: 'test.ts'},
   })
 
-  expect(withoutHeaders).toEqual(withHeaders.replace(/#### /g, ''))
+  expect(withoutHeaders).toEqual(withHeaders.replace(/#### (.*)/g, '$1:'))
 })
