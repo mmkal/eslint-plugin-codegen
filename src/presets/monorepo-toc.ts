@@ -22,7 +22,14 @@ import {relative} from './util/path'
  * [optional] the relative path to the root of the git repository. By default, searches parent directories for a package.json to find the "root".
  * @param filter
  * [optional] a dictionary of filter rules to whitelist packages. Filters can be applied based on package.json keys,
- * e.g. `filter: { package.name: someRegex, path: some/relative/path }`
+ *
+ * examples:
+ * - `filter: '@myorg/.*-lib'` (match packages with names matching this regex)
+ * - `filter: { package.name: '@myorg/.*-lib' }` (equivalent to the above)
+ * - `filter: { package.version: '^[1-9].*' }` (match packages with versions starting with a non-zero digit, i.e. 1.0.0+)
+ * - `filter: '^(?!.*(internal$))'` (match packages that do not contain "internal" anywhere (using [negative lookahead](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Lookahead_assertion)))
+ * - `filter: { package.name: '@myorg', path: 'libraries' }` (match packages whose name contains "@myorg" and whose path matches "libraries")
+ * - `filter: { readme: 'This is production-ready' }` (match packages whose readme contains the string "This is production-ready")
  * @param sort
  * [optional] sort based on package properties (see `filter`), or readme length. Use `-` as a prefix to sort descending.
  * e.g. `sort: -readme.length`
@@ -41,7 +48,7 @@ export const monorepoTOC: Preset<{
       const readme = [readmePath && fs.readFileSync(readmePath).toString(), leafPkg.description]
         .filter(Boolean)
         .join(os.EOL + os.EOL)
-      return {package: leafPkg, leafPath, readme}
+      return {package: leafPkg, path: leafPath, readme}
     })
     .filter(props => {
       const filter = typeof options.filter === 'object' ? options.filter : {'package.name': options.filter!}
@@ -60,7 +67,7 @@ export const monorepoTOC: Preset<{
       const comp = a < b ? -1 : a > b ? 1 : 0
       return comp * multiplier
     })
-    .map(props => ({leafPath: props.leafPath, leafPkg: props.package, readme: props.readme}))
+    .map(props => ({leafPath: props.path, leafPkg: props.package, readme: props.readme}))
     .map(({leafPath, leafPkg, readme}) => {
       const description = (() => {
         return readme
