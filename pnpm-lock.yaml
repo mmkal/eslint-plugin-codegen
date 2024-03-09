@@ -17,6 +17,9 @@ dependencies:
   '@babel/traverse':
     specifier: ^7.11.5
     version: 7.19.6
+  '@pnpm/deps.graph-sequencer':
+    specifier: ^1.0.0
+    version: 1.0.0
   '@types/dedent':
     specifier: 0.7.0
     version: 0.7.0
@@ -926,6 +929,11 @@ packages:
     resolution: {integrity: sha512-htyl8TWnKL7K/ESFa1oW2UB5lVDxuF5DpM7tBi6Hu2LNL3mWkIzNLG6N4zoCUP1lCKNxWy/3iu8mS8MvToGd6w==}
     engines: {node: '>=12.22.0'}
     dev: true
+
+  /@pnpm/deps.graph-sequencer@1.0.0:
+    resolution: {integrity: sha512-vWWVbYYBBN/kweokmURicokyg7crzcDZo9/naziv8B8RSWrLWFpq5Xl0ro6QCQKgRmb6O78Qy9uQT+Fp79RxsA==}
+    engines: {node: '>=16.14'}
+    dev: false
 
   /@pnpm/network.ca-file@1.0.2:
     resolution: {integrity: sha512-YcPQ8a0jwYU9bTdJDpXjMi7Brhkr1mXsXrUJvjqM2mQDgkRiz8jFaQGOdaLxgjtUfQgZhKy/O3cG/YwmgKaxLA==}

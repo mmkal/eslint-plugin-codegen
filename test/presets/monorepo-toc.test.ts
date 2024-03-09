@@ -193,3 +193,73 @@ test('invalid workspaces', () => {
     }),
   ).toThrow(/Expected to find workspaces array, got 'package.json - not an array'/)
 })
+
+test('toplogical sort', () => {
+  Object.keys(mockFs)
+    .filter(k => k.includes('packages/'))
+    .forEach(k => {
+      // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
+      delete mockFs[k]
+    })
+  Object.assign(mockFs, {
+    'packages/client/package.json': '{ "name": "client" }',
+    'packages/schemainspect/package.json': '{ "name": "schemainspect", "dependencies": {"client": "*"} }',
+    'packages/migra/package.json': '{ "name": "migra", "dependencies": {"client": "*", "schemainspect": "*"} }',
+    'packages/migrator/package.json': '{ "name": "migrator", "dependencies": {"migra": "*", "client": "*"} }',
+    'packages/typegen/package.json': '{ "name": "typegen", "dependencies": {"client": "*"} }',
+    'packages/admin/package.json':
+      '{ "name": "admin", "dependencies": {"client": "*", "schemainspect": "*", "migrator": "*"} }',
+  })
+
+  expect(
+    preset.monorepoTOC({
+      ...params,
+      options: {
+        sort: 'topological',
+      },
+    }),
+  ).toMatchInlineSnapshot(`
+    "- [client](./packages/client)
+    - [schemainspect](./packages/schemainspect)
+    - [typegen](./packages/typegen)
+    - [migra](./packages/migra)
+    - [migrator](./packages/migrator)
+    - [admin](./packages/admin)"
+  `)
+})
+
+test('toposort helper', () => {
+  expect(
+    preset.toposort({
+      client: [],
+      schemainspect: ['client'],
+      migra: ['client', 'schemainspect'],
+      migrator: ['migra', 'client'],
+      typegen: ['client'],
+      admin: ['client', 'schemainspect', 'migrator'],
+    }),
+  ).toMatchInlineSnapshot(`
+    {
+      "chunks": [
+        [
+          "client",
+        ],
+        [
+          "schemainspect",
+          "typegen",
+        ],
+        [
+          "migra",
+        ],
+        [
+          "migrator",
+        ],
+        [
+          "admin",
+        ],
+      ],
+      "cycles": [],
+      "safe": true,
+    }
+  `)
+})

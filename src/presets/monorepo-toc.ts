@@ -1,4 +1,5 @@
 import type {Preset} from '.'
+import {graphSequencer} from '@pnpm/deps.graph-sequencer'
 import * as fs from 'fs'
 import * as lodash from 'lodash'
 import * as os from 'os'
@@ -32,7 +33,10 @@ import {relative} from './util/path'
  * - `filter: { readme: 'This is production-ready' }` (match packages whose readme contains the string "This is production-ready")
  * @param sort
  * [optional] sort based on package properties (see `filter`), or readme length. Use `-` as a prefix to sort descending.
- * e.g. `sort: -readme.length`
+ * examples:
+ * - `sort: package.name` (sort by package name)
+ * - `sort: -readme.length` (sort by readme length, descending)
+ * - `sort: toplogical` (sort by toplogical dependencies, starting with the most depended-on packages)
  */
 export const monorepoTOC: Preset<{
   repoRoot?: string
@@ -41,6 +45,25 @@ export const monorepoTOC: Preset<{
 }> = ({options, context}) => {
   const packages = getLeafPackages(options.repoRoot, context.physicalFilename)
 
+  const packageNames = new Set(packages.map(({packageJson}) => packageJson.name))
+  const toposorted = toposort(
+    Object.fromEntries(
+      packages
+        .map(({packageJson}) => {
+          const dependencies = Object.keys({...packageJson.dependencies, ...packageJson.devDependencies}).filter(dep =>
+            packageNames.has(dep),
+          )
+          return [packageJson.name!, dependencies] as const
+        })
+        .sort(([a], [b]) => a.localeCompare(b)),
+    ),
+  )
+  const toposortIndexes = Object.fromEntries(
+    toposorted.chunks.flatMap((chunk, i) => {
+      return chunk.map(pkg => [pkg, i] as const)
+    }),
+  )
+
   const leafPackages = packages
     .map(({path: leafPath, packageJson: leafPkg}) => {
       const dirname = path.dirname(leafPath)
@@ -48,7 +71,12 @@ export const monorepoTOC: Preset<{
       const readme = [readmePath && fs.readFileSync(readmePath).toString(), leafPkg.description]
         .filter(Boolean)
         .join(os.EOL + os.EOL)
-      return {package: leafPkg, path: leafPath, readme}
+      return {
+        package: leafPkg,
+        path: leafPath,
+        readme,
+        topological: toposortIndexes[leafPkg.name!] ?? Number.POSITIVE_INFINITY,
+      }
     })
     .filter(props => {
       const filter = typeof options.filter === 'object' ? options.filter : {'package.name': options.filter!}
@@ -83,4 +111,11 @@ export const monorepoTOC: Preset<{
     })
 
   return leafPackages.join(os.EOL)
+}
+
+export const toposort = <K extends string, Deps extends K>(graph: Record<K, Deps[]>) => {
+  return graphSequencer<K>(
+    new Map(Object.entries(graph) as Array<[K, Array<K | Deps>]>),
+    Object.keys(graph).sort() as K[],
+  )
 }
