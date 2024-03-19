@@ -8,7 +8,7 @@ const params = buildPresetParams(__filename)
 const mockFs: any = {}
 
 beforeEach(() => {
-  // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 

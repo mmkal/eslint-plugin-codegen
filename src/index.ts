@@ -1,4 +1,4 @@
-/* eslint-disable mmkal/@typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import * as child_process from 'child_process'
 import * as dedent from 'dedent'
 import type * as eslint from 'eslint'
@@ -28,10 +28,6 @@ export const dependencies: presetsModule.PresetDependencies = {
 }
 
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
-
-type MatchAll = (text: string, pattern: string | RegExp) => Iterable<NonNullable<ReturnType<string['match']>>>
-// eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/no-require-imports
-const matchAll: MatchAll = require('string.prototype.matchall')
 
 export type {Preset} from './presets'
 
@@ -92,10 +88,10 @@ const codegen: eslint.Rule.RuleModule = {
       const position = (index: number) => {
         const stringUpToPosition = sourceCode.slice(0, index)
         const lines = stringUpToPosition.split(os.EOL)
-        return {line: lines.length, column: lines[lines.length - 1].length}
+        return {line: lines.length, column: lines.at(-1)!.length}
       }
 
-      const startMatches = [...matchAll(sourceCode, markers.start)].filter(startMatch => {
+      const startMatches = [...sourceCode.matchAll(markers.start)].filter(startMatch => {
         const prevCharacter = sourceCode[startMatch.index! - 1]
         return !prevCharacter || prevCharacter === '\n'
       })
@@ -106,7 +102,7 @@ const codegen: eslint.Rule.RuleModule = {
         const startMarkerLoc = {start, end: {...start, column: start.column + startMatch[0].length}}
         const searchForEndMarkerUpTo =
           startMatchesIndex === startMatches.length - 1 ? sourceCode.length : startMatches[startMatchesIndex + 1].index
-        const endMatch = [...matchAll(sourceCode.slice(0, searchForEndMarkerUpTo), markers.end)].find(
+        const endMatch = [...sourceCode.slice(0, searchForEndMarkerUpTo).matchAll(markers.end)].find(
           e => e.index! > startMatch.index!,
         )
         if (!endMatch) {
@@ -117,7 +113,7 @@ const codegen: eslint.Rule.RuleModule = {
             fix: fixer =>
               fixer.replaceTextRange(
                 [afterStartMatch, afterStartMatch],
-                os.EOL + markers.end.source.replace(/\\/g, ''),
+                os.EOL + markers.end.source.replaceAll('\\', ''),
               ),
           })
           return
@@ -136,7 +132,7 @@ const codegen: eslint.Rule.RuleModule = {
         const presets: Record<string, presetsModule.Preset | undefined> = {
           ...presetsModule,
           ...context.options[0]?.presets,
-        }
+        } as {}
         const preset = typeof opts?.preset === 'string' && presets[opts.preset]
         if (typeof preset !== 'function') {
           context.report({
@@ -148,7 +144,7 @@ const codegen: eslint.Rule.RuleModule = {
 
         const range: eslint.AST.Range = [startIndex + startMatch[0].length + os.EOL.length, endMatch.index!]
         const existingContent = sourceCode.slice(...range)
-        const normalise = (val: string) => val.trim().replace(/\r?\n/g, os.EOL)
+        const normalise = (val: string) => val.trim().replaceAll(/\r?\n/g, os.EOL)
         const result = tryCatch(
           () => {
             const meta: presetsModule.PresetMeta = {

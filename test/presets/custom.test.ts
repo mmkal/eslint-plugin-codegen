@@ -7,7 +7,7 @@ const params = buildPresetParams(__filename)
 jest.mock('ts-node/register/transpile-only')
 
 test('custom preset validation', () => {
-  // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const customPreset = require('./custom-preset')
 
   expect(Object.keys(customPreset)).toEqual(['getText', 'thrower'])

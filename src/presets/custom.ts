@@ -44,16 +44,16 @@ export const custom: Preset<
 
   const requireFirst = options.require || (sourcePath.endsWith('.ts') ? 'ts-node/register/transpile-only' : undefined)
   if (requireFirst) {
-    // eslint-disable-next-line mmkal/@typescript-eslint/no-require-imports
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require(requireFirst)
   }
 
   if (options.dev ?? !process.env.CI) {
-    // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete require.cache[sourcePath]
   }
 
-  // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires, mmkal/@typescript-eslint/no-require-imports
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
   const sourceModule = require(sourcePath)
   const func: Preset<any> = options.export ? sourceModule[options.export] : sourceModule
   if (typeof func !== 'function') {

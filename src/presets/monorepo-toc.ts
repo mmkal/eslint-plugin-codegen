@@ -83,7 +83,7 @@ export const monorepoTOC: Preset<{
       return (
         Object.keys(filter)
           .filter(key => typeof filter[key] === 'string')
-          // eslint-disable-next-line mmkal/@rushstack/security/no-unsafe-regexp
+          // eslint-disable-next-line @rushstack/security/no-unsafe-regexp
           .every(key => new RegExp(lodash.get(filter, key)).test(lodash.get(props, key)))
       )
     })

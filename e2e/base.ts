@@ -1,6 +1,6 @@
-// eslint-disable-next-line mmkal/unicorn/filename-case
+// eslint-disable-next-line unicorn/filename-case
 /* eslint-disable no-console */
-/* eslint-disable mmkal/import/no-extraneous-dependencies */
+/* eslint-disable import/no-extraneous-dependencies */
 /**
  * Copyright (c) Microsoft Corporation.
  *
@@ -156,4 +156,4 @@ export const test = base.extend<TestFixtures>({
   },
 })
 
-const slugify = (string: string) => string.replace(/\W+/g, ' ').trim().replace(/\s+/g, '-')
+const slugify = (string: string) => string.replaceAll(/\W+/g, ' ').trim().replaceAll(/\s+/g, '-')

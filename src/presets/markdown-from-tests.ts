@@ -62,7 +62,7 @@ export const markdownFromTests: Preset<{source: string; headerLevel?: number}> =
   return specs
     .map(s => {
       const lines = [
-        // eslint-disable-next-line mmkal/@typescript-eslint/restrict-template-expressions
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         `${'#'.repeat(options.headerLevel || 0)} ${s.title}${options.headerLevel ? '' : ':'}${'\n'}`.trimStart(),
         ...(s.preamble ? [s.preamble, ''] : []),
         '```typescript',
