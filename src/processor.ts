@@ -2,7 +2,7 @@ import type * as eslint from 'eslint'
 import * as os from 'os'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const eslintPluginMarkdownProcessor: eslint.Linter.Processor = require('eslint-plugin-markdown/lib/processor')
+const eslintPluginMarkdownProcessor = require('eslint-plugin-markdown/lib/processor') as eslint.Linter.Processor
 
 export const createProcessor = (): eslint.Linter.Processor => {
   return {

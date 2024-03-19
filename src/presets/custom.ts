@@ -53,8 +53,9 @@ export const custom: Preset<
     delete require.cache[sourcePath]
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
   const sourceModule = require(sourcePath)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
   const func: Preset<any> = options.export ? sourceModule[options.export] : sourceModule
   if (typeof func !== 'function') {
     throw new TypeError(`Couldn't find export ${options.export || 'function'} from ${sourcePath} - got ${typeof func}`)

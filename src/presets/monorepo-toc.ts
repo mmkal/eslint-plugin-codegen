@@ -83,15 +83,15 @@ export const monorepoTOC: Preset<{
       return (
         Object.keys(filter)
           .filter(key => typeof filter[key] === 'string')
-          // eslint-disable-next-line @rushstack/security/no-unsafe-regexp
-          .every(key => new RegExp(lodash.get(filter, key)).test(lodash.get(props, key)))
+          // // eslint-disable-next-line @rushstack/security/no-unsafe-regexp
+          .every(key => new RegExp(lodash.get(filter, key)).test(lodash.get(props, key) as string))
       )
     })
     .sort((...args) => {
       const sort = options.sort || 'package.name'
       const multiplier = sort.startsWith('-') ? -1 : 1
       const key = sort.replace(/^-/, '')
-      const [a, b] = args.map(arg => lodash.get(arg, key))
+      const [a, b] = args.map(arg => lodash.get(arg, key) as string)
       const comp = a < b ? -1 : a > b ? 1 : 0
       return comp * multiplier
     })
