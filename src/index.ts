@@ -150,7 +150,7 @@ const codegen: eslint.Rule.RuleModule = {
             const meta: presetsModule.PresetMeta = {
               filename: context.physicalFilename,
               existingContent,
-              glob: globSync,
+              glob: globSync as never,
               fs,
               path,
             }
