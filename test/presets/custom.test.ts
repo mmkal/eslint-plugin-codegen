@@ -1,6 +1,7 @@
 import * as path from 'path'
 import * as preset from '../../src/presets/custom'
 import {buildPresetParams} from './meta'
+import {test, expect, vi as jest} from 'vitest'
 
 const params = buildPresetParams(__filename)
 
@@ -8,7 +9,7 @@ jest.mock('ts-node/register/transpile-only')
 
 test('custom preset validation', () => {
   // eslint-disable-next-line mmkal/@typescript-eslint/no-var-requires
-  const customPreset = require('./custom-preset')
+  const customPreset = require('./custom-preset.cjs')
 
   expect(Object.keys(customPreset)).toEqual(['getText', 'thrower'])
 
@@ -103,5 +104,5 @@ test('can require module first', () => {
       ...params,
       options: {source: './custom-preset.cjs', require: 'thismoduledoesnotexist'},
     }),
-  ).toThrow(/Cannot find module 'thismoduledoesnotexist' from 'src\/presets\/custom.ts'/)
+  ).toThrow(/Cannot find module 'thismoduledoesnotexist'(\n.*)*src\/presets\/custom.ts/)
 })

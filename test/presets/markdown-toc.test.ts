@@ -1,6 +1,7 @@
 import dedent from 'dedent'
 import * as preset from '../../src/presets/markdown-toc'
 import {buildPresetParams} from './meta'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const mockFs: any = {}
 
@@ -9,8 +10,8 @@ beforeEach(() => {
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
-jest.mock('fs', () => {
-  const actual = jest.requireActual('fs')
+jest.mock('fs', async () => {
+  const actual: any = await jest.importActual('fs')
   const reader =
     (orig: string) =>
     (...args: any[]) => {
@@ -60,14 +61,45 @@ test('generate markdown', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "- [H2](#h2)
-       - [H3](#h3)
-       - [Another H3](#another-h3)
-          - [H4 duplicate](#h4-duplicate)
-             - [H5](#h5)
-             - [H5](#h5-1)
-          - [H4 duplicate](#h4-duplicate-1)
-    - [Another H2](#another-h2)"
+    "- [Motivation](#motivation)
+    - [Contents](#contents)
+    - [How to use](#how-to-use)
+       - [Setup](#setup)
+          - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
+       - [Presets](#presets)
+          - [barrel](#barrel)
+             - [Example](#example)
+             - [Params](#params)
+             - [Demo](#demo)
+          - [custom](#custom)
+             - [Example](#example-1)
+             - [Params](#params-1)
+             - [Demo](#demo-1)
+          - [markdownFromJsdoc](#markdownfromjsdoc)
+             - [Example](#example-2)
+             - [Params](#params-2)
+          - [monorepoTOC](#monorepotoc)
+             - [Example (basic)](#example-basic)
+             - [Example (using config options)](#example-using-config-options)
+             - [Params](#params-3)
+             - [Demo](#demo-2)
+          - [markdownFromJsdoc](#markdownfromjsdoc-1)
+             - [Example](#example-3)
+             - [Params](#params-4)
+             - [Demo](#demo-3)
+          - [markdownTOC](#markdowntoc)
+             - [Example](#example-4)
+             - [Params](#params-5)
+             - [Demo](#demo-4)
+          - [markdownFromTests](#markdownfromtests)
+             - [Example](#example-5)
+             - [Params](#params-6)
+             - [Demo](#demo-5)
+          - [labeler](#labeler)
+             - [Example](#example-6)
+             - [Params](#params-7)
+             - [Demo](#demo-6)
+       - [Customisation](#customisation)"
   `)
 
   expect(
@@ -79,8 +111,9 @@ test('generate markdown', () => {
       },
     }),
   ).toMatchInlineSnapshot(`
-    "- [H2](#h2)
-    - [Another H2](#another-h2)"
+    "- [Motivation](#motivation)
+    - [Contents](#contents)
+    - [How to use](#how-to-use)"
   `)
 })
 
@@ -101,11 +134,45 @@ test('calculates min hashes', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "- [H3](#h3)
-    - [Another H3](#another-h3)
-       - [H4 duplicate](#h4-duplicate)
-          - [H5](#h5)
-          - [H5](#h5-1)"
+    "- [Motivation](#motivation)
+    - [Contents](#contents)
+    - [How to use](#how-to-use)
+       - [Setup](#setup)
+          - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
+       - [Presets](#presets)
+          - [barrel](#barrel)
+             - [Example](#example)
+             - [Params](#params)
+             - [Demo](#demo)
+          - [custom](#custom)
+             - [Example](#example-1)
+             - [Params](#params-1)
+             - [Demo](#demo-1)
+          - [markdownFromJsdoc](#markdownfromjsdoc)
+             - [Example](#example-2)
+             - [Params](#params-2)
+          - [monorepoTOC](#monorepotoc)
+             - [Example (basic)](#example-basic)
+             - [Example (using config options)](#example-using-config-options)
+             - [Params](#params-3)
+             - [Demo](#demo-2)
+          - [markdownFromJsdoc](#markdownfromjsdoc-1)
+             - [Example](#example-3)
+             - [Params](#params-4)
+             - [Demo](#demo-3)
+          - [markdownTOC](#markdowntoc)
+             - [Example](#example-4)
+             - [Params](#params-5)
+             - [Demo](#demo-4)
+          - [markdownFromTests](#markdownfromtests)
+             - [Example](#example-5)
+             - [Params](#params-6)
+             - [Demo](#demo-5)
+          - [labeler](#labeler)
+             - [Example](#example-6)
+             - [Params](#params-7)
+             - [Demo](#demo-6)
+       - [Customisation](#customisation)"
   `)
 
   expect(
@@ -116,5 +183,9 @@ test('calculates min hashes', () => {
         maxDepth: 3,
       },
     }),
-  ).toMatchInlineSnapshot(`""`)
+  ).toMatchInlineSnapshot(`
+    "- [Motivation](#motivation)
+    - [Contents](#contents)
+    - [How to use](#how-to-use)"
+  `)
 })

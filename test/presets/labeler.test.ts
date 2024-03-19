@@ -3,6 +3,7 @@ import minimatch from 'minimatch'
 import readPkgUp from 'read-pkg-up'
 import * as preset from '../../src/presets/labeler'
 import {buildPresetParams} from './meta'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const mockFs: any = {}
 
@@ -11,8 +12,8 @@ beforeEach(() => {
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
-jest.mock('fs', () => {
-  const actual = jest.requireActual('fs')
+jest.mock('fs', async () => {
+  const actual: any = await jest.importActual('fs')
   const reader =
     (orig: string) =>
     (...args: any[]) => {

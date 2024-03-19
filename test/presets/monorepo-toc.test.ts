@@ -4,6 +4,7 @@ import * as jsYaml from 'js-yaml'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/monorepo-toc'
 import {buildPresetParams} from './meta'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const mockFs: any = {}
 
@@ -12,8 +13,8 @@ beforeEach(() => {
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
-jest.mock('fs', () => {
-  const actual = jest.requireActual('fs')
+jest.mock('fs', async () => {
+  const actual: any = await jest.importActual('fs')
   const reader =
     (orig: string) =>
     (...args: any[]) => {

@@ -1,6 +1,7 @@
 import dedent from 'dedent'
 import * as preset from '../../src/presets/markdown-from-tests'
 import {buildPresetParams} from './meta'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const params = buildPresetParams(__dirname + '/test.ts')
 
@@ -11,8 +12,8 @@ beforeEach(() => {
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
-jest.mock('fs', () => {
-  const actual = jest.requireActual('fs')
+jest.mock('fs', async () => {
+  const actual: any = await jest.importActual('fs')
   const reader =
     (orig: string) =>
     (...args: any[]) => {

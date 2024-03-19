@@ -1,11 +1,9 @@
 import baseDedent from 'dedent'
 import {RuleTester} from 'eslint'
 import * as os from 'os'
+import * as path from 'path'
 import * as codegen from '../src'
-
-jest.mock('glob', () => ({
-  globSync: () => ['foo.ts', 'bar.ts'],
-}))
+import {test} from 'vitest'
 
 /** wrapper for dedent which respects os.EOL */
 const dedent = (...args: Parameters<typeof baseDedent>) => {
@@ -88,7 +86,7 @@ tester.run('codegen', codegen.rules.codegen, {
       `,
     },
     {
-      filename: __filename,
+      filename: path.join(__dirname, 'fixtures/barrel/barrel.ts'),
       parserOptions: {ecmaVersion: 2015, sourceType: 'module'},
       code: dedent`
         // codegen:start {preset: barrel}

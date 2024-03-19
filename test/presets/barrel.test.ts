@@ -2,6 +2,7 @@ import * as glob from 'glob'
 import minimatch from 'minimatch'
 import * as preset from '../../src/presets/barrel'
 import {buildPresetParams} from './meta'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const params = buildPresetParams(__filename)
 

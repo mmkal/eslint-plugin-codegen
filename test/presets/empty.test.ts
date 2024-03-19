@@ -1,5 +1,6 @@
 import * as preset from '../../src/presets/empty'
 import {buildPresetParams} from './meta'
+import {test, expect} from 'vitest'
 
 const params = buildPresetParams(__filename)
 
