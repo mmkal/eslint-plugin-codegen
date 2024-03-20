@@ -298,7 +298,7 @@ Use a test file to generate library usage documentation. Note: this has been tes
 
 |name       |description                                           |
 |-----------|------------------------------------------------------|
-|source     |the jest test file                                    |
+|source     |the test file                                         |
 |headerLevel|The number of `#` characters to prefix each title with|
 <!-- codegen:end -->
 

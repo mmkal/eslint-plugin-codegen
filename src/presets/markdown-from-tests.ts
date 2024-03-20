@@ -16,7 +16,7 @@ import * as path from 'path'
  *
  * `<!-- codegen:start {preset: markdownFromTests, source: test/foo.test.ts, headerLevel: 3} -->`
  *
- * @param source the jest test file
+ * @param source the test file
  * @param headerLevel The number of `#` characters to prefix each title with
  */
 export const markdownFromTests: Preset<{source: string; headerLevel?: number}> = ({

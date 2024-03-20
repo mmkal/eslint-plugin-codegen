@@ -1,11 +1,11 @@
 import * as path from 'path'
-import {test, expect, vi as jest} from 'vitest'
+import {test, expect, vi} from 'vitest'
 import * as preset from '../../src/presets/custom'
 import {buildPresetParams} from './meta'
 
 const params = buildPresetParams(__filename)
 
-jest.mock('ts-node/register/transpile-only')
+vi.mock('ts-node/register/transpile-only')
 
 test('custom preset validation', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires

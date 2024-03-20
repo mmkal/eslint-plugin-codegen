@@ -1,6 +1,6 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
-import {test, expect, beforeEach, vi as jest} from 'vitest'
+import {test, expect, beforeEach, vi} from 'vitest'
 import * as preset from '../../src/presets/barrel'
 import {buildPresetParams, getFakeFs} from './meta'
 
@@ -12,9 +12,9 @@ beforeEach(() => {
 
 const params = buildPresetParams(__filename, fs)
 
-jest.mock('glob')
+vi.mock('glob')
 
-jest.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
+vi.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
   const found = Object.keys(mockFs).filter(k => minimatch(k, pattern as string))
   const ignores = (typeof opts?.ignore === 'string' ? [opts?.ignore] : opts?.ignore || []) as string[]
   return found.filter(f => ignores.every(i => !minimatch(f, i)))
