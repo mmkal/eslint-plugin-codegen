@@ -28,8 +28,8 @@
   ],
   "scripts": {
     "prepare": "pnpm build",
-    "eslint": "eslint",
-    "lint": "tsc && eslint .",
+    "eslint": "eslint --max-warnings 0",
+    "lint": "tsc && pnpm eslint .",
     "build": "tsc -p tsconfig.lib.json",
     "test": "pnpm build && vitest run",
     "e2e": "playwright test"
