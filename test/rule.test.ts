@@ -2,8 +2,8 @@ import baseDedent from 'dedent'
 import {RuleTester} from 'eslint'
 import * as os from 'os'
 import * as path from 'path'
-import * as codegen from '../src'
 import {test} from 'vitest'
+import * as codegen from '../src'
 
 /** wrapper for dedent which respects os.EOL */
 const dedent = (...args: Parameters<typeof baseDedent>) => {

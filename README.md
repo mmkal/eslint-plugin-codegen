@@ -169,7 +169,7 @@ export * from './some/path/module-c'
 ![](./gifs/barrel.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L32)
+#### [custom](./src/presets/custom.ts#L31)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
 
@@ -203,7 +203,7 @@ This can be used with:
 ![](./gifs/custom.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
-#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L17)
+#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L16)
 
 Convert jsdoc for an es export from a javascript/typescript file to markdown.
 
@@ -220,7 +220,7 @@ Convert jsdoc for an es export from a javascript/typescript file to markdown.
 <!-- codegen:end -->
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/monorepo-toc.ts, export: monorepoTOC} -->
-#### [monorepoTOC](./src/presets/monorepo-toc.ts#L41)
+#### [monorepoTOC](./src/presets/monorepo-toc.ts#L40)
 
 Generate a table of contents for a monorepo.
 
@@ -266,7 +266,7 @@ Convert jsdoc to an es export from a javascript/typescript file to markdown.
 ![](./gifs/markdownFromJsdoc.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-toc.ts, export: markdownTOC} -->
-#### [markdownTOC](./src/presets/markdown-toc.ts#L16)
+#### [markdownTOC](./src/presets/markdown-toc.ts#L15)
 
 Generate a table of contents from the current markdown file, based on markdown headers (e.g. `### My section title`)
 
@@ -287,7 +287,7 @@ Generate a table of contents from the current markdown file, based on markdown h
 ![](./gifs/markdownTOC.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
-#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L23)
+#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L22)
 
 Use a test file to generate library usage documentation. Note: this has been tested with vitest and jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested. JSDoc/inline comments above tests will be added as a "preamble", making this a decent way to quickly document API usage of a library, and to be sure that the usage is real and accurate.
 

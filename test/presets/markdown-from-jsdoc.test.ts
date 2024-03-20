@@ -1,9 +1,7 @@
 import dedent from 'dedent'
+import {test, expect, beforeEach} from 'vitest'
 import * as preset from '../../src/presets/markdown-from-jsdoc'
 import {buildPresetParams} from './meta'
-import {test, expect, beforeEach, vi as jest} from 'vitest'
-
-const params = buildPresetParams(__dirname + '/index.ts')
 
 const mockFs: any = {}
 
@@ -12,15 +10,14 @@ beforeEach(() => {
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
-jest.mock('fs', async () => {
-  const actual: any = await jest.importActual('fs')
+const fs = (() => {
+  const actual: any = require('fs')
   const reader =
     (orig: string) =>
     (...args: any[]) => {
-      const path = args[0].replaceAll('\\', '/')
-      // const fn = path in mockFs ? mockImpl : actual[orig]
-      if (path in mockFs) {
-        return mockFs[path]
+      const filepath = args[0].replaceAll('\\', '/')
+      if (filepath in mockFs) {
+        return mockFs[filepath]
       }
 
       try {
@@ -42,8 +39,10 @@ jest.mock('fs', async () => {
     existsSync: reader('existsSync'),
     readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
     statSync: () => ({isFile: () => true, isDirectory: () => false}),
-  }
-})
+  } as typeof import('fs')
+})()
+
+const params = buildPresetParams(__dirname + '/index.ts', fs)
 
 test('generate markdown', () => {
   Object.assign(mockFs, {

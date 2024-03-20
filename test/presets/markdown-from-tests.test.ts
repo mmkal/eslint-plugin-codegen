@@ -1,9 +1,7 @@
 import dedent from 'dedent'
+import {test, expect, beforeEach} from 'vitest'
 import * as preset from '../../src/presets/markdown-from-tests'
 import {buildPresetParams} from './meta'
-import {test, expect, beforeEach, vi as jest} from 'vitest'
-
-const params = buildPresetParams(__dirname + '/test.ts')
 
 const mockFs: any = {}
 
@@ -12,8 +10,8 @@ beforeEach(() => {
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
-jest.mock('fs', async () => {
-  const actual: any = await jest.importActual('fs')
+const fs = (() => {
+  const actual: any = require('fs')
   const reader =
     (orig: string) =>
     (...args: any[]) => {
@@ -33,7 +31,9 @@ jest.mock('fs', async () => {
     readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
     statSync: () => ({isFile: () => true, isDirectory: () => false}),
   }
-})
+})()
+
+const params = buildPresetParams(__dirname + '/test.ts', fs)
 
 test('generate markdown', () => {
   Object.assign(mockFs, {

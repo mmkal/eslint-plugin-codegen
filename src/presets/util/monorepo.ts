@@ -1,4 +1,3 @@
-import * as fs from 'fs'
 import {globSync} from 'glob'
 import {match} from 'io-ts-extra'
 import * as jsYaml from 'js-yaml'
@@ -12,7 +11,7 @@ export interface PackageGlobbable {
   repoRoot?: string
 }
 
-export const getLeafPackages = (repoRoot: string | undefined, filename: string) => {
+export const getLeafPackages = (repoRoot: string | undefined, filename: string, fs: typeof import('fs')) => {
   const contextDir = match(repoRoot)
     .case(String, s => path.join(path.dirname(filename), s))
     .default(() => path.dirname(readPkgUp.sync({cwd: path.dirname(filename)})!.path))
@@ -34,11 +33,11 @@ export const getLeafPackages = (repoRoot: string | undefined, filename: string) 
   const packageGlobs = pkg.workspaces?.packages || pkg.workspaces || parseLernaJson() || parsePnpmWorkspace()
 
   if (!Array.isArray(packageGlobs)) {
-    throw new TypeError(`Expected to find workspaces array, got ${inspect(packageGlobs)}`)
+    throw new TypeError(`Expected to find workspaces array, got ${inspect(packageGlobs)})}`)
   }
 
   const packages = lodash
-    .flatMap(packageGlobs, pattern => globSync(`${pattern}/package.json`, {cwd: contextDir}))
+    .flatMap(packageGlobs, pattern => globSync(`${pattern}/package.json`, {cwd: contextDir, fs}))
     .map(p => ({path: p, packageJson: readJsonFile<PackageJson>(p)}))
   return lodash.compact(packages)
 }

@@ -1,7 +1,7 @@
 import dedent from 'dedent'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 import * as preset from '../../src/presets/markdown-toc'
 import {buildPresetParams} from './meta'
-import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const mockFs: any = {}
 

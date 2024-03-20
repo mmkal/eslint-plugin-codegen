@@ -1,5 +1,4 @@
 import type {Preset} from '.'
-import * as fs from 'fs'
 import * as lodash from 'lodash'
 import * as os from 'os'
 
@@ -13,7 +12,7 @@ import * as os from 'os'
  * @param minDepth exclude headers with lower "depth". e.g. if set to 2, `# H1` would be excluded but `## H2` would be included. @default 2
  * @param maxDepth exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included.p
  */
-export const markdownTOC: Preset<{minDepth?: number; maxDepth?: number}> = ({meta, options}) => {
+export const markdownTOC: Preset<{minDepth?: number; maxDepth?: number}> = ({meta, options, dependencies: {fs}}) => {
   const lines = fs
     .readFileSync(meta.filename)
     .toString()

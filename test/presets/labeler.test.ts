@@ -1,9 +1,10 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
+import * as path from 'path'
 import readPkgUp from 'read-pkg-up'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 import * as preset from '../../src/presets/labeler'
 import {buildPresetParams} from './meta'
-import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const mockFs: any = {}
 
@@ -12,15 +13,15 @@ beforeEach(() => {
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
-jest.mock('fs', async () => {
-  const actual: any = await jest.importActual('fs')
+const fs = (() => {
+  const actual: any = require('fs')
   const reader =
     (orig: string) =>
     (...args: any[]) => {
-      const path = args[0].replace(process.cwd() + '\\', '').replaceAll('\\', '/')
+      const filepath = path.relative(process.cwd(), args[0])
       // const fn = path in mockFs ? mockImpl : actual[orig]
-      if (path in mockFs) {
-        return mockFs[path]
+      if (filepath in mockFs) {
+        return mockFs[filepath]
       }
 
       return actual[orig](...args)
@@ -30,10 +31,10 @@ jest.mock('fs', async () => {
     ...actual,
     readFileSync: reader('readFileSync'),
     existsSync: reader('existsSync'),
-    readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
+    readdirSync: (filepath: string) => Object.keys(mockFs).filter(k => k.startsWith(filepath.replace(/^\.\/?/, ''))),
     statSync: () => ({isFile: () => true, isDirectory: () => false}),
   }
-})
+})()
 
 jest.mock('glob')
 
@@ -47,8 +48,8 @@ jest.mock('read-pkg-up')
 
 jest.spyOn(readPkgUp, 'sync').mockImplementation(options =>
   Object.entries(mockFs)
-    .map(([path, content]) => ({
-      path,
+    .map(([filepath, content]) => ({
+      path: filepath,
       packageJson: JSON.parse(content as string),
     }))
     .find(p => options.cwd?.includes(p.path.replace('package.json', ''))),
@@ -67,7 +68,7 @@ beforeEach(() => {
 test('generate labels', () => {
   expect(
     preset.labeler({
-      ...buildPresetParams('.github/labeler.yml'),
+      ...buildPresetParams('.github/labeler.yml', fs),
       options: {},
     }),
   ).toMatchInlineSnapshot(`
