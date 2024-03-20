@@ -366,6 +366,7 @@ _Before:_
 `my-custom-presets.js`:
 
 <!-- eslint-disable @typescript-eslint/no-var-requires -->
+<!-- eslint-disable import/no-extraneous-dependencies -->
 ```js
 const {presets} = require('eslint-plugin-codegen')
 

@@ -3,6 +3,7 @@
         "lib": ["es2017", "DOM"],
         "target": "es2017",
         "module": "commonjs",
+        "skipLibCheck": true,
         "strict": true,
         "noEmit": true,
         "noErrorTruncation": true,
