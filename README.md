@@ -275,10 +275,10 @@ Generate a table of contents from the current markdown file, based on markdown h
 
 ##### Params
 
-|name    |description                                                                                                             |
-|--------|------------------------------------------------------------------------------------------------------------------------|
-|minDepth|exclude headers with lower "depth". e.g. if set to 2, `# H1` would be excluded but `## H2` would be included. @default 2|
-|maxDepth|exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included.p     |
+|name    |description                                                                                                                         |
+|--------|------------------------------------------------------------------------------------------------------------------------------------|
+|minDepth|exclude headers with lower "depth". e.g. if set to 2, `# H1` would be excluded but `## H2` would be included. @default 2            |
+|maxDepth|exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included. @default Infinity|
 <!-- codegen:end -->
 
 ##### Demo
