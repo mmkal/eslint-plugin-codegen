@@ -1,39 +1,15 @@
 import dedent from 'dedent'
-import {test, expect, beforeEach, vi as jest} from 'vitest'
+import {test, expect, beforeEach} from 'vitest'
 import * as preset from '../../src/presets/markdown-toc'
-import {buildPresetParams} from './meta'
+import {buildPresetParams, getFakeFs} from './meta'
 
-const mockFs: any = {}
+const {fs, mockFs, reset} = getFakeFs()
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  Object.keys(mockFs).forEach(k => delete mockFs[k])
+  reset()
 })
 
-jest.mock('fs', async () => {
-  const actual: any = await jest.importActual('fs')
-  const reader =
-    (orig: string) =>
-    (...args: any[]) => {
-      const path = args[0].replaceAll('\\', '/')
-      // const fn = path in mockFs ? mockImpl : actual[orig]
-      if (path in mockFs) {
-        return mockFs[path]
-      }
-
-      return actual[orig](...args)
-    }
-
-  return {
-    ...actual,
-    readFileSync: reader('readFileSync'),
-    existsSync: reader('existsSync'),
-    readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
-    statSync: () => ({isFile: () => true, isDirectory: () => false}),
-  }
-})
-
-const params = buildPresetParams('readme.md')
+const params = buildPresetParams('readme.md', fs)
 
 test('generate markdown', () => {
   Object.assign(mockFs, {
@@ -61,45 +37,14 @@ test('generate markdown', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "- [Motivation](#motivation)
-    - [Contents](#contents)
-    - [How to use](#how-to-use)
-       - [Setup](#setup)
-          - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
-       - [Presets](#presets)
-          - [barrel](#barrel)
-             - [Example](#example)
-             - [Params](#params)
-             - [Demo](#demo)
-          - [custom](#custom)
-             - [Example](#example-1)
-             - [Params](#params-1)
-             - [Demo](#demo-1)
-          - [markdownFromJsdoc](#markdownfromjsdoc)
-             - [Example](#example-2)
-             - [Params](#params-2)
-          - [monorepoTOC](#monorepotoc)
-             - [Example (basic)](#example-basic)
-             - [Example (using config options)](#example-using-config-options)
-             - [Params](#params-3)
-             - [Demo](#demo-2)
-          - [markdownFromJsdoc](#markdownfromjsdoc-1)
-             - [Example](#example-3)
-             - [Params](#params-4)
-             - [Demo](#demo-3)
-          - [markdownTOC](#markdowntoc)
-             - [Example](#example-4)
-             - [Params](#params-5)
-             - [Demo](#demo-4)
-          - [markdownFromTests](#markdownfromtests)
-             - [Example](#example-5)
-             - [Params](#params-6)
-             - [Demo](#demo-5)
-          - [labeler](#labeler)
-             - [Example](#example-6)
-             - [Params](#params-7)
-             - [Demo](#demo-6)
-       - [Customisation](#customisation)"
+    "- [H2](#h2)
+       - [H3](#h3)
+       - [Another H3](#another-h3)
+          - [H4 duplicate](#h4-duplicate)
+             - [H5](#h5)
+             - [H5](#h5-1)
+          - [H4 duplicate](#h4-duplicate-1)
+    - [Another H2](#another-h2)"
   `)
 
   expect(
@@ -111,20 +56,31 @@ test('generate markdown', () => {
       },
     }),
   ).toMatchInlineSnapshot(`
-    "- [Motivation](#motivation)
-    - [Contents](#contents)
-    - [How to use](#how-to-use)"
+    "- [H2](#h2)
+       - [H3](#h3)
+       - [Another H3](#another-h3)
+    - [Another H2](#another-h2)"
   `)
 })
 
 test('calculates min hashes', () => {
   Object.assign(mockFs, {
     'readme.md': dedent`
-      ### H3
+      # H1
+
+      Intro
+
+      ## First H2
+
+      Description
+
+      ## Second H2
+
+      ### An H3
       ### Another H3
-      #### H4 duplicate
+      #### Here's an H4
       ##### H5
-      ##### H5
+      ##### Aitch Five
     `,
   })
 
@@ -134,45 +90,13 @@ test('calculates min hashes', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "- [Motivation](#motivation)
-    - [Contents](#contents)
-    - [How to use](#how-to-use)
-       - [Setup](#setup)
-          - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
-       - [Presets](#presets)
-          - [barrel](#barrel)
-             - [Example](#example)
-             - [Params](#params)
-             - [Demo](#demo)
-          - [custom](#custom)
-             - [Example](#example-1)
-             - [Params](#params-1)
-             - [Demo](#demo-1)
-          - [markdownFromJsdoc](#markdownfromjsdoc)
-             - [Example](#example-2)
-             - [Params](#params-2)
-          - [monorepoTOC](#monorepotoc)
-             - [Example (basic)](#example-basic)
-             - [Example (using config options)](#example-using-config-options)
-             - [Params](#params-3)
-             - [Demo](#demo-2)
-          - [markdownFromJsdoc](#markdownfromjsdoc-1)
-             - [Example](#example-3)
-             - [Params](#params-4)
-             - [Demo](#demo-3)
-          - [markdownTOC](#markdowntoc)
-             - [Example](#example-4)
-             - [Params](#params-5)
-             - [Demo](#demo-4)
-          - [markdownFromTests](#markdownfromtests)
-             - [Example](#example-5)
-             - [Params](#params-6)
-             - [Demo](#demo-5)
-          - [labeler](#labeler)
-             - [Example](#example-6)
-             - [Params](#params-7)
-             - [Demo](#demo-6)
-       - [Customisation](#customisation)"
+    "- [First H2](#first-h2)
+    - [Second H2](#second-h2)
+       - [An H3](#an-h3)
+       - [Another H3](#another-h3)
+          - [Here's an H4](#heres-an-h4)
+             - [H5](#h5)
+             - [Aitch Five](#aitch-five)"
   `)
 
   expect(
@@ -184,8 +108,9 @@ test('calculates min hashes', () => {
       },
     }),
   ).toMatchInlineSnapshot(`
-    "- [Motivation](#motivation)
-    - [Contents](#contents)
-    - [How to use](#how-to-use)"
+    "- [First H2](#first-h2)
+    - [Second H2](#second-h2)
+       - [An H3](#an-h3)
+       - [Another H3](#another-h3)"
   `)
 })
