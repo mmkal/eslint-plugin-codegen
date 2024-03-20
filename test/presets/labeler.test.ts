@@ -1,7 +1,7 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
 import readPkgUp from 'read-pkg-up'
-import {test, expect, beforeEach, vi} from 'vitest'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 import * as preset from '../../src/presets/labeler'
 import {buildPresetParams, getFakeFs} from './meta'
 
@@ -11,17 +11,17 @@ beforeEach(() => {
   reset()
 })
 
-vi.mock('glob')
+jest.mock('glob')
 
-vi.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
+jest.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
   const found = Object.keys(mockFs).filter(k => minimatch(k, pattern as string))
   const ignores = typeof opts?.ignore === 'string' ? [opts?.ignore] : opts?.ignore || []
   return found.filter(f => (ignores as string[]).every(i => !minimatch(f, i)))
 })
 
-vi.mock('read-pkg-up')
+jest.mock('read-pkg-up')
 
-vi.spyOn(readPkgUp, 'sync').mockImplementation(options =>
+jest.spyOn(readPkgUp, 'sync').mockImplementation(options =>
   Object.entries(mockFs)
     .map(([filepath, content]) => ({
       path: filepath,
