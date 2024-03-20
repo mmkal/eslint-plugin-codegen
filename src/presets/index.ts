@@ -3,7 +3,7 @@ export type PresetMeta = {
   /** @deprecated instead of `meta.filename` use `context.physicalFilename` */
   filename: string
   /** @deprecated instead of `meta.glob` use `dependencies.glob.globSync` */
-  glob: (pattern: string, opts: any) => string[]
+  glob: (pattern: string, opts: unknown) => string[]
   /** @deprecated instead of `meta.fs` use `dependencies.fs` */
   fs: typeof import('fs')
   /** @deprecated instead of `meta.path` use `dependencies.path` */

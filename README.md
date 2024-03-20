@@ -61,19 +61,19 @@ or
 
 ```bash
 yarn add --dev eslint-plugin-codegen
-````
+```
 
 Then add the plugin and rule to your eslint config, for example in `eslintrc.js`:
 
 ```js
 module.exports = {
-  ...
+  //...
   plugins: [
-    ...
-    'codegen'
+    // ...
+    'codegen',
   ],
   rules: {
-    ...
+    // ...
     'codegen/codegen': 'error',
   },
 }
@@ -117,10 +117,7 @@ This plugin uses an [ESLint processor](https://eslint.org/docs/latest/extend/cus
 ```js
 module.exports = {
   plugins: ['markdown', 'codegen'],
-  extends: [
-    'plugin:markdown/recommended',
-    'plugin:codegen/recommended',
-  ]
+  extends: ['plugin:markdown/recommended', 'plugin:codegen/recommended'],
 }
 ```
 
@@ -128,15 +125,15 @@ Or specify the processor explicitly - when you switch to [flat config this will 
 
 ```js
 module.exports = {
-    // 1. Add the plugin.
-    plugins: ['markdown'],
-    overrides: [
-        {
-            // 2. Enable the Markdown processor for all .md files.
-            files: ['**/*.md'],
-            processor: 'codegen/processor', // NOT 'markdown/markdown'
-        },
-    ],
+  // 1. Add the plugin.
+  plugins: ['markdown'],
+  overrides: [
+    {
+      // 2. Enable the Markdown processor for all .md files.
+      files: ['**/*.md'],
+      processor: 'codegen/processor', // NOT 'markdown/markdown'
+    },
+  ],
 }
 ```
 
@@ -171,7 +168,7 @@ export * from './some/path/module-c'
 
 ![](./gifs/barrel.gif)
 
-<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} --> 
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
 #### [custom](./src/presets/custom.ts#L32)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
@@ -289,7 +286,6 @@ Generate a table of contents from the current markdown file, based on markdown h
 
 ![](./gifs/markdownTOC.gif)
 
-
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
 #### [markdownFromTests](./src/presets/markdown-from-tests.ts#L23)
 
@@ -344,17 +340,14 @@ In addition to the [custom](#custom) preset, you can also define your own preset
 
 ```js
 module.exports = {
-  ...
+  // ...
   plugins: [
-    ...
-    'codegen'
+    // ...
+    'codegen',
   ],
   rules: {
-    ...
-    'codegen/codegen': [
-      'error',
-      {presets: require('./my-custom-presets')}
-    ],
+    // ...
+    'codegen/codegen': ['error', {presets: require('./my-custom-presets')}],
   },
 }
 ```
@@ -372,10 +365,12 @@ _Before:_
 
 `my-custom-presets.js`:
 
+<!-- eslint-disable @typescript-eslint/no-var-requires -->
+<!-- eslint-disable import/no-extraneous-dependencies -->
 ```js
 const {presets} = require('eslint-plugin-codegen')
 
-module.exports.markdownTOC = (params) => {
+module.exports.markdownTOC = params => {
   const toc = presets.markdownTOC(params)
   return [
     '<details>',
@@ -391,13 +386,13 @@ module.exports.markdownTOC = (params) => {
 
 ```js
 module.exports = {
-  ...
+  // ...
   plugins: [
-    ...
-    'codegen'
+    // ...
+    'codegen',
   ],
   rules: {
-    ...
+    // ...
     'codegen/codegen': ['error', {presets: require('./my-custom-presets')}],
   },
 }

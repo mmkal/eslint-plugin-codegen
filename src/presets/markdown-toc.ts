@@ -30,12 +30,12 @@ export const markdownTOC: Preset<{minDepth?: number; maxDepth?: number}> = ({met
       const indent = ' '.repeat(3 * (hashes.length - minHashes))
       const text = h
         .slice(hashes.length + 1)
-        .replace(/]\(.*\)/g, '')
-        .replace(/[[\]]/g, '')
+        .replaceAll(/]\(.*\)/g, '')
+        .replaceAll(/[[\]]/g, '')
       const href = text
         .toLowerCase()
-        .replace(/\s/g, '-')
-        .replace(/[^\w-]/g, '')
+        .replaceAll(/\s/g, '-')
+        .replaceAll(/[^\w-]/g, '')
       return {indent, text, href}
     })
     .map(({indent, text, href}, i, arr) => {

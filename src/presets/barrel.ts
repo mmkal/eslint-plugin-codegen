@@ -48,16 +48,16 @@ export const barrel: Preset<{
 
   const extensionMap = typeof opts.extension === 'object' ? opts.extension : defaultExtensionsMap
 
-  const ext = meta.filename.split('.').slice(-1)[0]
+  const ext = meta.filename.split('.').at(-1)!
   const pattern = opts.include || `*.{${ext},${ext}x}`
   const exclude = Array.isArray(opts.exclude) ? opts.exclude : opts.exclude ? [opts.exclude] : undefined
 
   const relativeFiles = glob
-    // todo[glob>10.3.10]: use exclude directly when https://github.com/isaacs/node-glob/issues/570 is fixed
+    // todo[glob@>10.3.10]: use exclude directly when https://github.com/isaacs/node-glob/issues/570 is fixed
     .globSync(pattern, {cwd, ignore: exclude?.map(e => e.replace(/^\.\//, ''))})
     .sort((a, b) => a.localeCompare(b))
     .filter(f => path.resolve(cwd, f) !== path.resolve(meta.filename))
-    .map(f => `./${f}`.replace(/(\.\/)+\./g, '.'))
+    .map(f => `./${f}`.replaceAll(/(\.\/)+\./g, '.'))
     .map(f => {
       const base = f.replace(/\.\w+$/, '')
 
@@ -116,9 +116,10 @@ export const barrel: Preset<{
 
   // ignore stylistic differences. babel generate deals with most
   const normalise = (str: string) =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
     generate(parse(str, {sourceType: 'module', plugins: ['typescript']}) as any)
-      .code.replace(/'/g, `"`)
-      .replace(/\/index/g, '')
+      .code.replaceAll(`'`, `"`)
+      .replaceAll('/index', '')
 
   try {
     if (normalise(expectedContent) === normalise(meta.existingContent)) {
