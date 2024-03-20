@@ -1,48 +1,15 @@
 import dedent from 'dedent'
+import {test, expect, beforeEach} from 'vitest'
 import * as preset from '../../src/presets/markdown-from-jsdoc'
-import {buildPresetParams} from './meta'
+import {buildPresetParams, getFakeFs} from './meta'
 
-const params = buildPresetParams(__dirname + '/index.ts')
-
-const mockFs: any = {}
+const {fs, mockFs, reset} = getFakeFs()
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  Object.keys(mockFs).forEach(k => delete mockFs[k])
+  reset()
 })
 
-jest.mock('fs', () => {
-  const actual = jest.requireActual('fs')
-  const reader =
-    (orig: string) =>
-    (...args: any[]) => {
-      const path = args[0].replaceAll('\\', '/')
-      // const fn = path in mockFs ? mockImpl : actual[orig]
-      if (path in mockFs) {
-        return mockFs[path]
-      }
-
-      try {
-        return actual[orig](...args)
-      } catch (e) {
-        throw new Error(
-          `Failed calling ${orig} with args ${JSON.stringify(args)}: ${e}. Mock fs: ${JSON.stringify(
-            mockFs,
-            null,
-            2,
-          )}}`,
-        )
-      }
-    }
-
-  return {
-    ...actual,
-    readFileSync: reader('readFileSync'),
-    existsSync: reader('existsSync'),
-    readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
-    statSync: () => ({isFile: () => true, isDirectory: () => false}),
-  }
-})
+const params = buildPresetParams(__dirname + '/index.ts', fs)
 
 test('generate markdown', () => {
   Object.assign(mockFs, {

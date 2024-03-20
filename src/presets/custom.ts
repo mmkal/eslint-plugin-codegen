@@ -1,5 +1,4 @@
 import type {Preset} from '.'
-import * as fs from 'fs'
 import * as path from 'path'
 
 /**
@@ -37,6 +36,7 @@ export const custom: Preset<
     dev?: boolean
   } & Record<string, unknown>
 > = ({meta, options, ...rest}) => {
+  const {fs} = rest.dependencies
   const sourcePath = options.source ? path.join(path.dirname(meta.filename), options.source) : meta.filename
   if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) {
     throw new Error(`Source path is not a file: ${sourcePath}`)

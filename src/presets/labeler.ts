@@ -23,8 +23,8 @@ import {getLeafPackages} from './util/monorepo'
  *
  * @param repoRoot [optional] path to the repository root. If not specified, the rule will recursively search parent directories for package.json files
  */
-export const labeler: Preset<PackageGlobbable> = ({options, meta}) => {
-  const packages = getLeafPackages(options.repoRoot, meta.filename)
+export const labeler: Preset<PackageGlobbable> = ({options, meta, dependencies}) => {
+  const packages = getLeafPackages(options.repoRoot, meta.filename, dependencies.fs)
   return jsYaml.dump(
     Object.fromEntries(packages.map(p => [p.packageJson.name, [p.path.replace(/package\.json$/, '**/*')]])),
   )

@@ -1,4 +1,5 @@
 import dedent from 'dedent'
+import {test, expect, describe} from 'vitest'
 import {processors} from '../src'
 
 describe('markdown processor', () => {

@@ -1,38 +1,15 @@
 import dedent from 'dedent'
+import {test, expect, beforeEach} from 'vitest'
 import * as preset from '../../src/presets/markdown-toc'
-import {buildPresetParams} from './meta'
+import {buildPresetParams, getFakeFs} from './meta'
 
-const mockFs: any = {}
+const {fs, mockFs, reset} = getFakeFs()
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  Object.keys(mockFs).forEach(k => delete mockFs[k])
+  reset()
 })
 
-jest.mock('fs', () => {
-  const actual = jest.requireActual('fs')
-  const reader =
-    (orig: string) =>
-    (...args: any[]) => {
-      const path = args[0].replaceAll('\\', '/')
-      // const fn = path in mockFs ? mockImpl : actual[orig]
-      if (path in mockFs) {
-        return mockFs[path]
-      }
-
-      return actual[orig](...args)
-    }
-
-  return {
-    ...actual,
-    readFileSync: reader('readFileSync'),
-    existsSync: reader('existsSync'),
-    readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
-    statSync: () => ({isFile: () => true, isDirectory: () => false}),
-  }
-})
-
-const params = buildPresetParams('readme.md')
+const params = buildPresetParams('readme.md', fs)
 
 test('generate markdown', () => {
   Object.assign(mockFs, {
@@ -80,6 +57,8 @@ test('generate markdown', () => {
     }),
   ).toMatchInlineSnapshot(`
     "- [H2](#h2)
+       - [H3](#h3)
+       - [Another H3](#another-h3)
     - [Another H2](#another-h2)"
   `)
 })
@@ -87,11 +66,21 @@ test('generate markdown', () => {
 test('calculates min hashes', () => {
   Object.assign(mockFs, {
     'readme.md': dedent`
-      ### H3
+      # H1
+
+      Intro
+
+      ## First H2
+
+      Description
+
+      ## Second H2
+
+      ### An H3
       ### Another H3
-      #### H4 duplicate
+      #### Here's an H4
       ##### H5
-      ##### H5
+      ##### Aitch Five
     `,
   })
 
@@ -101,11 +90,13 @@ test('calculates min hashes', () => {
       options: {},
     }),
   ).toMatchInlineSnapshot(`
-    "- [H3](#h3)
-    - [Another H3](#another-h3)
-       - [H4 duplicate](#h4-duplicate)
-          - [H5](#h5)
-          - [H5](#h5-1)"
+    "- [First H2](#first-h2)
+    - [Second H2](#second-h2)
+       - [An H3](#an-h3)
+       - [Another H3](#another-h3)
+          - [Here's an H4](#heres-an-h4)
+             - [H5](#h5)
+             - [Aitch Five](#aitch-five)"
   `)
 
   expect(
@@ -116,5 +107,10 @@ test('calculates min hashes', () => {
         maxDepth: 3,
       },
     }),
-  ).toMatchInlineSnapshot(`""`)
+  ).toMatchInlineSnapshot(`
+    "- [First H2](#first-h2)
+    - [Second H2](#second-h2)
+       - [An H3](#an-h3)
+       - [Another H3](#another-h3)"
+  `)
 })

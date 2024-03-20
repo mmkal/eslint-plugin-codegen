@@ -1,6 +1,5 @@
 import type {Preset} from '.'
 import {graphSequencer} from '@pnpm/deps.graph-sequencer'
-import * as fs from 'fs'
 import * as lodash from 'lodash'
 import * as os from 'os'
 import * as path from 'path'
@@ -42,8 +41,8 @@ export const monorepoTOC: Preset<{
   repoRoot?: string
   filter?: string | Record<string, string>
   sort?: string
-}> = ({options, context}) => {
-  const packages = getLeafPackages(options.repoRoot, context.physicalFilename)
+}> = ({options, context, dependencies: {fs}}) => {
+  const packages = getLeafPackages(options.repoRoot, context.physicalFilename, fs)
 
   const packageNames = new Set(packages.map(({packageJson}) => packageJson.name))
   const toposorted = toposort(
@@ -113,9 +112,6 @@ export const monorepoTOC: Preset<{
   return leafPackages.join(os.EOL)
 }
 
-export const toposort = <K extends string, Deps extends K>(graph: Record<K, Deps[]>) => {
-  return graphSequencer<K>(
-    new Map(Object.entries(graph) as Array<[K, Array<K | Deps>]>),
-    Object.keys(graph).sort() as K[],
-  )
+export const toposort = <K extends string>(graph: Record<K, string[]>) => {
+  return graphSequencer<K>(new Map(Object.entries(graph) as Array<[K, Array<K>]>), Object.keys(graph).sort() as K[])
 }

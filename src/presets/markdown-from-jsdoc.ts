@@ -1,5 +1,4 @@
 import type {Preset} from '.'
-import * as fs from 'fs'
 import * as lodash from 'lodash'
 import * as os from 'os'
 import * as path from 'path'
@@ -17,6 +16,7 @@ import * as path from 'path'
 export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
   meta,
   options: {source: relativeFile, export: exportName},
+  dependencies: {fs},
 }) => {
   const targetFile = path.join(path.dirname(meta.filename), relativeFile)
   const targetContent = fs.readFileSync(targetFile).toString()

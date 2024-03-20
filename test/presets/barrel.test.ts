@@ -1,20 +1,20 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
+import {test, expect, beforeEach, vi} from 'vitest'
 import * as preset from '../../src/presets/barrel'
-import {buildPresetParams} from './meta'
+import {buildPresetParams, getFakeFs} from './meta'
 
-const params = buildPresetParams(__filename)
-
-const mockFs: any = {}
+const {fs, mockFs, reset} = getFakeFs()
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  Object.keys(mockFs).forEach(k => delete mockFs[k])
+  reset()
 })
 
-jest.mock('glob')
+const params = buildPresetParams(__filename, fs)
 
-jest.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
+vi.mock('glob')
+
+vi.spyOn(glob, 'globSync').mockImplementation((pattern, opts) => {
   const found = Object.keys(mockFs).filter(k => minimatch(k, pattern as string))
   const ignores = (typeof opts?.ignore === 'string' ? [opts?.ignore] : opts?.ignore || []) as string[]
   return found.filter(f => ignores.every(i => !minimatch(f, i)))

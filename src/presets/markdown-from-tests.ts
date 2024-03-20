@@ -1,7 +1,6 @@
 import type {Preset} from '.'
 import {parse} from '@babel/parser'
 import traverse from '@babel/traverse'
-import * as fs from 'fs'
 import * as lodash from 'lodash'
 import * as path from 'path'
 
@@ -17,10 +16,14 @@ import * as path from 'path'
  *
  * `<!-- codegen:start {preset: markdownFromTests, source: test/foo.test.ts, headerLevel: 3} -->`
  *
- * @param source the jest test file
+ * @param source the test file
  * @param headerLevel The number of `#` characters to prefix each title with
  */
-export const markdownFromTests: Preset<{source: string; headerLevel?: number}> = ({meta, options}) => {
+export const markdownFromTests: Preset<{source: string; headerLevel?: number}> = ({
+  meta,
+  options,
+  dependencies: {fs},
+}) => {
   const sourcePath = path.join(path.dirname(meta.filename), options.source)
   const sourceCode = fs.readFileSync(sourcePath).toString()
   const ast = parse(sourceCode, {sourceType: 'module', plugins: ['typescript']})

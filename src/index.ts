@@ -5,6 +5,7 @@ import type * as eslint from 'eslint'
 
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
+// eslint-disable-next-line no-restricted-imports
 import * as fs from 'fs'
 import {globSync} from 'glob'
 import * as glob from 'glob'

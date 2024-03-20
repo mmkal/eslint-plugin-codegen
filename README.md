@@ -3,7 +3,6 @@
 An eslint plugin for inline codegen. Auto-fixes out of sync code, with presets for barrels, jsdoc to markdown and more.
 
 [![CI](https://github.com/mmkal/eslint-plugin-codegen/actions/workflows/ci.yml/badge.svg)](https://github.com/mmkal/eslint-plugin-codegen/actions/workflows/ci.yml)
-[![](https://byob.yarr.is/mmkal/eslint-plugin-codegen/coverage)](https://github.com/mmkal/eslint-plugin-codegen/actions/workflows/ci.yml)
 ![npm](https://img.shields.io/npm/dt/eslint-plugin-codegen)
 
 ## Motivation
@@ -169,7 +168,7 @@ export * from './some/path/module-c'
 ![](./gifs/barrel.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L32)
+#### [custom](./src/presets/custom.ts#L31)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
 
@@ -203,7 +202,7 @@ This can be used with:
 ![](./gifs/custom.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
-#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L17)
+#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L16)
 
 Convert jsdoc for an es export from a javascript/typescript file to markdown.
 
@@ -220,7 +219,7 @@ Convert jsdoc for an es export from a javascript/typescript file to markdown.
 <!-- codegen:end -->
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/monorepo-toc.ts, export: monorepoTOC} -->
-#### [monorepoTOC](./src/presets/monorepo-toc.ts#L41)
+#### [monorepoTOC](./src/presets/monorepo-toc.ts#L40)
 
 Generate a table of contents for a monorepo.
 
@@ -266,7 +265,7 @@ Convert jsdoc to an es export from a javascript/typescript file to markdown.
 ![](./gifs/markdownFromJsdoc.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-toc.ts, export: markdownTOC} -->
-#### [markdownTOC](./src/presets/markdown-toc.ts#L16)
+#### [markdownTOC](./src/presets/markdown-toc.ts#L15)
 
 Generate a table of contents from the current markdown file, based on markdown headers (e.g. `### My section title`)
 
@@ -276,10 +275,10 @@ Generate a table of contents from the current markdown file, based on markdown h
 
 ##### Params
 
-|name    |description                                                                                                             |
-|--------|------------------------------------------------------------------------------------------------------------------------|
-|minDepth|exclude headers with lower "depth". e.g. if set to 2, `# H1` would be excluded but `## H2` would be included. @default 2|
-|maxDepth|exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included.p     |
+|name    |description                                                                                                                         |
+|--------|------------------------------------------------------------------------------------------------------------------------------------|
+|minDepth|exclude headers with lower "depth". e.g. if set to 2, `# H1` would be excluded but `## H2` would be included. @default 2            |
+|maxDepth|exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included. @default Infinity|
 <!-- codegen:end -->
 
 ##### Demo
@@ -287,7 +286,7 @@ Generate a table of contents from the current markdown file, based on markdown h
 ![](./gifs/markdownTOC.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
-#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L23)
+#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L22)
 
 Use a test file to generate library usage documentation. Note: this has been tested with vitest and jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested. JSDoc/inline comments above tests will be added as a "preamble", making this a decent way to quickly document API usage of a library, and to be sure that the usage is real and accurate.
 
@@ -299,7 +298,7 @@ Use a test file to generate library usage documentation. Note: this has been tes
 
 |name       |description                                           |
 |-----------|------------------------------------------------------|
-|source     |the jest test file                                    |
+|source     |the test file                                         |
 |headerLevel|The number of `#` characters to prefix each title with|
 <!-- codegen:end -->
 

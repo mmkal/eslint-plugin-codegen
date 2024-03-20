@@ -1,3 +1,4 @@
+import {test, expect} from 'vitest'
 import * as preset from '../../src/presets/empty'
 import {buildPresetParams} from './meta'
 
