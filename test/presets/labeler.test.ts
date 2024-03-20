@@ -1,40 +1,15 @@
 import * as glob from 'glob'
 import minimatch from 'minimatch'
-import * as path from 'path'
 import readPkgUp from 'read-pkg-up'
 import {test, expect, beforeEach, vi as jest} from 'vitest'
 import * as preset from '../../src/presets/labeler'
-import {buildPresetParams} from './meta'
+import {buildPresetParams, getFakeFs} from './meta'
 
-const mockFs: any = {}
+const {fs, mockFs, reset} = getFakeFs()
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  Object.keys(mockFs).forEach(k => delete mockFs[k])
+  reset()
 })
-
-const fs = (() => {
-  const actual: any = require('fs')
-  const reader =
-    (orig: string) =>
-    (...args: any[]) => {
-      const filepath = path.relative(process.cwd(), args[0])
-      // const fn = path in mockFs ? mockImpl : actual[orig]
-      if (filepath in mockFs) {
-        return mockFs[filepath]
-      }
-
-      return actual[orig](...args)
-    }
-
-  return {
-    ...actual,
-    readFileSync: reader('readFileSync'),
-    existsSync: reader('existsSync'),
-    readdirSync: (filepath: string) => Object.keys(mockFs).filter(k => k.startsWith(filepath.replace(/^\.\/?/, ''))),
-    statSync: () => ({isFile: () => true, isDirectory: () => false}),
-  }
-})()
 
 jest.mock('glob')
 

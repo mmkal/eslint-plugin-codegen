@@ -30,6 +30,10 @@ export const getFakeFs = () => {
   const reader =
     (orig: string) =>
     (...args: any[]) => {
+      if (args[0] in mockFs) {
+        return mockFs[args[0]]
+      }
+
       const filepath = args[0]
         .replace(process.cwd() + '\\', '')
         .replace(process.cwd() + '/', '')
