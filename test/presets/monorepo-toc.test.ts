@@ -2,14 +2,14 @@ import dedent from 'dedent'
 import * as glob from 'glob'
 import * as jsYaml from 'js-yaml'
 import minimatch from 'minimatch'
+import {test, expect, beforeEach, vi as jest} from 'vitest'
 import * as preset from '../../src/presets/monorepo-toc'
 import {buildPresetParams} from './meta'
-import {test, expect, beforeEach, vi as jest} from 'vitest'
 
 const mockFs: any = {}
 
 beforeEach(() => {
-  // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
@@ -21,7 +21,7 @@ jest.mock('fs', async () => {
       const path = args[0]
         .replace(process.cwd() + '\\', '')
         .replace(process.cwd() + '/', '')
-        .replace(/\\/g, '/')
+        .replaceAll('\\', '/')
       // const fn = path in mockFs ? mockImpl : actual[orig]
       if (path in mockFs) {
         return mockFs[path]
@@ -199,7 +199,7 @@ test('toplogical sort', () => {
   Object.keys(mockFs)
     .filter(k => k.includes('packages/'))
     .forEach(k => {
-      // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete mockFs[k]
     })
   Object.assign(mockFs, {

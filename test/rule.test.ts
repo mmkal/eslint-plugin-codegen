@@ -8,15 +8,15 @@ import {test} from 'vitest'
 /** wrapper for dedent which respects os.EOL */
 const dedent = (...args: Parameters<typeof baseDedent>) => {
   const result = baseDedent(...args)
-  return result.replace(/\r?\n/g, os.EOL)
+  return result.replaceAll(/\r?\n/g, os.EOL)
 }
 
 Object.assign(RuleTester, {
-  /* eslint-disable mmkal/jest/expect-expect, mmkal/jest/valid-title */
+  /* eslint-disable vitest/expect-expect, vitest/valid-title */
   it: (name: string, fn: any) => {
-    test(name.replace(/\r?\n/g, ' \\n ').trim(), fn)
+    test(name.replaceAll(/\r?\n/g, ' \\n ').trim(), fn)
   },
-  /* eslint-enable mmkal/jest/expect-expect, mmkal/jest/valid-title */
+  /* eslint-enable vitest/expect-expect, vitest/valid-title */
 })
 
 const tester = new RuleTester()

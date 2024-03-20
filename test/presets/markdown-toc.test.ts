@@ -6,7 +6,7 @@ import {test, expect, beforeEach, vi as jest} from 'vitest'
 const mockFs: any = {}
 
 beforeEach(() => {
-  // eslint-disable-next-line mmkal/@typescript-eslint/no-dynamic-delete
+  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
   Object.keys(mockFs).forEach(k => delete mockFs[k])
 })
 
@@ -15,7 +15,7 @@ jest.mock('fs', async () => {
   const reader =
     (orig: string) =>
     (...args: any[]) => {
-      const path = args[0].replace(/\\/g, '/')
+      const path = args[0].replaceAll('\\', '/')
       // const fn = path in mockFs ? mockImpl : actual[orig]
       if (path in mockFs) {
         return mockFs[path]

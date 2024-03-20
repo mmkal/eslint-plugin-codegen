@@ -34,8 +34,8 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
     .map(line => {
       return line
         .replace(/^\/\*\*$/, '') // clean up: /**
-        .replace(/^\* /g, '') // clean up:     * blah
-        .replace(/^\*$/g, '') // clean up:     *
+        .replaceAll(/^\* /g, '') // clean up:     * blah
+        .replaceAll(/^\*$/g, '') // clean up:     *
         .replace(/^\*\/$/, '') // clean up     */
     })
     .join(os.EOL)
@@ -67,7 +67,7 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
         const description = p.content
           .slice(firstSpace + 1)
           .trim()
-          .replace(/\r?\n/g, '<br />')
+          .replaceAll(/\r?\n/g, '<br />')
         return [name, description]
       })
 
@@ -89,7 +89,7 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string}> = ({
 
     if (sec.type === 'description') {
       // line breaks that run into letters aren't respected by jsdoc, so shouldn't be in markdown either
-      return sec.content.replace(/\r?\n\s*([A-Za-z])/g, ' $1')
+      return sec.content.replaceAll(/\r?\n\s*([A-Za-z])/g, ' $1')
     }
 
     if (sec.type === 'see') {
