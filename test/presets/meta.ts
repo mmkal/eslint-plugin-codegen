@@ -17,3 +17,37 @@ export const buildPresetParams = (filename: string, fs = realfs): Omit<PresetPar
   context: {filename, physicalFilename: filename} as any,
   dependencies: {...dependencies, fs},
 })
+
+export const getFakeFs = () => {
+  const mockFs: any = {}
+
+  const reset = () => {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    Object.keys(mockFs).forEach(k => delete mockFs[k])
+  }
+
+  const actual = require('fs')
+  const reader =
+    (orig: string) =>
+    (...args: any[]) => {
+      const filepath = args[0]
+        .replace(process.cwd() + '\\', '')
+        .replace(process.cwd() + '/', '')
+        .replaceAll('\\', '/')
+      if (filepath in mockFs) {
+        return mockFs[filepath]
+      }
+
+      return actual[orig](...args)
+    }
+
+  const fs = {
+    ...actual,
+    readFileSync: reader('readFileSync'),
+    existsSync: reader('existsSync'),
+    readdirSync: (filepath: string) => Object.keys(mockFs).filter(k => k.startsWith(filepath.replace(/^\.\/?/, ''))),
+    statSync: () => ({isFile: () => true, isDirectory: () => false}),
+  }
+
+  return {mockFs, reset, fs}
+}

@@ -4,39 +4,13 @@ import * as jsYaml from 'js-yaml'
 import minimatch from 'minimatch'
 import {test, expect, beforeEach, vi as jest} from 'vitest'
 import * as preset from '../../src/presets/monorepo-toc'
-import {buildPresetParams} from './meta'
+import {buildPresetParams, getFakeFs} from './meta'
 
-const mockFs: any = {}
+const {mockFs, fs, reset} = getFakeFs()
 
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-  Object.keys(mockFs).forEach(k => delete mockFs[k])
+  reset()
 })
-
-const fs = (() => {
-  const actual = require('fs')
-  const reader =
-    (orig: string) =>
-    (...args: any[]) => {
-      const path = args[0]
-        .replace(process.cwd() + '\\', '')
-        .replace(process.cwd() + '/', '')
-        .replaceAll('\\', '/')
-      if (path in mockFs) {
-        return mockFs[path]
-      }
-
-      return actual[orig](...args)
-    }
-
-  return {
-    ...actual,
-    readFileSync: reader('readFileSync'),
-    existsSync: reader('existsSync'),
-    readdirSync: (path: string) => Object.keys(mockFs).filter(k => k.startsWith(path.replace(/^\.\/?/, ''))),
-    statSync: () => ({isFile: () => true, isDirectory: () => false}),
-  }
-})()
 
 jest.mock('glob')
 
