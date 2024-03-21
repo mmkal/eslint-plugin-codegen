@@ -202,7 +202,7 @@ This can be used with:
 ![](./gifs/custom.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
-#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L16)
+#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L20)
 
 Convert jsdoc for an es export from a javascript/typescript file to markdown.
 
@@ -212,10 +212,11 @@ Convert jsdoc for an es export from a javascript/typescript file to markdown.
 
 ##### Params
 
-|name  |description                                                                                   |
-|------|----------------------------------------------------------------------------------------------|
-|source|{string} relative file path containing the export with jsdoc that should be copied to markdown|
-|export|{string} the name of the export                                                               |
+|name       |description                                                                                                                              |
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
+|source     |{string} relative file path containing the export with jsdoc that should be copied to markdown                                           |
+|export     |{string} the name of the export                                                                                                          |
+|headerLevel|{1|2|3|4|5} Determines if the export will correspond to a H1, H2, H3, H4 or H5. Nested headers will increment from this value. @default 4|
 <!-- codegen:end -->
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/monorepo-toc.ts, export: monorepoTOC} -->

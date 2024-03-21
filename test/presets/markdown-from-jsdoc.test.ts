@@ -42,7 +42,7 @@ test('generate markdown', () => {
        * @param a {number} the first number
        * @param b {number} the second number
        */
-      export const add = (a: number, b: number) => a - b
+      export const subtract = (a: number, b: number) => a - b
 
       /**
        * @param a
@@ -104,6 +104,85 @@ test('generate markdown', () => {
     |----|-----------------------------------|
     |a   |                                   |
     |b   |multi-line description<br />for 'b'|"
+  `)
+})
+
+test('generate markdown with various types of exports', () => {
+  Object.assign(mockFs, {
+    [params.context.physicalFilename]: dedent`
+      /** Configuration for a calculator */
+      export type CalculatorOptions = {
+        throwOnDivideByZero: boolean
+      }
+
+      /**
+       * Does calculations
+       * 
+       * **Warning**: might not get it right.
+       */
+      export class Calculator {
+        /** Create a new Calculator */
+        constructor(readonly options: CalculatorOptions) {}
+
+        /** Whether this calculator will throw on encountering a division by zero */
+        get throwOnDivideByZero() {
+          return this.options.throwOnDivideByZero
+        }
+
+        /** Adds a and b */
+        add(a: number, b: number) {
+          return a + b
+        }
+
+        /** Divides a and b */
+        divide(a: number, b: number) {
+          if (b === 0 && this.throwOnDivideByZero) throw new Error('Division by zero')
+          return a / b
+        }
+      }
+
+      /** Creates a calculator with default options */
+      export function createCalculator() {
+        return new Calculator({throwOnDivideByZero: false})
+      }
+    `,
+  })
+
+  expect(
+    preset.markdownFromJsdoc({
+      ...params,
+      options: {source: 'index.ts'},
+    }),
+  ).toMatchInlineSnapshot(`
+    "#### [CalculatorOptions](./index.ts#L2)
+
+    Configuration for a calculator
+
+    #### [Calculator](./index.ts#L11)
+
+    Does calculations
+
+    **Warning**: might not get it right.
+
+    ##### [constructor](./index.ts#L13)
+
+    Create a new Calculator
+
+    ##### [throwOnDivideByZero](./index.ts#L16)
+
+    Whether this calculator will throw on encountering a division by zero
+
+    ##### [add](./index.ts#L21)
+
+    Adds a and b
+
+    ##### [divide](./index.ts#L26)
+
+    Divides a and b
+
+    #### [createCalculator](./index.ts#L33)
+
+    Creates a calculator with default options"
   `)
 })
 
