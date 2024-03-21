@@ -7,7 +7,6 @@ const eslintPluginMarkdownProcessor = require('eslint-plugin-markdown/lib/proces
 export const createProcessor = (): eslint.Linter.Processor => {
   return {
     preprocess: (text, filename) => [
-      ...eslintPluginMarkdownProcessor.preprocess!(text, filename),
       {
         filename: codegenMarkdownCommentedOutFile,
         text: text
@@ -15,23 +14,12 @@ export const createProcessor = (): eslint.Linter.Processor => {
           .map(line => line && `// eslint-plugin-codegen:trim${line}`)
           .join(os.EOL),
       },
+      ...eslintPluginMarkdownProcessor.preprocess!(text, filename),
     ],
     postprocess(messageLists, filename) {
-      const shouldProcessHere = (message: eslint.Linter.LintMessage) => {
-        return message.ruleId?.endsWith('codegen/codegen') || message.fatal
-      }
-
-      const messageListsToProcessWithoutMarkdownPlugin = messageLists
-        .map(list => list.filter(rule => shouldProcessHere(rule)))
-        .filter(list => list.length)
-
-      const messageListsToProcessWithMarkdownPlugin = messageLists
-        .map(list => list.filter(rule => !shouldProcessHere(rule)))
-        .filter(list => list.length)
-
       return [
-        ...eslintPluginMarkdownProcessor.postprocess!(messageListsToProcessWithMarkdownPlugin, filename),
-        ...messageListsToProcessWithoutMarkdownPlugin.flat(),
+        ...messageLists[0], // first one is the codegen-able file, the rest are from eslint-plugin-markdown
+        ...eslintPluginMarkdownProcessor.postprocess!(messageLists.slice(1), filename),
       ]
     },
     supportsAutofix: true,

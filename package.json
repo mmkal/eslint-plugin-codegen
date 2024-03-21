@@ -47,7 +47,7 @@
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.0.0",
     "dedent": "^1.5.1",
-    "eslint-plugin-markdown": "^3.0.1",
+    "eslint-plugin-markdown": "^4.0.1",
     "expect": "^29.7.0",
     "fp-ts": "^2.1.0",
     "glob": "^10.3.10",
@@ -74,6 +74,7 @@
     "strip-ansi": "6.0.1",
     "ts-morph": "16.0.0",
     "ts-node": "9.1.1",
+    "tsx": "^4.7.1",
     "type-fest": "^3.4.0",
     "typescript": "^5.2.2",
     "vitest": "^1.4.0"

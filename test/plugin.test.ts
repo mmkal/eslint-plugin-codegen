@@ -24,12 +24,6 @@ describe('markdown processor', () => {
     expect(preprocessed).toMatchInlineSnapshot(`
       [
         {
-          "filename": "0.js",
-          "text": "// some javascript
-      const x = 1
-      ",
-        },
-        {
           "filename": "codegen-commented-out.js",
           "text": "// eslint-plugin-codegen:trim# Title
 
@@ -42,19 +36,13 @@ describe('markdown processor', () => {
       // eslint-plugin-codegen:trimconst x = 1
       // eslint-plugin-codegen:trim\`\`\`",
         },
+        {
+          "filename": "0.js",
+          "text": "// some javascript
+      const x = 1
+      ",
+        },
       ]
     `)
-  })
-
-  test('postprocessor flattens message lists', () => {
-    const messages = [[{line: 1, ruleId: 'codegen/codegen'}], [{line: 2, ruleId: 'codegen/codegen'}]] as Array<
-      Array<import('eslint').Linter.LintMessage>
-    >
-    const postprocessed = markdownProcessor.postprocess!(messages, 'codegen-commented-out.js')
-
-    expect(postprocessed).toEqual([
-      {line: 1, ruleId: 'codegen/codegen'},
-      {line: 2, ruleId: 'codegen/codegen'},
-    ])
   })
 })
