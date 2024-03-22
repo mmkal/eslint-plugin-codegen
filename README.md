@@ -287,7 +287,7 @@ Generate a table of contents from the current markdown file, based on markdown h
 ![](./gifs/markdownTOC.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
-#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L22)
+#### [markdownFromTests](./src/presets/markdown-from-tests.ts#L25)
 
 Use a test file to generate library usage documentation. Note: this has been tested with vitest and jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested. JSDoc/inline comments above tests will be added as a "preamble", making this a decent way to quickly document API usage of a library, and to be sure that the usage is real and accurate.
 
@@ -297,10 +297,13 @@ Use a test file to generate library usage documentation. Note: this has been tes
 
 ##### Params
 
-|name       |description                                           |
-|-----------|------------------------------------------------------|
-|source     |the test file                                         |
-|headerLevel|The number of `#` characters to prefix each title with|
+|name                          |description                                                                                    |
+|------------------------------|-----------------------------------------------------------------------------------------------|
+|source                        |the test file                                                                                  |
+|include                       |if defined, only tests with titles matching one of these regexes will be included              |
+|exclude                       |if defined, tests with titles matching one of these regexes will be excluded                   |
+|headerLevel                   |The number of `#` characters to prefix each title with                                         |
+|includeEslintDisableDirectives|If true, `// eslint-disable ...` type comments will be included in the preamble. @default false|
 <!-- codegen:end -->
 
 ##### Demo
@@ -347,7 +350,7 @@ module.exports = {
   ],
   rules: {
     // ...
-    'codegen/codegen': ['error', {presets: require('./my-custom-presets')}],
+    'codegen/codegen': ['error', {presets: require('./-presets')}],
   },
 }
 ```
@@ -360,8 +363,7 @@ _Before:_
  <!-- codegen:start {preset: markdownTOC}-->
  - [Section1](#section1)
  - [Section2](#section2)
- <!-- codegen:end -->
-```
+ <!-- codeg```
 
 `my-custom-presets.js`:
 

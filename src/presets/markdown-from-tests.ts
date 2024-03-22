@@ -17,13 +17,18 @@ import * as path from 'path'
  * `<!-- codegen:start {preset: markdownFromTests, source: test/foo.test.ts, headerLevel: 3} -->`
  *
  * @param source the test file
+ * @param include if defined, only tests with titles matching one of these regexes will be included
+ * @param exclude if defined, tests with titles matching one of these regexes will be excluded
  * @param headerLevel The number of `#` characters to prefix each title with
+ * @param includeEslintDisableDirectives If true, `// eslint-disable ...` type comments will be included in the preamble. @default false
  */
-export const markdownFromTests: Preset<{source: string; headerLevel?: number}> = ({
-  meta,
-  options,
-  dependencies: {fs},
-}) => {
+export const markdownFromTests: Preset<{
+  source: string
+  headerLevel?: number
+  include?: string[]
+  exclude?: string[]
+  includeEslintDisableDirectives?: boolean
+}> = ({meta, options, dependencies: {fs}}) => {
   const sourcePath = path.join(path.dirname(meta.filename), options.source)
   const sourceCode = fs.readFileSync(sourcePath).toString()
   const ast = parse(sourceCode, {sourceType: 'module', plugins: ['typescript']})
@@ -42,8 +47,17 @@ export const markdownFromTests: Preset<{source: string; headerLevel?: number}> =
         return
       }
 
+      if (options.include && !options.include.some(regex => new RegExp(regex).test(title.value))) {
+        return
+      }
+
+      if (options.exclude?.some(regex => new RegExp(regex).test(title.value))) {
+        return
+      }
+
       const preamble = ce.parent.leadingComments
         ?.flatMap(c => c.value)
+        .filter(line => options.includeEslintDisableDirectives || !line.includes('eslint-disable')) // remove eslint-disable directives
         .join('\n')
         .split('\n') // split again because we just joined together some multiline strings
         .map(line => line.trim().replace(/^\*/, '').trim())
