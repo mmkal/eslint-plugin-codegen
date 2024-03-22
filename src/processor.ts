@@ -18,7 +18,9 @@ export const createProcessor = (): eslint.Linter.Processor => {
     ],
     postprocess(messageLists, filename) {
       return [
-        ...messageLists[0], // first one is the codegen-able file, the rest are from eslint-plugin-markdown
+        // first one is the codegen-able file, the rest are from eslint-plugin-markdown
+        // but we're only interested in the codegen messages, not formatting issues etc. - those can cause bogus "fixes" which delete real content
+        ...messageLists[0].filter(m => m.ruleId === 'codegen/codegen'),
         ...eslintPluginMarkdownProcessor.postprocess!(messageLists.slice(1), filename),
       ]
     },
