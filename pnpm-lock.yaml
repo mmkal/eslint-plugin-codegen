@@ -98,8 +98,8 @@ devDependencies:
     specifier: 3.0.4
     version: 3.0.4
   np:
-    specifier: ^10.0.0
-    version: 10.0.0(typescript@5.2.2)
+    specifier: github:sindresorhus/np#pnpm-vs-npm-tag-version-prefix
+    version: github.com/sindresorhus/np/044ca1706e7b220690a2a4b79f519b2c1c23d831(typescript@5.2.2)
   strip-ansi:
     specifier: 6.0.1
     version: 6.0.1
@@ -690,7 +690,7 @@ packages:
     resolution: {integrity: sha512-ajo/heTlG3QgC8EGP6APIejksVAYt4ayz4tqoP3MolFELzcH1x1fzwEYRJTPO0IELutZ5HQ0c26/GqAYy79u3g==}
     engines: {node: '>= 0.4'}
     dependencies:
-      call-bind: 1.0.5
+      call-bind: 1.0.7
     dev: true
 
   /@microsoft/tsdoc-config@0.16.2:
@@ -2102,11 +2102,6 @@ packages:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
 
-  /callsites@4.1.0:
-    resolution: {integrity: sha512-aBMbD1Xxay75ViYezwT40aQONfr+pSXTHwNKvIXhXD6+LY3F1dLIcceoC5OZKBVHbXcysz1hL9D2w0JJIMXpUw==}
-    engines: {node: '>=12.20'}
-    dev: true
-
   /camelcase@7.0.1:
     resolution: {integrity: sha512-xlx1yCK2Oc1APsPXDL2LdlNP6+uu8OCDdhOBSVT279M/S+y75O30C2VuD8T2ogdePBBl7PfPF4504tnLgX3zfw==}
     engines: {node: '>=14.16'}
@@ -2560,13 +2555,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       is-obj: 2.0.0
-    dev: true
-
-  /dot-prop@7.2.0:
-    resolution: {integrity: sha512-Ol/IPXUARn9CSbkrdV4VJo7uCy1I3VuSiWCaFSg+8BdUOzF9n3jefIpcgAydvUZbTdEBZs2vEiTiS9m61ssiDA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dependencies:
-      type-fest: 2.19.0
     dev: true
 
   /eastasianwidth@0.2.0:
@@ -3888,8 +3876,8 @@ packages:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
     dev: true
 
-  /ignore-walk@6.0.3:
-    resolution: {integrity: sha512-C7FfFoTA+bI10qfeydT8aZbvr91vAEU+2W5BZUlzPec47oNb07SsOfwYrtxuvOYdUApPP/Qlh4DtAO51Ekk2QA==}
+  /ignore-walk@6.0.4:
+    resolution: {integrity: sha512-t7sv42WkwFkyKbivUCglsQW5YWMskWtbEf4MNKX5u/CCWHKSPzN4FtBQGsQZgCLbxOzpVlcbWVK5KB3auIOjSw==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
       minimatch: 9.0.3
@@ -4731,10 +4719,6 @@ packages:
     dependencies:
       p-locate: 5.0.0
 
-  /lodash.isequal@4.5.0:
-    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
-    dev: true
-
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
@@ -5000,54 +4984,6 @@ packages:
     engines: {node: '>=14.16'}
     dev: true
 
-  /np@10.0.0(typescript@5.2.2):
-    resolution: {integrity: sha512-goe1G6f2pkx6dJaeMGi4WV6z/0eKI2dh+O9fzQVOwgYbP6fYi6lJvPF5yhcROqh50pg+94nZ2ZFo42Ogakz5FQ==}
-    engines: {git: '>=2.11.0', node: '>=18', npm: '>=9', pnpm: '>=8', yarn: '>=1.7.0'}
-    hasBin: true
-    dependencies:
-      chalk: 5.3.0
-      chalk-template: 1.1.0
-      cosmiconfig: 8.3.6(typescript@5.2.2)
-      del: 7.1.0
-      escape-goat: 4.0.0
-      escape-string-regexp: 5.0.0
-      execa: 8.0.1
-      exit-hook: 4.0.0
-      github-url-from-git: 1.5.0
-      hosted-git-info: 7.0.1
-      ignore-walk: 6.0.3
-      import-local: 3.1.0
-      inquirer: 9.2.15
-      is-installed-globally: 1.0.0
-      is-interactive: 2.0.0
-      is-scoped: 3.0.0
-      issue-regex: 4.1.0
-      listr: 0.14.3
-      listr-input: 0.2.1
-      log-symbols: 6.0.0
-      meow: 13.2.0
-      new-github-release-url: 2.0.0
-      npm-name: 8.0.0
-      onetime: 7.0.0
-      open: 10.0.4
-      ow: 1.1.1
-      p-memoize: 7.1.1
-      p-timeout: 6.1.2
-      path-exists: 5.0.0
-      pkg-dir: 8.0.0
-      read-package-up: 11.0.0
-      read-pkg: 9.0.1
-      rxjs: 7.8.1
-      semver: 7.6.0
-      symbol-observable: 4.0.0
-      terminal-link: 3.0.0
-      update-notifier: 7.0.0
-    transitivePeerDependencies:
-      - typescript
-      - zen-observable
-      - zenObservable
-    dev: true
-
   /npm-name@8.0.0:
     resolution: {integrity: sha512-DIuCGcKYYhASAZW6Xh/tiaGMko8IHOHe0n3zOA7SzTi0Yvy00x8L7sa5yNiZ75Ny58O/KeRtNouy8Ut6gPbKiw==}
     engines: {node: '>=18'}
@@ -5234,17 +5170,6 @@ packages:
   /os-tmpdir@1.0.2:
     resolution: {integrity: sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==}
     engines: {node: '>=0.10.0'}
-    dev: true
-
-  /ow@1.1.1:
-    resolution: {integrity: sha512-sJBRCbS5vh1Jp9EOgwp1Ws3c16lJrUkJYlvWTYC03oyiYVwS/ns7lKRWow4w4XjDyTrA2pplQv4B2naWSR6yDA==}
-    engines: {node: '>=14.16'}
-    dependencies:
-      '@sindresorhus/is': 5.6.0
-      callsites: 4.1.0
-      dot-prop: 7.2.0
-      lodash.isequal: 4.5.0
-      vali-date: 1.0.0
     dev: true
 
   /p-cancelable@3.0.0:
@@ -6606,11 +6531,6 @@ packages:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
     dev: true
 
-  /vali-date@1.0.0:
-    resolution: {integrity: sha512-sgECfZthyaCKW10N0fm27cg8HYTFK5qMWgypqkXMQ4Wbl/zZKx7xZICgcoxIIE+WFAP/MBL2EFwC/YvLxw3Zeg==}
-    engines: {node: '>=0.10.0'}
-    dev: true
-
   /validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
     dependencies:
@@ -6892,4 +6812,54 @@ packages:
   /yocto-queue@1.0.0:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
+    dev: true
+
+  github.com/sindresorhus/np/044ca1706e7b220690a2a4b79f519b2c1c23d831(typescript@5.2.2):
+    resolution: {tarball: https://codeload.github.com/sindresorhus/np/tar.gz/044ca1706e7b220690a2a4b79f519b2c1c23d831}
+    id: github.com/sindresorhus/np/044ca1706e7b220690a2a4b79f519b2c1c23d831
+    name: np
+    version: 10.0.1
+    engines: {git: '>=2.11.0', node: '>=18', npm: '>=9', pnpm: '>=8', yarn: '>=1.7.0'}
+    hasBin: true
+    dependencies:
+      chalk: 5.3.0
+      chalk-template: 1.1.0
+      cosmiconfig: 8.3.6(typescript@5.2.2)
+      del: 7.1.0
+      escape-goat: 4.0.0
+      escape-string-regexp: 5.0.0
+      execa: 8.0.1
+      exit-hook: 4.0.0
+      github-url-from-git: 1.5.0
+      hosted-git-info: 7.0.1
+      ignore-walk: 6.0.4
+      import-local: 3.1.0
+      inquirer: 9.2.15
+      is-installed-globally: 1.0.0
+      is-interactive: 2.0.0
+      is-scoped: 3.0.0
+      issue-regex: 4.1.0
+      listr: 0.14.3
+      listr-input: 0.2.1
+      log-symbols: 6.0.0
+      meow: 13.2.0
+      new-github-release-url: 2.0.0
+      npm-name: 8.0.0
+      onetime: 7.0.0
+      open: 10.0.4
+      p-memoize: 7.1.1
+      p-timeout: 6.1.2
+      path-exists: 5.0.0
+      pkg-dir: 8.0.0
+      read-package-up: 11.0.0
+      read-pkg: 9.0.1
+      rxjs: 7.8.1
+      semver: 7.6.0
+      symbol-observable: 4.0.0
+      terminal-link: 3.0.0
+      update-notifier: 7.0.0
+    transitivePeerDependencies:
+      - typescript
+      - zen-observable
+      - zenObservable
     dev: true
