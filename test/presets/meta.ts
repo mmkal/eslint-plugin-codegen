@@ -1,7 +1,7 @@
 import * as glob from 'glob'
 import * as realfs from 'node:fs' // 'node:fs' rather than 'fs' to avoid test mock trying to shim this
 import * as path from 'path'
-import {dependencies} from '../../src'
+import {dependencies} from '../../src/dependencies'
 import {PresetMeta, PresetParams} from '../../src/presets'
 
 export const getMeta = (filename: string, fs = realfs): PresetMeta => ({
