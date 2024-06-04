@@ -104,7 +104,7 @@ export const test = base.extend<TestFixtures>({
 
       // exec(`npm init playwright@latest --yes -- --quiet --browser=chromium --gha --install-deps`)
       exec('npm init -y')
-      exec(`pnpm install eslint eslint-plugin-codegen eslint-plugin-mmkal typescript ts-node --save-dev`)
+      exec(`pnpm install eslint eslint-plugin-codegen eslint-plugin-mmkal typescript tsx --save-dev`)
 
       write('tsconfig.json', fs.readFileSync(path.join(__dirname, '..', 'tsconfig.json'), 'utf8'))
       write(

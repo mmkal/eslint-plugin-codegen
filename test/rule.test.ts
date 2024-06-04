@@ -33,6 +33,17 @@ tester.run('codegen', codegen.rules.codegen, {
         // codegen:end
       `,
     },
+    {
+      filename: path.join(__dirname, 'fixtures/barrel/barrel.ts'),
+      parserOptions: {ecmaVersion: 2015, sourceType: 'module'},
+      code: dedent`
+        // codegen:start {preset: barrel}
+        // codegen:hash {input: 7mba4acf57c1b55b89cf0788f766811ed9, output=755fa1a129b4ad064b5eb3c371db52dc}
+        export * from './bar'
+        export * from './foo'
+        // codegen:end
+      `,
+    },
   ],
   invalid: [
     {
@@ -95,6 +106,7 @@ tester.run('codegen', codegen.rules.codegen, {
       errors: [{message: /content doesn't match/}],
       output: dedent`
         // codegen:start {preset: barrel}
+        // codegen:hash {input: ba4acf57c1b55b89cf0788f766811ed9, output=755fa1a129b4ad064b5eb3c371db52dc}
         export * from './bar'
         export * from './foo'
         // codegen:end

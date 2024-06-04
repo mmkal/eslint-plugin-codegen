@@ -1,6 +1,24 @@
 import type {Preset} from '.'
 import * as path from 'path'
 
+const tsxAvailable = () => {
+  try {
+    require.resolve('tsx/cjs')
+    return true
+  } catch {
+    return false
+  }
+}
+
+const tsNodeAvailable = () => {
+  try {
+    require.resolve('ts-node/register/transpile-only')
+    return true
+  } catch {
+    return false
+  }
+}
+
 /**
  * Define your own codegen function, which will receive all options specified.
  *
@@ -25,7 +43,7 @@ import * as path from 'path'
  *
  * @param source Relative path to the module containing the custom preset. Default: the file being linted.
  * @param export The name of the export. If omitted, the module's default export should be a preset function.
- * @param require A module to load before `source`. If not set, defaults to `ts-node/register/transpile-only` for typescript sources.
+ * @param require A module to load before `source`. If not set, defaults to `tsx/cjs` or `ts-node/register/transpile-only` for typescript sources.
  * @param dev Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.
  */
 export const custom: Preset<
@@ -42,7 +60,14 @@ export const custom: Preset<
     throw new Error(`Source path is not a file: ${sourcePath}`)
   }
 
-  const requireFirst = options.require || (sourcePath.endsWith('.ts') ? 'ts-node/register/transpile-only' : undefined)
+  let requireFirst = options.require // || (sourcePath.endsWith('.ts') ? 'ts-node/register/transpile-only' : undefined)
+  if (!requireFirst && sourcePath.endsWith('.ts')) {
+    if (tsxAvailable()) {
+      requireFirst = 'tsx/cjs'
+    } else if (tsNodeAvailable()) {
+      requireFirst = 'ts-node/register/transpile-only'
+    }
+  }
   if (requireFirst) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     require(requireFirst)

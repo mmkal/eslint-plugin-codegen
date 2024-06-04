@@ -1,3 +1,4 @@
+import {createHash} from 'crypto'
 import type * as eslint from 'eslint'
 import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
@@ -5,6 +6,7 @@ import {globSync} from 'glob'
 import * as jsYaml from 'js-yaml'
 import * as os from 'os'
 import * as path from 'path'
+import {inspect} from 'util'
 import {dependencies} from './dependencies'
 import * as presetsModule from './presets'
 
@@ -101,7 +103,7 @@ export const codegen: eslint.Rule.RuleModule = {
           ...presetsModule,
           ...context.options[0]?.presets,
         } as {}
-        const preset = typeof opts?.preset === 'string' && presets[opts.preset]
+        const preset = typeof opts?.preset === 'string' ? presets[opts.preset] : undefined
         if (typeof preset !== 'function') {
           context.report({
             message: `unknown preset ${opts.preset as string}. Available presets: ${Object.keys(presets).join(', ')}`,
@@ -112,17 +114,49 @@ export const codegen: eslint.Rule.RuleModule = {
 
         const range: eslint.AST.Range = [startIndex + startMatch[0].length + os.EOL.length, endMatch.index!]
         const existingContent = sourceCode.slice(...range)
+
+        const meta: presetsModule.PresetMeta = {
+          filename: context.physicalFilename,
+          existingContent,
+          glob: globSync as never,
+          fs: dependencies.fs,
+          path,
+        }
+        const parameters = {meta, options: opts, context, dependencies}
+
+        const sourceCodeWithoutExistingContent = sourceCode.slice(0, range[0]) + sourceCode.slice(range[1])
+        const hashableInputs = {
+          filename: context.physicalFilename,
+          sourceCodeWithoutExistingContent,
+          parameters,
+        }
+        const inputHash = createHash('md5')
+          .update(inspect(hashableInputs, {depth: 10}))
+          .digest('hex')
+        const existingResultHashHeader = existingContent
+          .trim()
+          .split('\n')[0]
+          ?.match(/codegen:hash {(.*)}/)
+        const existingResultHash =
+          existingResultHashHeader && (jsYaml.load(existingResultHashHeader?.[1]) as {input: string; output: string})
+
+        const existingContentOutputHash = existingResultHashHeader
+          ? createHash('md5')
+              .update(JSON.stringify(existingContent.split(existingResultHashHeader?.[0])[1].trim()))
+              .digest('hex')
+          : undefined
+
+        const contentUpToDate =
+          existingContentOutputHash &&
+          existingResultHash?.input === inputHash &&
+          existingContentOutputHash === existingResultHash?.output
+
         const normalise = (val: string) => val.trim().replaceAll(/\r?\n/g, os.EOL)
+        const hasNonWhitespace = (s: string) => /\S/.test(s)
         const result = tryCatch(
           () => {
-            const meta: presetsModule.PresetMeta = {
-              filename: context.physicalFilename,
-              existingContent,
-              glob: globSync as never,
-              fs: dependencies.fs,
-              path,
-            }
-            return preset({meta, options: opts, context, dependencies})
+            if (contentUpToDate && hasNonWhitespace(existingContent)) return existingContent
+            return preset(parameters)
           },
           err => `${err as string}`,
         )
@@ -132,7 +166,16 @@ export const codegen: eslint.Rule.RuleModule = {
           return
         }
 
-        const expected = result.right
+        const outputHash = createHash('md5').update(JSON.stringify(result.right.trim())).digest('hex')
+        const resultHashHeader = `codegen:hash {input: ${inputHash}, output=${outputHash}}`
+
+        const hashComment =
+          markers === baseMarkersByExtension['.md']
+            ? `<!-- ${resultHashHeader} -->`
+            : markers === baseMarkersByExtension['.yml']
+              ? `# ${resultHashHeader}`
+              : `// ${resultHashHeader}`
+        const expected = hasNonWhitespace(result.right) ? [hashComment, result.right].join('\n') : result.right
         try {
           expect(normalise(existingContent)).toBe(normalise(expected))
         } catch (e: unknown) {
