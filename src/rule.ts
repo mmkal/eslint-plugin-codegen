@@ -4,9 +4,9 @@ import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
 import {globSync} from 'glob'
 import * as jsYaml from 'js-yaml'
+import ms from 'ms'
 import * as os from 'os'
 import * as path from 'path'
-import {inspect} from 'util'
 import {dependencies} from './dependencies'
 import * as presetsModule from './presets'
 
@@ -103,7 +103,7 @@ export const codegen: eslint.Rule.RuleModule = {
           ...presetsModule,
           ...context.options[0]?.presets,
         } as {}
-        const preset = typeof opts?.preset === 'string' ? presets[opts.preset] : undefined
+        const preset = typeof opts?.preset === 'string' ? presets[opts.preset] : presets.custom
         if (typeof preset !== 'function') {
           context.report({
             message: `unknown preset ${opts.preset as string}. Available presets: ${Object.keys(presets).join(', ')}`,
@@ -122,42 +122,71 @@ export const codegen: eslint.Rule.RuleModule = {
           fs: dependencies.fs,
           path,
         }
-        const parameters = {meta, options: opts, context, dependencies}
+        const parameters: presetsModule.PresetParams = {
+          meta,
+          options: opts,
+          context,
+          dependencies,
+          cache: (cacheInstructions, fn) => {
+            const existingResultHashHeader = existingContent
+              .trim()
+              .split('\n')[0]
+              ?.match(/codegen:hash ({.*})/)
+            const existingResultHash =
+              existingResultHashHeader &&
+              (jsYaml.safeLoad(existingResultHashHeader?.[1]) as {input: string; output: string; timestamp: string})
+
+            const defaultHashableInputs = {
+              filename: context.physicalFilename,
+              sourceCodeWithoutExistingContent,
+              options: parameters.options,
+            }
+
+            const getInputs = cacheInstructions.inputs || (x => x)
+
+            const inputHash = createHash('md5')
+              .update(JSON.stringify(getInputs(defaultHashableInputs)))
+              .digest('hex')
+
+            const hashableOutput = existingResultHashHeader
+              ? existingContent.split(existingResultHashHeader?.[0])[1].trim()
+              : null
+            const existingContentOutputHash =
+              typeof hashableOutput === 'string'
+                ? createHash('md5').update(JSON.stringify(hashableOutput)).digest('hex')
+                : undefined
+
+            const contentUpToDate =
+              existingContentOutputHash &&
+              existingResultHash?.input === inputHash &&
+              existingContentOutputHash === existingResultHash?.output &&
+              Date.now() - new Date(existingResultHash.timestamp).getTime() < ms(cacheInstructions.maxAge || '4 weeks')
+
+            if (contentUpToDate) {
+              return existingContent
+            }
+
+            const newContent = fn()
+
+            const outputHash = createHash('md5').update(JSON.stringify(newContent)).digest('hex')
+            const resultHashHeader = `codegen:hash {input: ${inputHash}, output: ${outputHash}, timestamp: ${new Date().toISOString()}}`
+
+            const hashComment =
+              markers === baseMarkersByExtension['.md']
+                ? `<!-- ${resultHashHeader} -->`
+                : markers === baseMarkersByExtension['.yml']
+                  ? `# ${resultHashHeader}`
+                  : `// ${resultHashHeader}`
+
+            return [hashComment, newContent].join('\n')
+          },
+        }
 
         const sourceCodeWithoutExistingContent = sourceCode.slice(0, range[0]) + sourceCode.slice(range[1])
-        const hashableInputs = {
-          filename: context.physicalFilename,
-          sourceCodeWithoutExistingContent,
-          parameters,
-        }
-        const inputHash = createHash('md5')
-          .update(inspect(hashableInputs, {depth: 10}))
-          .digest('hex')
-        const existingResultHashHeader = existingContent
-          .trim()
-          .split('\n')[0]
-          ?.match(/codegen:hash {(.*)}/)
-        const existingResultHash =
-          existingResultHashHeader && (jsYaml.load(existingResultHashHeader?.[1]) as {input: string; output: string})
-
-        const existingContentOutputHash = existingResultHashHeader
-          ? createHash('md5')
-              .update(JSON.stringify(existingContent.split(existingResultHashHeader?.[0])[1].trim()))
-              .digest('hex')
-          : undefined
-
-        const contentUpToDate =
-          existingContentOutputHash &&
-          existingResultHash?.input === inputHash &&
-          existingContentOutputHash === existingResultHash?.output
 
         const normalise = (val: string) => val.trim().replaceAll(/\r?\n/g, os.EOL)
-        const hasNonWhitespace = (s: string) => /\S/.test(s)
         const result = tryCatch(
-          () => {
-            if (contentUpToDate && hasNonWhitespace(existingContent)) return existingContent
-            return preset(parameters)
-          },
+          () => preset(parameters),
           err => `${err as string}`,
         )
 
@@ -166,24 +195,13 @@ export const codegen: eslint.Rule.RuleModule = {
           return
         }
 
-        const outputHash = createHash('md5').update(JSON.stringify(result.right.trim())).digest('hex')
-        const resultHashHeader = `codegen:hash {input: ${inputHash}, output=${outputHash}}`
-
-        const hashComment =
-          markers === baseMarkersByExtension['.md']
-            ? `<!-- ${resultHashHeader} -->`
-            : markers === baseMarkersByExtension['.yml']
-              ? `# ${resultHashHeader}`
-              : `// ${resultHashHeader}`
-        const expected = hasNonWhitespace(result.right) ? [hashComment, result.right].join('\n') : result.right
         try {
-          expect(normalise(existingContent)).toBe(normalise(expected))
+          expect(normalise(existingContent)).toBe(normalise(result.right))
         } catch (e: unknown) {
-          const loc = {start: position(range[0]), end: position(range[1])}
           context.report({
             message: `content doesn't match: ${e as string}`,
-            loc,
-            fix: fixer => fixer.replaceTextRange(range, normalise(expected) + os.EOL),
+            loc: {start: position(range[0]), end: position(range[1])},
+            fix: fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL),
           })
         }
       })

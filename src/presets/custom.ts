@@ -29,17 +29,21 @@ const tsNodeAvailable = () => {
  *
  * export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
  *   const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
- *   return `filename: ${meta.filename}\ncustom prop: ${options.myCustomProp}\nComponent paths: ${components.join(', ')}`
+ *   const json = JSON.stringify({filename: meta.filename, customProp: options.myCustomProp, components}, null, 2)
+ *   return `export default ${json}`
  * }
  *
  * @description
  * This can be used with:
  *
- * `<!-- codegen:start {preset: custom, source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
+ * `<!-- codegen:start {source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
  *
- * Note that a `glob` helper method is passed to the preset via `meta`. This uses the `globSync` method of https://npm.im/glob. There are also `fs`
- * and `path` helpers passed, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them
- * being production dependencies.
+ * <br />
+ *
+ * Note that some helpers passed via `dependencies`, such as `glob`, `fs`, `path`, `child_process`, `lodash`, `jsYaml`, `dedent`, and `readPkgUp`, corresponding to those
+ * node modules respectively. These can be useful to allow access to those libraries without them being production dependencies.
+ * This also allows your lint process to use these node-only dependencies, even in a file that is not run in node - only the calls would be included in any
+ * bundled output, not the dependencies themselves.
  *
  * @param source Relative path to the module containing the custom preset. Default: the file being linted.
  * @param export The name of the export. If omitted, the module's default export should be a preset function.
@@ -60,7 +64,7 @@ export const custom: Preset<
     throw new Error(`Source path is not a file: ${sourcePath}`)
   }
 
-  let requireFirst = options.require // || (sourcePath.endsWith('.ts') ? 'ts-node/register/transpile-only' : undefined)
+  let requireFirst = options.require
   if (!requireFirst && sourcePath.endsWith('.ts')) {
     if (tsxAvailable()) {
       requireFirst = 'tsx/cjs'

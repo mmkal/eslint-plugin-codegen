@@ -11,7 +11,7 @@ test('custom preset validation', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const customPreset = require('./custom-preset.cjs')
 
-  expect(Object.keys(customPreset)).toEqual(['getText', 'thrower'])
+  expect(Object.keys(customPreset)).toEqual(['getText', 'thrower', 'centuryLogStatement'])
 
   expect(customPreset.getText.toString().trim()).toMatch(/'Named export with input: ' \+ options.input/)
 })
