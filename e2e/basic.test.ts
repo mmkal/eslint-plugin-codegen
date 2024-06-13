@@ -42,10 +42,11 @@ const codegen = async (page: Page, parameters: {file: string; type: () => Promis
   await page.keyboard.press('Enter')
 
   for (const line of parameters.result.split('\n')) {
-    await page.getByText(line).first().waitFor()
+    await page.getByText(line).first().waitFor({timeout: 1_000_000_000})
   }
 
   await new Promise(r => setTimeout(r, 1500))
+  if (process.env.PAUSE) await new Promise(r => setTimeout(r, 1_000_000_000))
 }
 
 test.setTimeout(0)
@@ -118,24 +119,28 @@ test('custom', async ({workbox: page}) => {
         dedent`
           import React from 'react'
 
-          export const eslintDeps: import('eslint-plugin-codegen').Preset = ({
-            dependencies: {glob, path},
-          }) => {
-            const packages = glob.globSync('node_modules/eslint*/package.json', {cwd: process.cwd()})
-            const folders = packages.map(p => path.basename(path.dirname(p)))
-            return \`export const eslintDependencies = \${JSON.stringify(folders, null, 2)}\`
-          }
-
-          export const MyComponent = (props: {items: string[]}) => (
+          export const MyComponent = ({children}: {children: React.ReactNode}) => (
             <div>
-              <h1>You have {eslintDependencies.length} eslint dependencies</h1>\n
-              {props.items.map(item => (
-                <span>{item}</span>\n
-              ))}
+              <h1>You have {devDependencies.length} dev dependencies</h1>\n
+              <h2>Your readme is {readmeLength} characters long</h2>\n
+              {children}
             </div>\n
-          )
+          )\n
 
+          export const myCodegen: import('eslint-plugin-codegen').Preset = ({
+            dependencies: {fs, dedent},
+          }) => {
+            const readme = fs.readFileSync('README.md', 'utf8')
+            const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+            const devDeps = Object.keys(packageJson.devDependencies)
+            return dedent.default\`
+              export const readmeLength = \${readme.length}
+
+              export const devDependencies = \${JSON.stringify(devDeps, null, 6)}
+            \`
+          }
         `,
+        {delay: 25},
       )
 
       await page.keyboard.press('Enter')
@@ -144,9 +149,9 @@ test('custom', async ({workbox: page}) => {
       await new Promise(r => setTimeout(r, 500))
 
       await page.keyboard.type(dedent`
-        // codegen:start {export: eslintDeps}
+        // codegen:start {export: myCodegen}
       `)
     },
-    result: '"eslint-plugin-codegen"',
+    result: 'export const readmeLength',
   })
 })
