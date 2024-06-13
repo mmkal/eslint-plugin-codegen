@@ -1,7 +1,9 @@
+require('tsx/cjs')
 const mmkal = require('eslint-plugin-mmkal')
+const codegen = require('./src/config')
 
 module.exports = [
-  ...mmkal.recommendedFlatConfigs,
+  ...mmkal.recommendedFlatConfigs.filter(cfg => !cfg.plugins?.codegen && !cfg.rules?.['codegen/codegen']),
   {
     rules: {
       'no-restricted-imports': [
@@ -21,4 +23,6 @@ module.exports = [
     rules: {'no-restricted-imports': 'off'},
   },
   {ignores: ['.vscode-test']},
+  codegen.pluginConfig,
+  codegen.javascriptFilesConfig,
 ]
