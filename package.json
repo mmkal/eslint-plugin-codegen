@@ -73,7 +73,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-mmkal": "^0.7.0",
     "minimatch": "3.0.4",
-    "np": "github:sindresorhus/np#pnpm-vs-npm-tag-version-prefix",
+    "np": "^10.0.0",
     "strip-ansi": "6.0.1",
     "ts-morph": "16.0.0",
     "ts-node": "9.1.1",
