@@ -3,7 +3,17 @@ const mmkal = require('eslint-plugin-mmkal')
 const codegen = require('./src/config')
 
 module.exports = [
-  ...mmkal.recommendedFlatConfigs.filter(cfg => !cfg.plugins?.codegen && !cfg.rules?.['codegen/codegen']),
+  ...mmkal.recommendedFlatConfigs
+    .map(cfg => {
+      if (cfg.plugins.codegen) return {rules: {'no-unused-vars': 'off'}}
+      if (cfg.rules?.['codegen/codegen']) {
+        const {['codegen/codegen']: _, ...rules} = cfg.rules
+        return {
+          ...cfg,
+          rules: {'no-unused-vars': 'off', ...rules},
+        }
+      }
+    }),
   {
     rules: {
       'no-restricted-imports': [
