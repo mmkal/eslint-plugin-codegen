@@ -126,7 +126,7 @@ export const test = base.extend<TestFixtures>({
     const video = workbox.video()
     if (video) {
       videoPath ||= await video.path()
-      const targetVideoPath = path.join(process.cwd(), 'test-results', 'videos', titleSlug, 'recording.webm')
+      const targetVideoPath = path.join(process.cwd(), 'test-results', 'videos', titleSlug + path.extname(videoPath))
       await fs.promises.cp(videoPath, targetVideoPath)
       exec(
         `${gifskiPath} --fps 32 ${targetVideoPath} -o ${path.join(process.cwd(), 'gifs', titleSlug + '.gif')} --quality 100`,
