@@ -71,7 +71,7 @@
     "@types/minimatch": "3.0.3",
     "@vscode/test-electron": "^2.3.8",
     "eslint": "^8.57.0",
-    "eslint-plugin-mmkal": "^0.4.1",
+    "eslint-plugin-mmkal": "^0.7.0",
     "minimatch": "3.0.4",
     "np": "github:sindresorhus/np#pnpm-vs-npm-tag-version-prefix",
     "strip-ansi": "6.0.1",
