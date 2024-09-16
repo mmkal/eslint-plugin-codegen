@@ -4,7 +4,7 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "packageManager": "pnpm@8.10.2",
+  "packageManager": "pnpm@9.4.0",
   "keywords": [
     "typescript",
     "type-check",
@@ -70,7 +70,7 @@
     "@types/js-yaml": "3.12.5",
     "@types/minimatch": "3.0.3",
     "@vscode/test-electron": "^2.3.8",
-    "eslint": "^8.57.0",
+    "eslint": "^9.9.0",
     "eslint-plugin-mmkal": "^0.7.0",
     "minimatch": "3.0.4",
     "np": "^10.0.0",

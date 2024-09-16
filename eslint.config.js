@@ -5,7 +5,7 @@ const codegen = require('./src/config')
 module.exports = [
   ...mmkal.recommendedFlatConfigs
     .map(cfg => {
-      if (cfg.plugins.codegen) return {rules: {'no-unused-vars': 'off'}}
+      if (cfg.plugins?.codegen) return {rules: {'no-unused-vars': 'off'}}
       if (cfg.rules?.['codegen/codegen']) {
         const {['codegen/codegen']: _, ...rules} = cfg.rules
         return {
