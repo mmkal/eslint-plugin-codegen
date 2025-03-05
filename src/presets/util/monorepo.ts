@@ -26,14 +26,15 @@ export const getLeafPackages = (repoRoot: string | undefined, filename: string, 
   const readYamlFile = <T>(f: string) => jsYaml.load(maybeReadFile(f) || 'null') as T
 
   const parseLernaJson = () => readJsonFile<{packages: string[]}>('lerna.json')?.packages
-  const parsePnpmWorkspace = () =>
-    readYamlFile<{packages: string[]}>('pnpm-workspace.yaml')?.packages
+  const parsePnpmWorkspace = () => readYamlFile<{packages: string[]}>('pnpm-workspace.yaml')?.packages
 
   const pkg = readJsonFile<{workspaces?: {packages?: string[]}}>('package.json')
   const packageGlobs = pkg.workspaces?.packages || pkg.workspaces || parseLernaJson() || parsePnpmWorkspace()
 
   if (!Array.isArray(packageGlobs)) {
-    throw new TypeError(`Expected to find workspaces array from package.json, lerna.json or pnpm-workspace.yaml, got ${inspect(packageGlobs)})}`)
+    throw new TypeError(
+      `Expected to find workspaces array from package.json, lerna.json or pnpm-workspace.yaml, got ${inspect(packageGlobs)})}`,
+    )
   }
 
   const packages = lodash

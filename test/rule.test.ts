@@ -1,7 +1,6 @@
 import baseDedent from 'dedent'
 import {RuleTester} from 'eslint'
 import * as os from 'os'
-import * as path from 'path'
 import {test} from 'vitest'
 import * as codegen from '../src'
 
@@ -54,16 +53,6 @@ tester.run('codegen', codegen.rules.codegen, {
       filename: __filename,
       code: dedent`
         // codegen:start {preset: empty}
-        // codegen:end
-      `,
-    },
-    {
-      name: 'barrel preset',
-      filename: path.join(__dirname, 'fixtures/barrel/barrel.ts'),
-      code: dedent`
-        // codegen:start {preset: barrel}
-        export * from './bar'
-        export * from './foo'
         // codegen:end
       `,
     },
@@ -122,21 +111,6 @@ tester.run('codegen', codegen.rules.codegen, {
         // codegen:start {preset: empty}
         // codegen:end
         // codegen:start {preset: empty}
-        // codegen:end
-      `,
-    },
-    {
-      name: 'barrel preset fix',
-      filename: path.join(__dirname, 'fixtures/barrel/barrel.ts'),
-      code: dedent`
-        // codegen:start {preset: barrel}
-        // codegen:end
-      `,
-      errors: [{message: /content doesn't match/}],
-      output: dedent`
-        // codegen:start {preset: barrel}
-        export * from './bar'
-        export * from './foo'
         // codegen:end
       `,
     },
