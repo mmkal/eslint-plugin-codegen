@@ -19,22 +19,30 @@ const tsNodeAvailable = () => {
   }
 }
 
+interface CustomPresetOptions {
+  source?: string
+  export?: string
+  require?: string
+  dev?: boolean
+}
+
 /**
  * Define your own codegen function, which will receive all options specified.
  *
  * Import the `Preset` type from this library to define a strongly-typed preset function:
  *
  * @example
- * import {Preset} from 'eslint-plugin-codegen'
- *
- * export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
+ * export const jsonPrinter: import('eslint-plugin-codegen').Preset<{myCustomProp: string}> = ({meta, options}) => {
  *   const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
  *   const json = JSON.stringify({filename: meta.filename, customProp: options.myCustomProp, components}, null, 2)
  *   return `export default ${json}`
  * }
+ * 
+ * // codegen:start {export: jsonPrinter}
  *
  * @description
- * This can be used with:
+ * This can be used in other files by specifying the `source` option like:
+ * 
  *
  * `<!-- codegen:start {source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
  *
@@ -51,15 +59,10 @@ const tsNodeAvailable = () => {
  * @param dev Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.
  */
 export const custom: Preset<
-  {
-    source?: string
-    export?: string
-    require?: string
-    dev?: boolean
-  } & Record<string, unknown>
-> = ({meta, options, ...rest}) => {
+CustomPresetOptions & Record<string, unknown>
+> = ({context, options, ...rest}) => {
   const {fs} = rest.dependencies
-  const sourcePath = options.source ? path.join(path.dirname(meta.filename), options.source) : meta.filename
+  const sourcePath = options.source ? path.join(path.dirname(context.physicalFilename), options.source) : context.physicalFilename
   if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) {
     throw new Error(`Source path is not a file: ${sourcePath}`)
   }
@@ -90,5 +93,5 @@ export const custom: Preset<
     throw new TypeError(`Couldn't find export ${options.export || 'function'} from ${sourcePath} - got ${typeof func}`)
   }
 
-  return func({meta, options, ...rest})
+  return func({context, options, ...rest})
 }

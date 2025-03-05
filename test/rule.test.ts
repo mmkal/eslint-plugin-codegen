@@ -20,11 +20,25 @@ Object.assign(RuleTester, {
   /* eslint-enable vitest/expect-expect, vitest/valid-title */
 })
 
-const ts = new Date().toISOString()
+const realToISOString = Date.prototype.toISOString
+const initTimeIOSString = new Date().toISOString()
+const notLongAgoTs = new Date(new Date(initTimeIOSString).getTime() - 60_000).toISOString()
 
-beforeEach(() => {
-  Object.assign(Date.prototype, {toISOString: () => ts}) // freeze time to avoid flaky tests, even if they take >1ms to run
+Object.assign(Date.prototype, {
+  toISOString() {
+    const actualResult = realToISOString.call(this)
+    if (new Date(actualResult).getTime() - new Date(initTimeIOSString).getTime() < 5000) {
+      // give the test 5s to run - pretend it's instant if it's within 5s of the init time
+      return initTimeIOSString
+    }
+    return actualResult
+  },
 })
+
+// notes for debugging in future:
+// for "valid" cases, the "expected" in failures is what the rule outputs, "received" is what we write here under `code`
+// for "invalid" cases, the "expected" is what we write here under `output`, and "received" is what the rule outputs
+// if you change anything in the cache tests, you'll probably need to update the cache `output` value. The plugin doesn't expose the hash of the "old" content, so you need to just add log statements, copy-paste the value, then delete the logs.
 
 const tester = new RuleTester()
 tester.run('codegen', codegen.rules.codegen, {
@@ -45,7 +59,6 @@ tester.run('codegen', codegen.rules.codegen, {
     {
       name: 'barrel preset',
       filename: path.join(__dirname, 'fixtures/barrel/barrel.ts'),
-      parserOptions: {ecmaVersion: 2015, sourceType: 'module'},
       code: dedent`
         // codegen:start {preset: barrel}
         export * from './bar'
@@ -58,8 +71,8 @@ tester.run('codegen', codegen.rules.codegen, {
       filename: __filename,
       code: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 6c4faf277969ea604df6aa4215a40741, output: adb11f34a780fc80aa7d7f69f0a5f4c5, timestamp: 2000-01-01T00:00:00.000Z}
-        console.log('century: 20th')
+        // codegen:hash {input: e19e0815001e9afce62346bb82795269, output: d48256c0a41c3b7396155e1054032719, timestamp: ${notLongAgoTs}}
+        console.log('The century is: 20th')
         // codegen:end
       `,
     },
@@ -114,7 +127,6 @@ tester.run('codegen', codegen.rules.codegen, {
     {
       name: 'barrel preset fix',
       filename: path.join(__dirname, 'fixtures/barrel/barrel.ts'),
-      parserOptions: {ecmaVersion: 2015, sourceType: 'module'},
       code: dedent`
         // codegen:start {preset: barrel}
         // codegen:end
@@ -137,18 +149,18 @@ tester.run('codegen', codegen.rules.codegen, {
       errors: [{message: /Error: test error!/}],
     },
     {
-      name: 'custom preset cached fix',
+      name: 'custom preset add cache info',
       filename: __filename,
       code: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        console.log('century: 20th')
+        console.log('The century is: 21st')
         // codegen:end
       `,
       errors: [{message: /.*/}],
       output: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 6c4faf277969ea604df6aa4215a40741, output: adb11f34a780fc80aa7d7f69f0a5f4c5, timestamp: ${ts}}
-        console.log('century: 20th')
+        // codegen:hash {input: e19e0815001e9afce62346bb82795269, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: ${initTimeIOSString}}
+        console.log('The century is: 21st')
         // codegen:end
       `,
     },
@@ -158,15 +170,15 @@ tester.run('codegen', codegen.rules.codegen, {
       // note timestamp of hash is 1900, we only cache for 100 years so this is due an update
       code: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 6c4faf277969ea604df6aa4215a40741, output: adb11f34a780fc80aa7d7f69f0a5f4c5, timestamp: 1900-01-01T00:00:00.000Z}
-        console.log('century: 20th')
+        // codegen:hash {input: e19e0815001e9afce62346bb82795269, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: 1900-01-01T00:00:00.000Z}
+        console.log('The century is: 20th')
         // codegen:end
       `,
       errors: [{message: /.*/}],
       output: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 6c4faf277969ea604df6aa4215a40741, output: adb11f34a780fc80aa7d7f69f0a5f4c5, timestamp: ${ts}}
-        console.log('century: 20th')
+        // codegen:hash {input: e19e0815001e9afce62346bb82795269, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: ${initTimeIOSString}}
+        console.log('The century is: 21st')
         // codegen:end
       `,
     },

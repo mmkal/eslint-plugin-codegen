@@ -8,6 +8,6 @@ module.exports.thrower = () => {
 module.exports.centuryLogStatement = ({cache}) => {
   return cache({maxAge: '100 years'}, () => {
     const century = new Date().getFullYear() >= 2000 ? '21st' : '20th'
-    return `console.log('century: ${'20th' || century}')`
+    return `console.log('The century is: ${century}')`
   })
 }

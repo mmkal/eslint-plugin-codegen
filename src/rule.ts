@@ -1,3 +1,4 @@
+import stripAnsi from 'strip-ansi'
 import {createHash} from 'crypto'
 import type * as eslint from 'eslint'
 import expect from 'expect'
@@ -98,12 +99,15 @@ export const codegen: eslint.Rule.RuleModule = {
           return
         }
 
-        const opts = maybeOptions.right || {}
+        const opts = {
+          preset: 'custom',
+          ...(maybeOptions.right || {}),
+        }
         const presets: Record<string, presetsModule.Preset | undefined> = {
           ...presetsModule,
           ...context.options[0]?.presets,
         } as {}
-        const preset = typeof opts?.preset === 'string' ? presets[opts.preset] : presets.custom
+        const preset = presets[opts.preset]
         if (typeof preset !== 'function') {
           context.report({
             message: `unknown preset ${opts.preset as string}. Available presets: ${Object.keys(presets).join(', ')}`,
@@ -122,13 +126,9 @@ export const codegen: eslint.Rule.RuleModule = {
           fs: dependencies.fs,
           path,
         }
-        const parameters: presetsModule.PresetParams = {
-          meta,
-          options: opts,
-          context,
-          dependencies,
-          cache: (cacheInstructions, fn) => {
-            const existingResultHashHeader = existingContent
+
+        const getCacheResult = (cacheInstructions: presetsModule.CacheOptions, fn: () => string) => {
+          const existingResultHashHeader = existingContent
               .trim()
               .split('\n')[0]
               ?.match(/codegen:hash ({.*})/)
@@ -163,7 +163,10 @@ export const codegen: eslint.Rule.RuleModule = {
               Date.now() - new Date(existingResultHash.timestamp).getTime() < ms(cacheInstructions.maxAge || '4 weeks')
 
             if (contentUpToDate) {
-              return existingContent
+              return {
+                type: 'content-up-to-date',
+                content: existingContent,
+              } as const
             }
 
             const newContent = fn()
@@ -178,7 +181,19 @@ export const codegen: eslint.Rule.RuleModule = {
                   ? `# ${resultHashHeader}`
                   : `// ${resultHashHeader}`
 
-            return [hashComment, newContent].join('\n')
+            return {
+              type: 'content-updated',
+              content: [hashComment, newContent].join('\n'),
+            } as const
+        }
+
+        const parameters: presetsModule.PresetParams = {
+          meta,
+          options: opts,
+          context,
+          dependencies,
+          cache: (cacheInstructions, fn) => {
+            return getCacheResult(cacheInstructions, fn).content
           },
         }
 
@@ -187,7 +202,7 @@ export const codegen: eslint.Rule.RuleModule = {
         const normalise = (val: string) => val.trim().replaceAll(/\r?\n/g, os.EOL)
         const result = tryCatch(
           () => preset(parameters),
-          err => `${err as string}`,
+          (err) => `Failed to run preset ${opts.preset}: ${(err as Error)?.stack || err as string}`,
         )
 
         if (result._tag === 'Left') {
@@ -198,8 +213,10 @@ export const codegen: eslint.Rule.RuleModule = {
         try {
           expect(normalise(existingContent)).toBe(normalise(result.right))
         } catch (e: unknown) {
+          let message = `content doesn't match: ${e as string}`
+          if (process.env.NODE_ENV === 'test') message = stripAnsi(message)
           context.report({
-            message: `content doesn't match: ${e as string}`,
+            message,
             loc: {start: position(range[0]), end: position(range[1])},
             fix: fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL),
           })
