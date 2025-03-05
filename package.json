@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-codegen",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -76,8 +76,9 @@
     "eslint": "^8.57.0",
     "eslint-plugin-mmkal": "^0.10.1",
     "minimatch": "3.0.4",
-    "np": "^10.0.0",
+    "np": "^10.0.7",
     "pkg-pr-new": "^0.0.17",
+    "strip-ansi": "6.0.1",
     "ts-morph": "16.0.0",
     "ts-node": "9.1.1",
     "tsx": "^4.7.1",
