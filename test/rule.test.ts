@@ -2,7 +2,6 @@ import baseDedent from 'dedent'
 import {RuleTester} from 'eslint'
 import * as os from 'os'
 import * as path from 'path'
-import {beforeEach} from 'vitest'
 import {test} from 'vitest'
 import * as codegen from '../src'
 
@@ -14,12 +13,14 @@ const dedent = (...args: Parameters<typeof baseDedent>) => {
 
 Object.assign(RuleTester, {
   /* eslint-disable vitest/expect-expect, vitest/valid-title */
+  // override RuleTester.it to improve test names passed to viteset
   it: (name: string, fn: any) => {
     test(name.replaceAll(/\r?\n/g, ' \\n ').trim(), fn)
   },
   /* eslint-enable vitest/expect-expect, vitest/valid-title */
 })
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 const realToISOString = Date.prototype.toISOString
 const initTimeIOSString = new Date().toISOString()
 const notLongAgoTs = new Date(new Date(initTimeIOSString).getTime() - 60_000).toISOString()

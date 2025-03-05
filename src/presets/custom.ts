@@ -37,12 +37,12 @@ interface CustomPresetOptions {
  *   const json = JSON.stringify({filename: meta.filename, customProp: options.myCustomProp, components}, null, 2)
  *   return `export default ${json}`
  * }
- * 
+ *
  * // codegen:start {export: jsonPrinter}
  *
  * @description
  * This can be used in other files by specifying the `source` option like:
- * 
+ *
  *
  * `<!-- codegen:start {source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
  *
@@ -58,17 +58,23 @@ interface CustomPresetOptions {
  * @param require A module to load before `source`. If not set, defaults to `tsx/cjs` or `ts-node/register/transpile-only` for typescript sources.
  * @param dev Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.
  */
-export const custom: Preset<
-CustomPresetOptions & Record<string, unknown>
-> = ({context, options, ...rest}) => {
+export const custom: Preset<CustomPresetOptions & Record<string, unknown>> = ({context, options, ...rest}) => {
   const {fs} = rest.dependencies
-  const sourcePath = options.source ? path.join(path.dirname(context.physicalFilename), options.source) : context.physicalFilename
+  const sourcePath = options.source
+    ? path.join(path.dirname(context.physicalFilename), options.source)
+    : context.physicalFilename
   if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) {
     throw new Error(`Source path is not a file: ${sourcePath}`)
   }
 
   let requireFirst = options.require
-  if (!requireFirst && (sourcePath.endsWith('.ts') || sourcePath.endsWith('.tsx') || sourcePath.endsWith('.cts') || sourcePath.endsWith('.mts'))) {
+  if (
+    !requireFirst &&
+    (sourcePath.endsWith('.ts') ||
+      sourcePath.endsWith('.tsx') ||
+      sourcePath.endsWith('.cts') ||
+      sourcePath.endsWith('.mts'))
+  ) {
     if (tsxAvailable()) {
       requireFirst = 'tsx/cjs'
     } else if (tsNodeAvailable()) {

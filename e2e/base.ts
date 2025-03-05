@@ -3,7 +3,6 @@
 /* eslint-disable unicorn/prefer-module */
 // eslint-disable-next-line unicorn/filename-case
 /* eslint-disable no-console */
-/* eslint-disable import/no-extraneous-dependencies */
 /**
  * Copyright (c) Microsoft Corporation.
  *
@@ -23,8 +22,8 @@ import {test as base, type Page, _electron} from '@playwright/test'
 import {downloadAndUnzipVSCode} from '@vscode/test-electron/out/download'
 
 export {expect} from '@playwright/test'
-import {SpawnSyncOptionsWithBufferEncoding, spawnSync} from 'node:child_process'
 import dedent from 'dedent'
+import {SpawnSyncOptionsWithBufferEncoding, spawnSync} from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
@@ -88,7 +87,9 @@ export const test = base.extend<TestFixtures>({
     const exec = (command: string, options?: SpawnSyncOptionsWithBufferEncoding) =>
       spawnSync(command, {cwd: projectPath, stdio: 'inherit', shell: true, ...options})
 
-    process.env.QUICKTIME_RECORD && exec('osascript e2e/applescript/start-recording.applescript', {cwd: process.cwd()})
+    if (process.env.QUICKTIME_RECORD) {
+      exec('osascript e2e/applescript/start-recording.applescript', {cwd: process.cwd()})
+    }
 
     await use(workbox)
 

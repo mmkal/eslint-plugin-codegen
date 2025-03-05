@@ -5,27 +5,44 @@ const codegen = require('./src/config')
 module.exports = [
   ...mmkal.recommendedFlatConfigs
     .map(cfg => {
-      if (cfg.plugins?.codegen || `${cfg.processor}`.startsWith('codegen/')) return {
-        rules: {'no-unused-vars': 'off'}, // make sure it's non-empty so eslint doesn't complain
+      const harmlessRules = {'no-unused-vars': 'off'} // make sure it's non-empty so eslint doesn't complain
+      if (cfg.plugins?.codegen) {
+        const plugins = {...cfg.plugins}
+        delete plugins.codegen
+        cfg = {
+          ...cfg,
+          plugins,
+          rules: {...harmlessRules, ...cfg.rules},
+        }
+      }
+      if (`${cfg.processor}`.startsWith('codegen/')) {
+        const copied = {...cfg}
+        delete copied.processor
+        cfg = {
+          ...copied,
+          rules: {...harmlessRules, ...copied.rules},
+        }
       }
       if (cfg.rules?.['codegen/codegen']) {
         const rules = {...cfg.rules}
         delete rules['codegen/codegen']
-        return {
+        cfg = {
           ...cfg,
-          rules: {
-            ...rules,
-            'no-unused-vars': 'off', // make sure it's non-empty so eslint doesn't complain
-          }
+          rules: {...rules, ...harmlessRules},
         }
       }
+
+      // doesn't seem to be codegen related, leave it alone
       return cfg
     })
     .map(cfg => {
       if (require('util').inspect(cfg).includes('codegen/')) {
-        throw new Error(`codegen config found in eslint config coming from eslint-plugin-mmkal for this repo, this is going to cause confusion. Config: ${JSON.stringify(cfg)}`, {
-          cause: cfg,
-        })
+        throw new Error(
+          `codegen config found in eslint config coming from eslint-plugin-mmkal for this repo, this is going to cause confusion. Config: ${JSON.stringify(cfg)}`,
+          {
+            cause: cfg,
+          },
+        )
       }
       return cfg
     }),

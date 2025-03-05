@@ -1,4 +1,3 @@
-import stripAnsi from 'strip-ansi'
 import {createHash} from 'crypto'
 import type * as eslint from 'eslint'
 import expect from 'expect'
@@ -8,6 +7,7 @@ import * as jsYaml from 'js-yaml'
 import ms from 'ms'
 import * as os from 'os'
 import * as path from 'path'
+import stripAnsi from 'strip-ansi'
 import {dependencies} from './dependencies'
 import * as presetsModule from './presets'
 
@@ -101,7 +101,7 @@ export const codegen: eslint.Rule.RuleModule = {
 
         const opts = {
           preset: 'custom',
-          ...(maybeOptions.right || {}),
+          ...maybeOptions.right,
         }
         const presets: Record<string, presetsModule.Preset | undefined> = {
           ...presetsModule,
@@ -110,7 +110,7 @@ export const codegen: eslint.Rule.RuleModule = {
         const preset = presets[opts.preset]
         if (typeof preset !== 'function') {
           context.report({
-            message: `unknown preset ${opts.preset as string}. Available presets: ${Object.keys(presets).join(', ')}`,
+            message: `unknown preset ${opts.preset}. Available presets: ${Object.keys(presets).join(', ')}`,
             loc: startMarkerLoc,
           })
           return
@@ -131,62 +131,62 @@ export const codegen: eslint.Rule.RuleModule = {
 
         const getCacheResult = (cacheOptions: presetsModule.CacheOptions, fn: () => string) => {
           const existingResultHashHeader = existingContent
-              .trim()
-              .split('\n')[0]
-              ?.match(/codegen:hash ({.*})/)
-            const existingResultHash =
-              existingResultHashHeader &&
-              (jsYaml.safeLoad(existingResultHashHeader?.[1]) as {input: string; output: string; timestamp: string})
+            .trim()
+            .split('\n')[0]
+            ?.match(/codegen:hash ({.*})/)
+          const existingResultHash =
+            existingResultHashHeader &&
+            (jsYaml.safeLoad(existingResultHashHeader?.[1]) as {input: string; output: string; timestamp: string})
 
-            const defaultHashableInputs = {
-              filename: context.physicalFilename,
-              sourceCodeWithoutExistingContent,
-              options: parameters.options,
-            }
+          const defaultHashableInputs = {
+            filename: context.physicalFilename,
+            sourceCodeWithoutExistingContent,
+            options: parameters.options,
+          }
 
-            const getInputs = cacheOptions.inputs || (x => x)
+          const getInputs = cacheOptions.inputs || (x => x)
 
-            const inputHash = createHash('md5')
-              .update(JSON.stringify(getInputs(defaultHashableInputs)))
-              .digest('hex')
+          const inputHash = createHash('md5')
+            .update(JSON.stringify(getInputs(defaultHashableInputs)))
+            .digest('hex')
 
-            const hashableOutput = existingResultHashHeader
-              ? existingContent.split(existingResultHashHeader?.[0])[1].trim()
-              : null
-            const existingContentOutputHash =
-              typeof hashableOutput === 'string'
-                ? createHash('md5').update(JSON.stringify(hashableOutput)).digest('hex')
-                : undefined
+          const hashableOutput = existingResultHashHeader
+            ? existingContent.split(existingResultHashHeader?.[0])[1].trim()
+            : null
+          const existingContentOutputHash =
+            typeof hashableOutput === 'string'
+              ? createHash('md5').update(JSON.stringify(hashableOutput)).digest('hex')
+              : undefined
 
-            const contentUpToDate =
-              existingContentOutputHash &&
-              existingResultHash?.input === inputHash &&
-              existingContentOutputHash === existingResultHash?.output &&
-              Date.now() - new Date(existingResultHash.timestamp).getTime() < ms(cacheOptions.maxAge || '4 weeks')
+          const contentUpToDate =
+            existingContentOutputHash &&
+            existingResultHash?.input === inputHash &&
+            existingContentOutputHash === existingResultHash?.output &&
+            Date.now() - new Date(existingResultHash.timestamp).getTime() < ms(cacheOptions.maxAge || '4 weeks')
 
-            if (contentUpToDate) {
-              return {
-                type: 'content-up-to-date',
-                content: existingContent,
-              } as const
-            }
-
-            const newContent = fn()
-
-            const outputHash = createHash('md5').update(JSON.stringify(newContent)).digest('hex')
-            const resultHashHeader = `codegen:hash {input: ${inputHash}, output: ${outputHash}, timestamp: ${new Date().toISOString()}}`
-
-            const hashComment =
-              markers === baseMarkersByExtension['.md']
-                ? `<!-- ${resultHashHeader} -->`
-                : markers === baseMarkersByExtension['.yml']
-                  ? `# ${resultHashHeader}`
-                  : `// ${resultHashHeader}`
-
+          if (contentUpToDate) {
             return {
-              type: 'content-updated',
-              content: [hashComment, newContent].join('\n'),
+              type: 'content-up-to-date',
+              content: existingContent,
             } as const
+          }
+
+          const newContent = fn()
+
+          const outputHash = createHash('md5').update(JSON.stringify(newContent)).digest('hex')
+          const resultHashHeader = `codegen:hash {input: ${inputHash}, output: ${outputHash}, timestamp: ${new Date().toISOString()}}`
+
+          const hashComment =
+            markers === baseMarkersByExtension['.md']
+              ? `<!-- ${resultHashHeader} -->`
+              : markers === baseMarkersByExtension['.yml']
+                ? `# ${resultHashHeader}`
+                : `// ${resultHashHeader}`
+
+          return {
+            type: 'content-updated',
+            content: [hashComment, newContent].join('\n'),
+          } as const
         }
 
         const parameters: presetsModule.PresetParams = {
@@ -202,7 +202,7 @@ export const codegen: eslint.Rule.RuleModule = {
         const normalise = (val: string) => val.trim().replaceAll(/\r?\n/g, os.EOL)
         const result = tryCatch(
           () => preset(parameters),
-          (err) => `Failed to run preset ${opts.preset}: ${(err as Error)?.stack || err as string}`,
+          err => `Failed to run preset ${opts.preset}: ${(err as Error)?.stack || (err as string)}`,
         )
 
         if (result._tag === 'Left') {

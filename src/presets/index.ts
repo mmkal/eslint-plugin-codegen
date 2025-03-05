@@ -40,11 +40,7 @@ export interface CacheOptions {
    * inputs: defaults => [defaults, globSync('some/path/*.ts').map(filepath => fs.readFileSync(filepath))]
    * ```
    */
-  inputs?: (defaults: {
-    filename: string
-    sourceCodeWithoutExistingContent: string
-    options: unknown
-  }) => unknown
+  inputs?: (defaults: {filename: string; sourceCodeWithoutExistingContent: string; options: unknown}) => unknown
 }
 
 export type PresetParams<Options = {}> = {
