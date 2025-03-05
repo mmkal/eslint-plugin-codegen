@@ -267,6 +267,10 @@ The helpers that are provided to the generator function via the `dependencies` p
 - `makeSynchronous`: A function for making functions synchronous by running them in a subprocess. See [the code](./src/make-synchronous.ts) for more details. It's a simplified version of [this](https://github.com/sindresorhus/make-synchronous). **Note: it's strongly recommended to use this with the `cache` feature to avoid slowing down your lint process**.
 - `fetchSync`: A simplified `fetch` wrapper that runs synchronously via `makeSynchronous`. See [the code](./src/fetch-sync.ts) for more details. Useful for fetching data from the internet without adding a production dependency. **Note: it's strongly recommended to use this with the `cache` feature to avoid slowing down your lint process**.
 
+##### TypeScript
+
+The plugin will attempt to run generator functions written in typescript. If `tsx` or `ts-node` are available, they will be used to register their respective loaders before requiring the file containing the generator function. If you have trouble, try installing `tsx` even if you don't otherwise use it - or just write the generator function in a separate javascript file.
+
 Note: to get type safety for the helpers in javascript files, use the `{@type ...}` syntax:
 
 ```typescript
