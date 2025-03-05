@@ -139,7 +139,7 @@ export const codegen: eslint.Rule.RuleModule = {
             (jsYaml.safeLoad(existingResultHashHeader?.[1]) as {input: string; output: string; timestamp: string})
 
           const defaultHashableInputs = {
-            filename: context.physicalFilename,
+            filename: path.relative(process.cwd(), context.physicalFilename),
             sourceCodeWithoutExistingContent,
             options: parameters.options,
           }
