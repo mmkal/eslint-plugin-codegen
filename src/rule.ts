@@ -127,7 +127,9 @@ export const codegen: eslint.Rule.RuleModule = {
           path,
         }
 
-        const getCacheResult = (cacheInstructions: presetsModule.CacheOptions, fn: () => string) => {
+        const sourceCodeWithoutExistingContent = sourceCode.slice(0, range[0]) + sourceCode.slice(range[1])
+
+        const getCacheResult = (cacheOptions: presetsModule.CacheOptions, fn: () => string) => {
           const existingResultHashHeader = existingContent
               .trim()
               .split('\n')[0]
@@ -142,7 +144,7 @@ export const codegen: eslint.Rule.RuleModule = {
               options: parameters.options,
             }
 
-            const getInputs = cacheInstructions.inputs || (x => x)
+            const getInputs = cacheOptions.inputs || (x => x)
 
             const inputHash = createHash('md5')
               .update(JSON.stringify(getInputs(defaultHashableInputs)))
@@ -160,7 +162,7 @@ export const codegen: eslint.Rule.RuleModule = {
               existingContentOutputHash &&
               existingResultHash?.input === inputHash &&
               existingContentOutputHash === existingResultHash?.output &&
-              Date.now() - new Date(existingResultHash.timestamp).getTime() < ms(cacheInstructions.maxAge || '4 weeks')
+              Date.now() - new Date(existingResultHash.timestamp).getTime() < ms(cacheOptions.maxAge || '4 weeks')
 
             if (contentUpToDate) {
               return {
@@ -196,8 +198,6 @@ export const codegen: eslint.Rule.RuleModule = {
             return getCacheResult(cacheInstructions, fn).content
           },
         }
-
-        const sourceCodeWithoutExistingContent = sourceCode.slice(0, range[0]) + sourceCode.slice(range[1])
 
         const normalise = (val: string) => val.trim().replaceAll(/\r?\n/g, os.EOL)
         const result = tryCatch(

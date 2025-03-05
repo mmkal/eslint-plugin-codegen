@@ -21,6 +21,9 @@ export interface PresetDependencies {
   dedent: typeof import('dedent').default
   glob: Pick<typeof import('glob'), 'globSync'>
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
+  cheerio: typeof import('cheerio')
+  makeSynchronous: typeof import('../make-synchronous').makeSynchronous
+  fetchSync: typeof import('../fetch-sync').fetchSync
 }
 
 export interface CacheOptions {

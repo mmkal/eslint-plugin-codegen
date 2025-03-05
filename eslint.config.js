@@ -5,14 +5,29 @@ const codegen = require('./src/config')
 module.exports = [
   ...mmkal.recommendedFlatConfigs
     .map(cfg => {
-      if (cfg.plugins?.codegen) return {rules: {'no-unused-vars': 'off'}}
+      if (cfg.plugins?.codegen || `${cfg.processor}`.startsWith('codegen/')) return {
+        rules: {'no-unused-vars': 'off'}, // make sure it's non-empty so eslint doesn't complain
+      }
       if (cfg.rules?.['codegen/codegen']) {
-        const {['codegen/codegen']: _, ...rules} = cfg.rules
+        const rules = {...cfg.rules}
+        delete rules['codegen/codegen']
         return {
           ...cfg,
-          rules: {'no-unused-vars': 'off', ...rules},
+          rules: {
+            ...rules,
+            'no-unused-vars': 'off', // make sure it's non-empty so eslint doesn't complain
+          }
         }
       }
+      return cfg
+    })
+    .map(cfg => {
+      if (require('util').inspect(cfg).includes('codegen/')) {
+        throw new Error(`codegen config found in eslint config coming from eslint-plugin-mmkal for this repo, this is going to cause confusion. Config: ${JSON.stringify(cfg)}`, {
+          cause: cfg,
+        })
+      }
+      return cfg
     }),
   {
     rules: {
@@ -38,7 +53,7 @@ module.exports = [
     files: ['e2e/**/*.ts'],
     rules: {'no-restricted-imports': 'off'},
   },
-  {ignores: ['.vscode-test']},
+  {ignores: ['.vscode-test', 'test-results']},
   codegen.pluginConfig,
   codegen.javascriptFilesConfig,
 ]
