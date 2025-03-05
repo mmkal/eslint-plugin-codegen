@@ -17,7 +17,7 @@ Here's an example of it being used along with VSCode's eslint plugin, with auto-
 
 ## Contents
 
-<!-- codegen:start {preset: markdownTOC, minDepth: 2, maxDepth: 5} -->
+<!-- codegen:start {preset: markdownTOC, minDepth: 2, maxDepth: 4} -->
 - [Motivation](#motivation)
 - [Contents](#contents)
 - [How to use](#how-to-use)
@@ -139,23 +139,24 @@ module.exports = {
 ### Presets
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L53)
+#### [custom](./src/presets/custom.ts#L61)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
 
 ##### Example
 
 ```typescript
-import {Preset} from 'eslint-plugin-codegen'
-
-export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
+export const jsonPrinter: import('eslint-plugin-codegen').Preset<{myCustomProp: string}> = ({meta, options}) => {
   const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
   const json = JSON.stringify({filename: meta.filename, customProp: options.myCustomProp, components}, null, 2)
   return `export default ${json}`
 }
+
+// codegen:start {export: jsonPrinter}
 ```
 
-This can be used with:
+This can be used in other files by specifying the `source` option like:
+
 
 `<!-- codegen:start {source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
 
@@ -233,15 +234,18 @@ If the the generated code doesn't match the output hash, the generator function 
 This means that if you change the filename, or any of the source code, it will re-run. You can control this behaviour when defining your generator function:
 
 ```ts
-export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Preset = ({cache, dependencies}) => {
-  return cache({maxAge: '4 weeks'}, () => {
-    const res = dependencies.fetchSync('https://en.wikipedia.org/wiki/Secretary-General_of_the_United_Nations')
-    const $ = dependencies.cheerio.load(res.text)
-    const incumbent = $('.infobox div:contains("Incumbent")')
-    const secretaryGeneral = incumbent.find('a').text()
-    return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
-  })
-}
+export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Preset =
+  ({cache, dependencies}) => {
+    return cache({maxAge: '4 weeks'}, () => {
+      const res = dependencies.fetchSync(
+        'https://en.wikipedia.org/wiki/Secretary-General_of_the_United_Nations',
+      )
+      const $ = dependencies.cheerio.load(res.text)
+      const incumbent = $('.infobox div:contains("Incumbent")')
+      const secretaryGeneral = incumbent.find('a').text()
+      return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
+    })
+  }
 
 // codegen:start {preset: custom, export: secretaryGeneralLogStatement}
 // codegen:hash {input: 4119892f2e6eaf56ae5c346de91be718, output: eed0d07c81b82bff1d3e4751073b0112, timestamp: 2025-03-05T18:58:13.921Z}
