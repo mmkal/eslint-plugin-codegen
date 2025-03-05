@@ -65,7 +65,7 @@ export const custom: Preset<
   }
 
   let requireFirst = options.require
-  if (!requireFirst && sourcePath.endsWith('.ts')) {
+  if (!requireFirst && (sourcePath.endsWith('.ts') || sourcePath.endsWith('.tsx') || sourcePath.endsWith('.cts') || sourcePath.endsWith('.mts'))) {
     if (tsxAvailable()) {
       requireFirst = 'tsx/cjs'
     } else if (tsNodeAvailable()) {
