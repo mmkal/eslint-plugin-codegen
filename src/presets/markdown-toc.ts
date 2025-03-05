@@ -1,7 +1,8 @@
 import type {Preset} from '.'
+import * as cheerio from 'cheerio'
 import * as lodash from 'lodash'
+import {marked} from 'marked'
 import * as os from 'os'
-
 /**
  * Generate a table of contents from the current markdown file, based on markdown headers (e.g. `### My section title`)
  *
@@ -13,6 +14,8 @@ import * as os from 'os'
  * @param maxDepth exclude headers with higher "depth". e.g. if set to 3, `#### H4` would be excluded but `### H3` would be included. @default Infinity
  */
 export const markdownTOC: Preset<{minDepth?: number; maxDepth?: number}> = ({context, options, dependencies: {fs}}) => {
+  const html = marked.parse(fs.readFileSync(context.physicalFilename).toString()) as string
+  const $ = cheerio.load(html)
   const lines = fs
     .readFileSync(context.physicalFilename)
     .toString()
