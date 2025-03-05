@@ -34,6 +34,8 @@ export const configs: eslint.ESLint.Plugin['configs'] = {
 
 export const rules = {codegen}
 
+export * from './flat-config'
+
 export * as presets from './presets'
 
 export * as flatConfig from './config'

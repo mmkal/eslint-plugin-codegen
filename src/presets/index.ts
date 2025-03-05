@@ -18,7 +18,7 @@ export interface PresetDependencies {
   child_process: typeof import('child_process')
   lodash: typeof import('lodash')
   jsYaml: typeof import('js-yaml')
-  dedent: typeof import('dedent')
+  dedent: typeof import('dedent').default
   glob: Pick<typeof import('glob'), 'globSync'>
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
 }
