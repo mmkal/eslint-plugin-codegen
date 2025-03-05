@@ -6,6 +6,7 @@ import * as fs from 'fs'
 import * as glob from 'glob'
 import * as jsYaml from 'js-yaml'
 import lodash from 'lodash'
+import * as marked from 'marked'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
 import {fetchSync} from './fetch-sync'
@@ -24,4 +25,5 @@ export const dependencies: presetsModule.PresetDependencies = {
   makeSynchronous,
   fetchSync,
   cheerio,
+  marked,
 }

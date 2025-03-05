@@ -22,6 +22,7 @@ export interface PresetDependencies {
   glob: Pick<typeof import('glob'), 'globSync'>
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
   cheerio: typeof import('cheerio')
+  marked: typeof import('marked')
   makeSynchronous: typeof import('../make-synchronous').makeSynchronous
   fetchSync: typeof import('../fetch-sync').fetchSync
 }

@@ -264,6 +264,7 @@ The helpers that are provided to the generator function via the `dependencies` p
 - `glob`: https://npmjs.com/package/glob
 - `readPkgUp`: https://npmjs.com/package/read-pkg-up
 - `cheerio`: https://npmjs.com/package/cheerio
+- `marked`: https://npmjs.com/package/marked
 - `makeSynchronous`: A function for making functions synchronous by running them in a subprocess. See [the code](./src/make-synchronous.ts) for more details. It's a simplified version of [this](https://github.com/sindresorhus/make-synchronous). **Note: it's strongly recommended to use this with the `cache` feature to avoid slowing down your lint process**.
 - `fetchSync`: A simplified `fetch` wrapper that runs synchronously via `makeSynchronous`. See [the code](./src/fetch-sync.ts) for more details. Useful for fetching data from the internet without adding a production dependency. **Note: it's strongly recommended to use this with the `cache` feature to avoid slowing down your lint process**.
 
