@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable unicorn/prefer-module */
 // eslint-disable-next-line unicorn/filename-case
 /* eslint-disable no-console */
-/* eslint-disable import/no-extraneous-dependencies */
 /**
  * Copyright (c) Microsoft Corporation.
  *
@@ -20,11 +22,11 @@ import {test as base, type Page, _electron} from '@playwright/test'
 import {downloadAndUnzipVSCode} from '@vscode/test-electron/out/download'
 
 export {expect} from '@playwright/test'
-import {spawnSync} from 'child_process'
 import dedent from 'dedent'
-import * as fs from 'fs'
-import * as os from 'os'
-import * as path from 'path'
+import {SpawnSyncOptionsWithBufferEncoding, spawnSync} from 'node:child_process'
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
 
 export type TestOptions = {
   vscodeVersion: string
@@ -39,13 +41,20 @@ type TestFixtures = TestOptions & {
 export const test = base.extend<TestFixtures>({
   vscodeVersion: ['insiders', {option: true}],
   async workbox({vscodeVersion, createProject, createTempDir}, use) {
+    const titleSlug = slugify(test.info().title)
     const defaultCachePath = await createTempDir()
     const vscodePath = await downloadAndUnzipVSCode(vscodeVersion)
-    await fs.promises.cp(
-      '/Users/mmkal/.vscode/extensions/dbaeumer.vscode-eslint-2.4.2',
-      path.join(defaultCachePath, 'extensions', 'dbaeumer.vscode-eslint-2.4.2'),
-      {recursive: true},
-    )
+    const systemVscodeFolder = path.join(os.homedir(), '.vscode')
+    const systemExtensionsDirectory = path.join(systemVscodeFolder, 'extensions')
+    const gifskiPath = path.join(os.homedir(), 'Downloads/gifski-1.32.0/mac/gifski')
+    const systemExtensionNames = await fs.promises.readdir(systemExtensionsDirectory)
+
+    const systemEslintExtension = systemExtensionNames.find(child => child.startsWith('dbaeumer.vscode-eslint'))!
+    const systemEslintExtensionPath = path.join(systemExtensionsDirectory, systemEslintExtension)
+
+    await fs.promises.cp(systemEslintExtensionPath, path.join(defaultCachePath, 'extensions', systemEslintExtension), {
+      recursive: true,
+    })
     const projectPath = await createProject()
     const electronApp = await _electron.launch({
       executablePath: vscodePath,
@@ -66,11 +75,50 @@ export const test = base.extend<TestFixtures>({
         `--user-data-dir=${path.join(defaultCachePath, 'user-data')}`,
         projectPath,
       ],
-      recordVideo: {dir: 'test-results/videos'},
+      recordVideo: {
+        dir: `test-results/videos/${titleSlug}`,
+        // 942:707 is the default aspect ratio of the electron runner and I don't know how to change it.
+        size: {width: 942 * 1.5, height: 707 * 1.5},
+      },
     })
     const workbox = await electronApp.firstWindow()
     await workbox.context().tracing.start({screenshots: true, snapshots: true, title: test.info().title})
+
+    const exec = (command: string, options?: SpawnSyncOptionsWithBufferEncoding) =>
+      spawnSync(command, {cwd: projectPath, stdio: 'inherit', shell: true, ...options})
+
+    if (process.env.QUICKTIME_RECORD) {
+      exec('osascript e2e/applescript/start-recording.applescript', {cwd: process.cwd()})
+    }
+
     await use(workbox)
+
+    let videoPath: string | undefined
+    if (process.env.QUICKTIME_RECORD) {
+      const before = new Date()
+      exec('osascript e2e/applescript/stop-recording.applescript', {cwd: process.cwd()})
+      const desktop = path.join(os.homedir(), 'Desktop')
+      await new Promise(r => setTimeout(r, 3000)) // give it a few seconds to save
+      const after = new Date()
+      const desktopMovFiles = fs
+        .readdirSync(desktop)
+        .filter(f => f.endsWith('.mov'))
+        .map(f => {
+          const filepath = path.join(desktop, f)
+          return {filepath, ctime: fs.statSync(filepath).ctime}
+        })
+        .filter(f => Date.now() - f.ctime.getTime() < 1000 * 60 * 60)
+        .sort((a, b) => b.ctime.getTime() - a.ctime.getTime())
+      const likelyFiles = desktopMovFiles.filter(f => f.ctime > before && f.ctime < after)
+      if (likelyFiles.length !== 1) {
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        throw new Error(
+          `Expected one file to be created between ${before.toISOString()} and ${after.toISOString()}, got ${JSON.stringify(desktopMovFiles, null, 2)}`,
+        )
+      }
+      videoPath = likelyFiles[0].filepath
+    }
+
     const tracePath = test.info().outputPath('trace.zip')
     await workbox.context().tracing.stop({path: tracePath})
     test.info().attachments.push({name: 'trace', path: tracePath, contentType: 'application/zip'})
@@ -78,9 +126,12 @@ export const test = base.extend<TestFixtures>({
     const logPath = path.join(defaultCachePath, 'user-data')
     const video = workbox.video()
     if (video) {
-      // await workbox.video()?.saveAs(path.join(process.cwd(), 'videos', slugify(test.info().title) + '.webm'))
-      const exec = (command: string) => spawnSync(command, {cwd: projectPath, stdio: 'inherit', shell: true})
-      exec(`ffmpeg -y -i ${await video.path()} -pix_fmt rgb24 ${process.cwd()}/gifs/${slugify(test.info().title)}.gif`)
+      videoPath ||= await video.path()
+      const targetVideoPath = path.join(process.cwd(), 'test-results', 'videos', titleSlug + path.extname(videoPath))
+      await fs.promises.cp(videoPath, targetVideoPath)
+      exec(
+        `${gifskiPath} --fps 32 ${targetVideoPath} -o ${path.join(process.cwd(), 'gifs', titleSlug + '.gif')} --quality 100`,
+      )
     }
 
     if (fs.existsSync(logPath)) {
@@ -102,26 +153,35 @@ export const test = base.extend<TestFixtures>({
         fs.writeFileSync(fullpath, content)
       }
 
-      // exec(`npm init playwright@latest --yes -- --quiet --browser=chromium --gha --install-deps`)
-      exec('npm init -y')
-      exec(`pnpm install eslint eslint-plugin-codegen eslint-plugin-mmkal typescript ts-node --save-dev`)
+      const editJson = (name: string, edit: (json: unknown) => void) => {
+        const fullpath = path.join(projectPath, name)
+        if (!fs.existsSync(fullpath)) {
+          fs.mkdirSync(path.dirname(fullpath), {recursive: true})
+          fs.cpSync(path.join(__dirname, '..', name), fullpath)
+        }
+        const json = JSON.parse(fs.readFileSync(fullpath, 'utf8')) as {}
+        edit(json)
+        fs.writeFileSync(fullpath, JSON.stringify(json, null, 2))
+      }
 
-      write('tsconfig.json', fs.readFileSync(path.join(__dirname, '..', 'tsconfig.json'), 'utf8'))
+      exec('npm init -y')
+      exec(`pnpm install eslint@8 react@18 @types/react typescript tsx --save-dev`)
+
+      editJson('tsconfig.json', (json: any) => {
+        json.compilerOptions.jsx = 'react'
+        json.include.push('node_modules/eslint-plugin-codegen')
+      })
       write(
-        '.eslintrc.js',
-        // parserOptions: {project: null} // this is more of an eslint-plugin-mmkal thing but typescript-eslint doesn't like the processor I've got
-        // also, need to not pass fatal messages in the processor to eslint-plugin-markdown
+        'eslint.config.js',
         dedent`
-          module.exports = {
-            ...require('eslint-plugin-mmkal').getRecommended(),
-            parserOptions: {project: null},
-            plugins: ['codegen'],
-            extends: ['plugin:codegen/recommended'],
-            rules: {
-              'mmkal/codegen/codegen': 'off',
-              'codegen/codegen': 'warn',
-            },
-          }
+          module.exports = [
+            ...require(${JSON.stringify(path.join(__dirname, '..', 'eslint.config.js'))})
+              .map(({rules, ...cfg}) => ({
+                ...cfg,
+              }))
+              .filter(cfg => Object.keys(cfg).length > 0),
+            {rules: {'codegen/codegen': 'warn'}},
+          ]
         `,
       )
 
@@ -129,30 +189,37 @@ export const test = base.extend<TestFixtures>({
       write('src/barrel/b.ts', 'export const b = 1')
       write('src/barrel/index.ts', '')
       write('src/custom/index.ts', '')
-      write('README.md', '')
+      write('src/custom/component.tsx', '')
+      write('README.md', 'Sample project')
 
+      // use local eslint-plugin-codegen by inserting typescript directly into node_modules
+      editJson('package.json', (json: any) => (json.devDependencies['eslint-plugin-codegen'] = '*'))
       write(
-        '.vscode/settings.json',
-        fs
-          .readFileSync(path.join(__dirname, '../.vscode/settings.json'))
-          .toString()
-          .replace('{', '{\n  "editor.autoClosingBrackets": "never",')
-          .replace('{', '{\n  "editor.autoIndent": "none",')
-          .replace('{', '{\n  "editor.insertSpaces": false,'),
+        'node_modules/eslint-plugin-codegen/index.ts',
+        `export * from ${JSON.stringify(path.join(__dirname, '..', 'src'))}`,
       )
+
+      editJson('.vscode/settings.json', (json: any) => {
+        json['editor.inlineSuggest.enabled'] = false
+        json['editor.autoClosingBrackets'] = 'never'
+        json['editor.autoClosingQuotes'] = 'never'
+        json['editor.autoIndent'] = 'none'
+        json['editor.insertSpaces'] = false
+        json['eslint.experimental.useFlatConfig'] = true
+      })
 
       return projectPath
     })
   },
   // eslint-disable-next-line no-empty-pattern
   async createTempDir({}, use) {
-    const tempDirs: string[] = []
+    const temporaryDirectories: string[] = []
     await use(async () => {
-      const tempDir = await fs.promises.realpath(await fs.promises.mkdtemp(path.join(os.tmpdir(), 'pwtest-')))
-      tempDirs.push(tempDir)
-      return tempDir
+      const tempo = await fs.promises.realpath(await fs.promises.mkdtemp(path.join(os.tmpdir(), 'pwtest-')))
+      temporaryDirectories.push(tempo)
+      return tempo
     })
-    for (const tempDir of tempDirs) await fs.promises.rm(tempDir, {recursive: true})
+    for (const tempo of temporaryDirectories) await fs.promises.rm(tempo, {recursive: true})
   },
 })
 

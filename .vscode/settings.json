@@ -2,6 +2,13 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "always"
     },
+    "editor.inlineSuggest.suppressSuggestions": true,
+    "editor.quickSuggestionsDelay": 3000,
+    "editor.quickSuggestions": { "other": false, "comments": false, "strings": false },
+    "editor.wordBasedSuggestions": "off",
+    "editor.acceptSuggestionOnCommitCharacter": false,
+
+
     "eslint.validate": [
         "javascript",
         "typescript",

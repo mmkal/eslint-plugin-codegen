@@ -17,15 +17,15 @@ Here's an example of it being used along with VSCode's eslint plugin, with auto-
 
 ## Contents
 
-<!-- codegen:start {preset: markdownTOC, minDepth: 2, maxDepth: 5} -->
+<!-- codegen:start {preset: markdownTOC, minDepth: 2, maxDepth: 4} -->
 - [Motivation](#motivation)
 - [Contents](#contents)
 - [How to use](#how-to-use)
    - [Setup](#setup)
       - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
    - [Presets](#presets)
-      - [barrel](#barrel)
       - [custom](#custom)
+      - [barrel](#barrel)
       - [markdownFromJsdoc](#markdownfromjsdoc)
       - [monorepoTOC](#monorepotoc)
       - [markdownFromJsdoc](#markdownfromjsdoc-1)
@@ -137,6 +137,153 @@ module.exports = {
 ```
 
 ### Presets
+
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
+#### [custom](./src/presets/custom.ts#L61)
+
+Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
+
+##### Example
+
+```typescript
+export const jsonPrinter: import('eslint-plugin-codegen').Preset<{myCustomProp: string}> = ({meta, options}) => {
+  const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
+  const json = JSON.stringify({filename: meta.filename, customProp: options.myCustomProp, components}, null, 2)
+  return `export default ${json}`
+}
+
+// codegen:start {export: jsonPrinter}
+```
+
+This can be used in other files by specifying the `source` option like:
+
+
+`<!-- codegen:start {source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
+
+<br /> Note that some helpers passed via `dependencies`, such as `glob`, `fs`, `path`, `child_process`, `lodash`, `jsYaml`, `dedent`, and `readPkgUp`, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them being production dependencies. This also allows your lint process to use these node-only dependencies, even in a file that is not run in node - only the calls would be included in any bundled output, not the dependencies themselves.
+
+##### Params
+
+|name   |description                                                                                                                                                                                              |
+|-------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|source |Relative path to the module containing the custom preset. Default: the file being linted.                                                                                                                |
+|export |The name of the export. If omitted, the module's default export should be a preset function.                                                                                                             |
+|require|A module to load before `source`. If not set, defaults to `tsx/cjs` or `ts-node/register/transpile-only` for typescript sources.                                                                         |
+|dev    |Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.|
+<!-- codegen:end -->
+
+##### Caching
+
+Sometimes, you may want to write a custom function that takes a long time to run. To avoid having to wait for it to run every time you lint, you can set the `dev` option to `true`. This will clear the require cache for the custom function, so it will be run fresh each time.
+
+```typescript
+export const longRunningFunction: import('eslint-plugin-codegen').Preset = ({cache}) => {
+  const result = cache({maxAge: '1 year'}, () => {
+    // do something that takes a long time to run, but doesn't need to run too often
+  })
+  return result
+}
+// codegen:start {preset: custom, export: longRunningFunction}
+```
+
+You can use some helpers that are passed to the preset function:
+
+```typescript
+export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Preset = ({cache, dependencies}) => {
+  const result = cache({maxAge: '1 year'}, () => {
+    const res = dependencies.fetchSync('https://www.un.org/sg')
+    const secretaryGeneral = (/Secretary-General ([A-Z].+?) [a-z]/.exec(res.text))?.[1]
+    return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
+  })
+  return result
+}
+
+// codegen:start {preset: custom, export: secretaryGeneralLogStatement}
+```
+
+This will transform to something like:
+
+```typescript
+export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Preset = ({cache, dependencies}) => {
+  return cache({maxAge: '4 weeks'}, () => {
+    const res = dependencies.fetchSync('https://en.wikipedia.org/wiki/Secretary-General_of_the_United_Nations')
+    const $ = dependencies.cheerio.load(res.text)
+    const incumbent = $('.infobox div:contains("Incumbent")')
+    const secretaryGeneral = incumbent.find('a').text()
+    return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
+  })
+  return result
+}
+
+// codegen:start {preset: custom, export: secretaryGeneralLogStatement}
+// codegen:hash {input: 4119892f2e6eaf56ae5c346de91be718, output: eed0d07c81b82bff1d3e4751073b0112, timestamp: 2025-03-05T18:58:13.921Z}
+console.log('The UN Secretary-General is António Guterres')
+// codegen:end
+```
+
+It will not re-run unless the input has changed, the output hash doesn't match, or until 1 year after the recorded timestamp. "The input" is a hash of the following:
+
+- the filename the directive appears in
+- the source code _excluding_ any existing content between the `codegen:start` and `codegen:end` directives
+- the options passed to the preset
+
+The output (i.e. the generated code between the start and end directives) is also hashed and written to the hash directive.
+
+If the the generated code doesn't match the output hash, the generator function will re-run.
+
+This means that if you change the filename, or any of the source code, it will re-run. You can control this behaviour when defining your generator function:
+
+```ts
+export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Preset =
+  ({cache, dependencies}) => {
+    return cache({maxAge: '4 weeks'}, () => {
+      const res = dependencies.fetchSync(
+        'https://en.wikipedia.org/wiki/Secretary-General_of_the_United_Nations',
+      )
+      const $ = dependencies.cheerio.load(res.text)
+      const incumbent = $('.infobox div:contains("Incumbent")')
+      const secretaryGeneral = incumbent.find('a').text()
+      return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
+    })
+  }
+
+// codegen:start {preset: custom, export: secretaryGeneralLogStatement}
+// codegen:hash {input: 4119892f2e6eaf56ae5c346de91be718, output: eed0d07c81b82bff1d3e4751073b0112, timestamp: 2025-03-05T18:58:13.921Z}
+console.log('The UN Secretary-General is António Guterres')
+// codegen:end
+```
+
+The helpers that are provided to the generator function via the `dependencies` prop are listed below. You can use all of them in a type-safe way in your generator function, without having to add them as dependencies or even devDependencies:
+
+- `fs`: https://nodejs.org/api/fs.html
+- `path`: https://nodejs.org/api/path.html
+- `child_process`: https://nodejs.org/api/child_process.html
+- `lodash`: https://npmjs.com/package/lodash
+- `jsYaml`: https://npmjs.com/package/js-yaml
+- `dedent`: https://npmjs.com/package/dedent
+- `glob`: https://npmjs.com/package/glob
+- `readPkgUp`: https://npmjs.com/package/read-pkg-up
+- `cheerio`: https://npmjs.com/package/cheerio
+- `makeSynchronous`: A function for making functions synchronous by running them in a subprocess. See [the code](./src/make-synchronous.ts) for more details. It's a simplified version of [this](https://github.com/sindresorhus/make-synchronous). **Note: it's strongly recommended to use this with the `cache` feature to avoid slowing down your lint process**.
+- `fetchSync`: A simplified `fetch` wrapper that runs synchronously via `makeSynchronous`. See [the code](./src/fetch-sync.ts) for more details. Useful for fetching data from the internet without adding a production dependency. **Note: it's strongly recommended to use this with the `cache` feature to avoid slowing down your lint process**.
+
+##### TypeScript
+
+The plugin will attempt to run generator functions written in typescript. If `tsx` or `ts-node` are available, they will be used to register their respective loaders before requiring the file containing the generator function. If you have trouble, try installing `tsx` even if you don't otherwise use it - or just write the generator function in a separate javascript file.
+
+Note: to get type safety for the helpers in javascript files, use the `{@type ...}` syntax:
+
+```typescript
+/** @type {import('eslint-plugin-codegen').Preset} */
+module.exports.myGenerator = ({dependencies}) => {
+  const subpackages = dependencies.glob.sync('subpackages/**/*.package.json')
+  return `const subpackages = ${JSON.stringify(subpackages)}`
+}
+```
+
+##### Demo
+
+![](./gifs/custom.gif)
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/barrel.ts, export: barrel} -->
 #### [barrel](./src/presets/barrel.ts#L38)
 
@@ -166,40 +313,6 @@ export * from './some/path/module-c'
 ##### Demo
 
 ![](./gifs/barrel.gif)
-
-<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L31)
-
-Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
-
-##### Example
-
-```typescript
-import {Preset} from 'eslint-plugin-codegen'
-
-export const jsonPrinter: Preset<{myCustomProp: string}> = ({meta, options}) => {
-  const components = meta.glob('**\/*.tsx') // uses 'globSync' from glob package
-  return `filename: ${meta.filename}\ncustom prop: ${options.myCustomProp}\nComponent paths: ${components.join(', ')}`
-}
-```
-
-This can be used with:
-
-`<!-- codegen:start {preset: custom, source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}` Note that a `glob` helper method is passed to the preset via `meta`. This uses the `globSync` method of https://npm.im/glob. There are also `fs` and `path` helpers passed, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them being production dependencies.
-
-##### Params
-
-|name   |description                                                                                                                                                                                              |
-|-------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|source |Relative path to the module containing the custom preset. Default: the file being linted.                                                                                                                |
-|export |The name of the export. If omitted, the module's default export should be a preset function.                                                                                                             |
-|require|A module to load before `source`. If not set, defaults to `ts-node/register/transpile-only` for typescript sources.                                                                                      |
-|dev    |Set to `true` to clear the require cache for `source` before loading. Allows editing the function without requiring an IDE reload. Default false if the `CI` enviornment variable is set, true otherwise.|
-<!-- codegen:end -->
-
-##### Demo
-
-![](./gifs/custom.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
 #### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L20)

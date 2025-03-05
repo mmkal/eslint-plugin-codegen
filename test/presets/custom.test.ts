@@ -11,7 +11,7 @@ test('custom preset validation', () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const customPreset = require('./custom-preset.cjs')
 
-  expect(Object.keys(customPreset)).toEqual(['getText', 'thrower'])
+  expect(Object.keys(customPreset)).toEqual(['getText', 'thrower', 'centuryLogStatement'])
 
   expect(customPreset.getText.toString().trim()).toMatch(/'Named export with input: ' \+ options.input/)
 })
@@ -56,7 +56,7 @@ test(`when source isn't specified, uses filename`, () => {
   expect(
     preset.custom({
       ...params,
-      meta: {...params.meta, filename: path.join(__dirname, 'custom-preset.cjs')},
+      context: {...params.context, physicalFilename: path.join(__dirname, 'custom-preset.cjs')},
       options: {input: 'abc'},
     }),
   ).toEqual('Whole module export with input: abc')

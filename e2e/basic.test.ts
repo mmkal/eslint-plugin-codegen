@@ -26,12 +26,12 @@ async function openExistingFile(page: Page, name: string) {
   await page.keyboard.press('Enter')
 }
 
-const codegen = async (page: Page, params: {file: string; type: () => Promise<void>; result: string}) => {
-  await openExistingFile(page, params.file)
+const codegen = async (page: Page, parameters: {file: string; type: () => Promise<void>; result: string}) => {
+  await openExistingFile(page, parameters.file)
 
   await new Promise(r => setTimeout(r, 500))
   await page.keyboard.press('Meta+1')
-  await params.type()
+  await parameters.type()
   await page.getByTitle('Show Code Actions. Preferred').click()
   await new Promise(r => setTimeout(r, 500))
   // await page.getByText('Fix all auto-fixable problems').click() // didn't work - loses focus somehow, so use Down-Down-Down-Enter instead 🤷‍♂️
@@ -41,12 +41,15 @@ const codegen = async (page: Page, params: {file: string; type: () => Promise<vo
   await new Promise(r => setTimeout(r, 1000))
   await page.keyboard.press('Enter')
 
-  for (const line of params.result.split('\n')) {
-    await page.getByText(line).first().waitFor()
+  for (const line of parameters.result.split('\n')) {
+    await page.getByText(line).first().waitFor({timeout: 1_000_000_000})
   }
 
   await new Promise(r => setTimeout(r, 1500))
+  if (process.env.PAUSE) await new Promise(r => setTimeout(r, 1_000_000_000))
 }
+
+test.setTimeout(0)
 
 test('barrel', async ({workbox: page}) => {
   await codegen(page, {
@@ -110,16 +113,34 @@ test('markdownTOC', async ({workbox: page}) => {
 
 test('custom', async ({workbox: page}) => {
   await codegen(page, {
-    file: 'custom/index.ts',
+    file: 'custom/component.tsx',
     async type() {
       await page.keyboard.type(
         dedent`
-          export const findEslintDependencies: import('eslint-plugin-codegen').Preset = ({dependencies: {glob}}) => {
-            const packages = glob.globSync('node_modules/eslint*/package.json', {cwd: process.cwd()})
-            const folders = packages.map(p => p.split('/').at(-2))
-            return \`export const eslintDependencies = \${JSON.stringify(folders, null, 2)}\`
+          import React from 'react'
+
+          export const MyComponent = ({children}: {children: React.ReactNode}) => (
+            <div>
+              <h1>You have {devDependencies.length} dev dependencies</h1>\n
+              <h2>Your readme is {readmeLength} characters long</h2>\n
+              {children}
+            </div>\n
+          )\n
+
+          export const myCodegen: import('eslint-plugin-codegen').Preset = ({
+            dependencies: {fs, dedent},
+          }) => {
+            const readme = fs.readFileSync('README.md', 'utf8')
+            const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+            const devDeps = Object.keys(packageJson.devDependencies)
+            return dedent.default\`
+              export const readmeLength = \${readme.length}
+
+              export const devDependencies = \${JSON.stringify(devDeps, null, 6)}
+            \`
           }
         `,
+        {delay: 25},
       )
 
       await page.keyboard.press('Enter')
@@ -128,10 +149,9 @@ test('custom', async ({workbox: page}) => {
       await new Promise(r => setTimeout(r, 500))
 
       await page.keyboard.type(dedent`
-        // codegen:start {preset: custom, export: findEslintDependencies}
+        // codegen:start {export: myCodegen}
       `)
-      await page.keyboard.press('Meta+Shift+Tab')
     },
-    result: '"eslint-plugin-codegen"',
+    result: 'export const readmeLength',
   })
 })

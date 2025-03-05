@@ -165,7 +165,9 @@ test('invalid workspaces', () => {
       ...params,
       options: {},
     }),
-  ).toThrow(/Expected to find workspaces array from package.json, lerna.json or pnpm-workspace.yaml, got 'package.json - not an array'/)
+  ).toThrow(
+    /Expected to find workspaces array from package.json, lerna.json or pnpm-workspace.yaml, got 'package.json - not an array'/,
+  )
 })
 
 test('toplogical sort', () => {

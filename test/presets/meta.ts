@@ -16,6 +16,7 @@ export const buildPresetParams = (filename: string, fs = realfs): Omit<PresetPar
   meta: getMeta(filename),
   context: {filename, physicalFilename: filename} as any,
   dependencies: {...dependencies, fs},
+  cache: (opts, fn) => fn(),
 })
 
 export const getFakeFs = () => {

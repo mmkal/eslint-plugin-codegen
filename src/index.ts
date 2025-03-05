@@ -16,6 +16,7 @@ export const processors = {
   processor,
 } satisfies eslint.ESLint.Plugin['processors']
 
+/** Legacy non-flat configs */
 export const configs: eslint.ESLint.Plugin['configs'] = {
   recommended: {
     plugins: ['codegen'],
@@ -33,4 +34,8 @@ export const configs: eslint.ESLint.Plugin['configs'] = {
 
 export const rules = {codegen}
 
+export * from './flat-config'
+
 export * as presets from './presets'
+
+export * as flatConfig from './config'
