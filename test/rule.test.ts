@@ -157,5 +157,19 @@ tester.run('codegen', codegen.rules.codegen, {
         // codegen:end
       `,
     },
+    {
+      name: 'custom barrel',
+      filename: __filename,
+      code: dedent`
+        // codegen:start {source: ./presets/custom-preset.cjs, export: customBarrel}
+        // codegen:end
+      `,
+      errors: [{message: /content doesn't match:/}],
+      output: dedent`
+        // codegen:start {source: ./presets/custom-preset.cjs, export: customBarrel}
+        Object.assign(module.exports, require('./plugin.test'))
+        // codegen:end
+      `,
+    },
   ],
 })

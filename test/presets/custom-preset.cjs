@@ -11,3 +11,10 @@ module.exports.centuryLogStatement = ({cache}) => {
     return `console.log('The century is: ${century}')`
   })
 }
+
+/** @type {import('../../src').Preset} */
+module.exports.customBarrel = params => {
+  return params.presets
+    .barrel({...params, options: {include: '*.test.ts'}})
+    .replaceAll(/export \* from '(.*)'/g, "Object.assign(module.exports, require('$1'))")
+}

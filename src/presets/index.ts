@@ -49,18 +49,10 @@ export type PresetParams<Options = {}> = {
   meta: PresetMeta
   context: import('eslint').Rule.RuleContext
   dependencies: PresetDependencies
+  presets: typeof import('./_barrel')
   cache: (options: CacheOptions, fn: () => string) => string
 }
 
 export type Preset<Options extends {} = {}> = (params: PresetParams<Options>) => string
 
-// codegen:start {preset: barrel}
-export * from './barrel'
-export * from './custom'
-export * from './empty'
-export * from './labeler'
-export * from './markdown-from-jsdoc'
-export * from './markdown-from-tests'
-export * from './markdown-toc'
-export * from './monorepo-toc'
-// codegen:end
+export * from './_barrel'

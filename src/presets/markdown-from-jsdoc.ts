@@ -18,11 +18,11 @@ import * as path from 'path'
  * @param headerLevel {1|2|3|4|5} Determines if the export will correspond to a H1, H2, H3, H4 or H5. Nested headers will increment from this value. @default 4
  */
 export const markdownFromJsdoc: Preset<{source: string; export?: string; headerLevel?: number}> = ({
-  meta,
+  context,
   options: {source: relativeFile, export: exportName, headerLevel = 4},
   dependencies: {fs},
 }) => {
-  const targetFile = path.join(path.dirname(meta.filename), relativeFile)
+  const targetFile = path.join(path.dirname(context.physicalFilename), relativeFile)
   const sourceCode = fs.readFileSync(targetFile).toString()
   const ast = parse(sourceCode, {sourceType: 'module', plugins: ['typescript']})
   const idable = {} as Record<string, Node>

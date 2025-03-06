@@ -10,6 +10,7 @@ import * as path from 'path'
 import stripAnsi from 'strip-ansi'
 import {dependencies} from './dependencies'
 import * as presetsModule from './presets'
+import * as barreledPresets from './presets/_barrel'
 
 export const codegen: eslint.Rule.RuleModule = {
   // @ts-expect-error types are wrong?
@@ -194,6 +195,7 @@ export const codegen: eslint.Rule.RuleModule = {
           options: opts,
           context,
           dependencies,
+          presets: barreledPresets,
           cache: (cacheInstructions, fn) => {
             return getCacheResult(cacheInstructions, fn).content
           },
