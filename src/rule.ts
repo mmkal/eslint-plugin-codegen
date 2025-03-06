@@ -123,6 +123,10 @@ export const codegen: eslint.Rule.RuleModule = {
         const meta: presetsModule.PresetMeta = {
           filename: context.physicalFilename,
           existingContent,
+          existingContentRange: range,
+          sourceCode,
+
+          // the following are deprecated - use `dependencies` instead
           glob: globSync as never,
           fs: dependencies.fs,
           path,

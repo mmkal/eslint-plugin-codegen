@@ -1,7 +1,13 @@
 import {StringValue} from 'ms'
 
 export type PresetMeta = {
+  /** The existing content between the start and end markers */
   existingContent: string
+  /** The start and end indexes of the existing content */
+  existingContentRange: [start: number, end: number]
+  /** The source code, including the existing content */
+  sourceCode: string
+
   /** @deprecated instead of `meta.filename` use `context.physicalFilename` */
   filename: string
   /** @deprecated instead of `meta.glob` use `dependencies.glob.globSync` */
