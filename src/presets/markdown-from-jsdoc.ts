@@ -30,11 +30,11 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string; headerL
     ExportNamedDeclaration({node: decl}) {
       switch (decl.declaration?.type) {
         case 'ClassDeclaration': {
-          idable[decl.declaration.id.name] = decl as Node
+          idable[decl.declaration.id!.name] = decl as Node
           for (const node of decl.declaration.body.body) {
             if (node.type === 'ClassPrivateMethod' || node.type === 'ClassPrivateProperty') continue
             if ('key' in node && 'name' in node.key) {
-              idable[`${decl.declaration.id.name}: ${node.key.name}`] = node as Node
+              idable[`${decl.declaration.id!.name}: ${node.key.name}`] = node as Node
             }
           }
           break
