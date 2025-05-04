@@ -24,9 +24,11 @@ export interface PresetDependencies {
   cheerio: typeof import('cheerio')
   makeSynchronous: typeof import('../make-synchronous').makeSynchronous
   fetchSync: typeof import('../fetch-sync').fetchSync
+  babelCore: typeof import('@babel/core')
   babelParser: typeof import('@babel/parser')
   babelTraverse: typeof import('@babel/traverse')
   babelGenerator: typeof import('@babel/generator')
+  babelTypes: typeof import('@babel/types')
 }
 
 export interface CacheOptions {

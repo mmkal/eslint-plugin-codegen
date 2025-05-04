@@ -1,6 +1,8 @@
+import * as babelCore from '@babel/core'
 import * as babelGenerator from '@babel/generator'
 import * as babelParser from '@babel/parser'
 import * as babelTraverse from '@babel/traverse'
+import * as babelTypes from '@babel/types'
 import * as cheerio from 'cheerio'
 import * as child_process from 'child_process'
 import dedent from 'dedent'
@@ -27,7 +29,9 @@ export const dependencies: presetsModule.PresetDependencies = {
   makeSynchronous,
   fetchSync,
   cheerio,
+  babelCore,
   babelParser,
   babelTraverse,
   babelGenerator,
+  babelTypes,
 }
