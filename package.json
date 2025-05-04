@@ -41,6 +41,7 @@
     "@babel/traverse": "^7.27.1",
     "@babel/types": "^7.27.1",
     "@pnpm/deps.graph-sequencer": "^1.0.0",
+    "@types/babel__core": "^7.20.5",
     "@types/dedent": "0.7.0",
     "@types/eslint": "^8.44.7",
     "@types/glob": "7.1.3",
