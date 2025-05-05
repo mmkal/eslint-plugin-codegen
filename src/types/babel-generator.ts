@@ -179,7 +179,7 @@ export interface GeneratorOptions {
     | undefined
 }
 
-export class CodeGenerator {
+export declare class CodeGenerator {
   constructor(ast: t.Node, opts?: GeneratorOptions, code?: string)
   generate(): GeneratorResult
 }
@@ -191,7 +191,7 @@ export class CodeGenerator {
  * @param code - the original source code, used for source maps.
  * @returns - an object containing the output code and source map.
  */
-export function generate(
+export declare function generate(
   ast: t.Node,
   opts?: GeneratorOptions,
   code?: string | {[filename: string]: string},
