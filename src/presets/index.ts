@@ -27,7 +27,7 @@ export interface PresetDependencies {
   babelCore: typeof import('@babel/core')
   babelParser: typeof import('@babel/parser')
   babelTraverse: typeof import('@babel/traverse')
-  babelGenerator: typeof import('@babel/generator')
+  babelGenerator: typeof import('../types/babel-generator')
   babelTypes: typeof import('@babel/types')
 }
 
