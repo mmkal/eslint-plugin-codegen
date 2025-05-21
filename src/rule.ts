@@ -122,12 +122,12 @@ export const codegen: eslint.Rule.RuleModule = {
         const meta: presetsModule.PresetMeta = {
           filename: context.physicalFilename,
           existingContent,
+          existingContentPosition: [range[0], range[1]],
+          sourceCode,
           glob: globSync as never,
           fs: dependencies.fs,
           path,
         }
-
-        const sourceCodeWithoutExistingContent = sourceCode.slice(0, range[0]) + sourceCode.slice(range[1])
 
         const getCacheResult = (cacheOptions: presetsModule.CacheOptions, fn: () => string) => {
           const existingResultHashHeader = existingContent
@@ -138,9 +138,9 @@ export const codegen: eslint.Rule.RuleModule = {
             existingResultHashHeader &&
             (jsYaml.safeLoad(existingResultHashHeader?.[1]) as {input: string; output: string; timestamp: string})
 
-          const defaultHashableInputs = {
+          const defaultHashableInputs: Parameters<NonNullable<typeof cacheOptions.inputs>>[0] = {
             filename: path.relative(process.cwd(), context.physicalFilename),
-            sourceCodeWithoutExistingContent,
+            fnStr: fn.toString(),
             options: parameters.options,
           }
 

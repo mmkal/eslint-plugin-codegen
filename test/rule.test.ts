@@ -61,7 +61,7 @@ tester.run('codegen', codegen.rules.codegen, {
       filename: __filename,
       code: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 0267cb42076f3316895be46a35454fdc, output: d48256c0a41c3b7396155e1054032719, timestamp: ${notLongAgoTs}}
+        // codegen:hash {input: 433568e116b65df433f03a7fdcc4daa8, output: d48256c0a41c3b7396155e1054032719, timestamp: ${notLongAgoTs}}
         console.log('The century is: 20th')
         // codegen:end
       `,
@@ -134,7 +134,7 @@ tester.run('codegen', codegen.rules.codegen, {
       errors: [{message: /.*/}],
       output: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 0267cb42076f3316895be46a35454fdc, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: ${initTimeIOSString}}
+        // codegen:hash {input: 433568e116b65df433f03a7fdcc4daa8, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: ${initTimeIOSString}}
         console.log('The century is: 21st')
         // codegen:end
       `,
@@ -145,14 +145,14 @@ tester.run('codegen', codegen.rules.codegen, {
       // note timestamp of hash is 1900, we only cache for 100 years so this is due an update
       code: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 0267cb42076f3316895be46a35454fdc, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: 1900-01-01T00:00:00.000Z}
+        // codegen:hash {input: deadbeefdeadbeefdeadbeefdeadbeef, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: 1900-01-01T00:00:00.000Z}
         console.log('The century is: 20th')
         // codegen:end
       `,
       errors: [{message: /.*/}],
       output: dedent`
         // codegen:start {source: ./presets/custom-preset.cjs, export: centuryLogStatement}
-        // codegen:hash {input: 0267cb42076f3316895be46a35454fdc, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: ${initTimeIOSString}}
+        // codegen:hash {input: 433568e116b65df433f03a7fdcc4daa8, output: 7963286367c5f8f27d1baa9255f8d4d3, timestamp: ${initTimeIOSString}}
         console.log('The century is: 21st')
         // codegen:end
       `,
