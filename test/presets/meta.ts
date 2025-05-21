@@ -6,7 +6,9 @@ import {PresetMeta, PresetParams} from '../../src/presets'
 
 export const getMeta = (filename: string, fs = realfs): PresetMeta => ({
   filename,
-  existingContent: fs.readFileSync(__filename).toString(),
+  existingContent: '',
+  existingContentPosition: [0, 0],
+  sourceCode: fs.readFileSync(__filename).toString(),
   glob: glob.globSync as never,
   fs,
   path,

@@ -1,7 +1,9 @@
 import {StringValue} from 'ms'
 
 export type PresetMeta = {
+  sourceCode: string
   existingContent: string
+  existingContentPosition: [start: number, end: number]
   /** @deprecated instead of `meta.filename` use `context.physicalFilename` */
   filename: string
   /** @deprecated instead of `meta.glob` use `dependencies.glob.globSync` */
@@ -40,7 +42,7 @@ export interface CacheOptions {
    * inputs: defaults => [defaults, globSync('some/path/*.ts').map(filepath => fs.readFileSync(filepath))]
    * ```
    */
-  inputs?: (defaults: {filename: string; sourceCodeWithoutExistingContent: string; options: unknown}) => unknown
+  inputs?: (defaults: {filename: string; fnStr: string; options: unknown}) => unknown
 }
 
 export type PresetParams<Options = {}> = {
