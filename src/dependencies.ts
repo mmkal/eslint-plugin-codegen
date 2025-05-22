@@ -1,4 +1,3 @@
-import * as babelCore from '@babel/core'
 import * as babelGenerator from '@babel/generator'
 import * as babelParser from '@babel/parser'
 import * as babelTraverse from '@babel/traverse'
@@ -29,9 +28,8 @@ export const dependencies: presetsModule.PresetDependencies = {
   makeSynchronous,
   fetchSync,
   cheerio,
-  babelCore,
   babelParser,
   babelTraverse,
-  babelGenerator,
+  babelGenerator: babelGenerator as never,
   babelTypes,
 }
