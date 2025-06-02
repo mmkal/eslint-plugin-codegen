@@ -1,24 +1,23 @@
-import z from 'zod/v4'
 import {equivalentSimplified} from '../simplify'
-import {definePreset} from './zod-preset'
+import {definePreset} from './util/standard-schema-preset'
 
 /**
  * Copies a whole other file
  */
 export const copy = definePreset(
-  z.object({
+  {
     /** path to the file to copy. can be absolute or relative to the file being linted */
-    source: z.string(),
+    source: 'string',
     /** if provided, only runs if this file exists - if it's missing, the existing content is returned (defaulting to empty string) */
-    onlyIfExists: z.string().optional(),
+    onlyIfExists: 'string | undefined',
     /** if provided, these lines will be removed from the copied content. e.g. `excludeLines: ['^import', '// codegen:']` */
-    excludeLines: z.array(z.string()).optional(),
+    excludeLines: 'string[] | undefined',
     /**
      * if set to `strict` the content will update if it's not a perfect match. by default (`simplified`) it will only update
      * if the "simplified" version of the content is different.
      */
-    comparison: z.enum(['simplified', 'strict']).optional(),
-  }),
+    comparison: '"simplified" | "strict" | undefined',
+  },
   ({options, meta, context, dependencies: {fs, path}}) => {
     const getAbsolutePath = (filepath: string) => path.resolve(path.dirname(context.physicalFilename), filepath)
     const shouldRun = options.onlyIfExists ? fs.existsSync(getAbsolutePath(options.onlyIfExists)) : true
