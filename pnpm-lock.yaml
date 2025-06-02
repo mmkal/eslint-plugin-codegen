@@ -92,6 +92,9 @@ importers:
       strip-ansi:
         specifier: 6.0.1
         version: 6.0.1
+      zod:
+        specifier: ^3.25.48
+        version: 3.25.48
     devDependencies:
       '@eslint/config-inspector':
         specifier: ^0.4.11
@@ -4129,8 +4132,8 @@ packages:
     resolution: {integrity: sha512-Mb6GzuRyUEl8X+6V6xzHbd4XV0au/4gOYrYP+CAfHL32uPmGswES+v2YqonZiW1NZWVA3jkssCKSU2knonm/aQ==}
     engines: {node: '>=20'}
 
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+  zod@3.25.48:
+    resolution: {integrity: sha512-0X1mz8FtgEIvaxGjdIImYpZEaZMrund9pGXm3M6vM7Reba0e2eI71KPjSCGXBfwKDPwPoywf6waUKc3/tFvX2Q==}
 
 snapshots:
 
@@ -7709,7 +7712,7 @@ snapshots:
       quick-lru: 7.0.0
       url-join: 5.0.0
       validate-npm-package-name: 5.0.1
-      zod: 3.23.8
+      zod: 3.25.48
       zod-package-json: 1.0.3
 
   query-string@9.0.0:
@@ -8586,6 +8589,6 @@ snapshots:
 
   zod-package-json@1.0.3:
     dependencies:
-      zod: 3.23.8
+      zod: 3.25.48
 
-  zod@3.23.8: {}
+  zod@3.25.48: {}
