@@ -15,6 +15,7 @@ import * as readPkgUp from 'read-pkg-up'
 import {fetchSync} from './fetch-sync'
 import {makeSynchronous} from './make-synchronous'
 import * as presetsModule from './presets'
+import * as simplify from './simplify'
 
 export const dependencies: presetsModule.PresetDependencies = {
   dedent: Object.assign(dedent, {default: dedent}), // backcompat: accidentally used `import * as dedent from 'dedent'` previously
@@ -27,6 +28,7 @@ export const dependencies: presetsModule.PresetDependencies = {
   child_process,
   makeSynchronous,
   fetchSync,
+  simplify,
   cheerio,
   babelParser,
   babelTraverse,
