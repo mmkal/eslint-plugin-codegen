@@ -1,4 +1,3 @@
-import {equivalentSimplified} from '../simplify'
 import {definePreset} from './util/standard-schema-preset'
 
 /**
@@ -18,7 +17,7 @@ export const copy = definePreset(
      */
     comparison: '"simplified" | "strict" | undefined',
   },
-  ({options, meta, context, dependencies: {fs, path}}) => {
+  ({options, meta, context, dependencies: {fs, path, simplify}}) => {
     const getAbsolutePath = (filepath: string) => path.resolve(path.dirname(context.physicalFilename), filepath)
     const shouldRun = options.onlyIfExists ? fs.existsSync(getAbsolutePath(options.onlyIfExists)) : true
     if (!shouldRun) return meta.existingContent || ''
@@ -34,7 +33,7 @@ export const copy = definePreset(
     // eslint-disable-next-line unicorn/prefer-ternary
     if (!options.comparison || options.comparison === 'simplified') {
       // we only want to declare it outdated if the simplified versions are different
-      isUpToDate = equivalentSimplified(content, meta.existingContent)
+      isUpToDate = simplify.equivalentSimplified(content, meta.existingContent)
     } else {
       isUpToDate = content === meta.existingContent
     }

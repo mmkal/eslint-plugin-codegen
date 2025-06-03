@@ -42,7 +42,12 @@ const definePresetFromStandardSchema = <Input extends {}, Output extends {} = In
   }
 }
 
-export type DefinePreset = typeof definePreset
+export type DefinePreset = <const def, _r = arktype.type.instantiate<def, $>>(
+  def: arktype.type.validate<def, $>,
+  fn: arktype.type.infer<def, $> extends Record<string, unknown>
+    ? Preset<arktype.type.infer<def, $>>
+    : 'Options must be an object',
+) => typeof fn
 
 // const goodPreset = definePreset({name: 'string'}, ({options}) => {
 //   return options.name.slice()
