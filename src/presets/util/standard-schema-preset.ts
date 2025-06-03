@@ -42,17 +42,24 @@ const definePresetFromStandardSchema = <Input extends {}, Output extends {} = In
   }
 }
 
+/**
+ * Use this to define a preset, with runtime and compile-time type checking, without importing any values from this library.
+ * All you need to do is implement an identity function, then at lint time the plugin will do the rest.
+ *
+ * @example
+ * ```ts
+ * const definePreset: import('eslint-plugin-codegen').DefinePreset = (...args) => args
+ *
+ * export const myPreset = definePreset({ foo: 'string' }, ({options}) => {
+ *   return options.foo.slice()
+ * })
+ * ```
+ *
+ * (you can use jsdoc to define the type in plain js too)
+ * */
 export type DefinePreset = <const def, _r = arktype.type.instantiate<def, $>>(
   def: arktype.type.validate<def, $>,
   fn: arktype.type.infer<def, $> extends Record<string, unknown>
     ? Preset<arktype.type.infer<def, $>>
     : 'Options must be an object',
-) => typeof fn
-
-// const goodPreset = definePreset({name: 'string'}, ({options}) => {
-//   return options.name.slice()
-// })
-
-// const badPreset = definePreset('string', ({options}) => {
-//   return options.slice()
-// })
+) => [typeof def, typeof fn]

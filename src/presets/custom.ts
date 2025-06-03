@@ -1,5 +1,6 @@
 import type {Preset} from '.'
 import * as path from 'path'
+import {definePreset} from './util/standard-schema-preset'
 
 const tsxAvailable = () => {
   try {
@@ -94,7 +95,10 @@ export const custom: Preset<CustomPresetOptions & Record<string, unknown>> = ({c
   // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
   const sourceModule = require(sourcePath)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-  const func: Preset<any> = options.export ? sourceModule[options.export] : sourceModule
+  let func: Preset<any> = options.export ? sourceModule[options.export] : sourceModule
+  if (Array.isArray(func)) {
+    func = definePreset(func[0], func[1] as never)
+  }
   if (typeof func !== 'function') {
     throw new TypeError(`Couldn't find export ${options.export || 'function'} from ${sourcePath} - got ${typeof func}`)
   }
