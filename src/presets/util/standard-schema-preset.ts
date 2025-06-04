@@ -1,5 +1,5 @@
-import * as arktype from 'arktype'
 import {Preset} from '../..'
+import {arktype} from '../../esm-modules'
 import {StandardSchemaV1, looksLikeStandardSchemaFailure, prettifyStandardSchemaError} from '../../standard-schema'
 
 type $ = {}
