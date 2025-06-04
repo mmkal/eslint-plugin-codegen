@@ -8,7 +8,7 @@ import {defineConfig} from 'tsup'
 // in this (CJS) package, but are ESM-only. We achieve this by tsup-ing the runtime into CJS, then globbing and copying the types.
 
 const esmModulesFilepath = 'src/esm-modules.ts'
-const libsToBundle = Array.from(
+export const esmLibs = Array.from(
   fs.readFileSync(esmModulesFilepath, 'utf8').matchAll(/^export \* as (\S+) from ["'](\S+)["']/gm),
 ).map(([_, identifier, name]) => {
   const packageJson = JSON.parse(
@@ -22,7 +22,7 @@ const libsToBundle = Array.from(
 export default defineConfig({
   entry: [esmModulesFilepath],
   dts: false, // we're going to glob + copy the types instead
-  noExternal: libsToBundle.map(lib => lib.name),
+  noExternal: esmLibs.map(lib => lib.name),
   outDir: 'dist/bundled-esm-modules',
   plugins: [
     {
@@ -32,7 +32,7 @@ export default defineConfig({
           'dist/esm-modules.js',
           `module.exports = require("./bundled-esm-modules/esm-modules.js") // bundled by tsup`,
         )
-        for (const {name} of libsToBundle) {
+        for (const {name} of esmLibs) {
           const dtsFiles = glob.globSync(`node_modules/${name}/**/*.d.ts`)
           for (const dtsFile of dtsFiles) {
             const target = dtsFile.replace(`node_modules/${name}`, `dist/bundled-esm-modules/types/${name}`)
@@ -42,7 +42,7 @@ export default defineConfig({
         }
         fs.writeFileSync(
           'dist/esm-modules.d.ts',
-          libsToBundle
+          esmLibs
             .map(lib => {
               const typesPath = path.join('bundled-esm-modules/types', lib.name, lib.types)
               return `export * as ${lib.identifier} from './${typesPath}' // bundled by tsup post-build script`
