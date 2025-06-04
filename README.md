@@ -194,9 +194,11 @@ You can use some helpers that are passed to the preset function:
 
 ```typescript
 export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Preset = ({cache, dependencies}) => {
-  const result = cache({maxAge: '1 year'}, () => {
-    const res = dependencies.fetchSync('https://www.un.org/sg')
-    const secretaryGeneral = (/Secretary-General ([A-Z].+?) [a-z]/.exec(res.text))?.[1]
+  const result = cache({maxAge: '4 weeks'}, () => {
+    const res = dependencies.fetchSync('https://en.wikipedia.org/wiki/Secretary-General_of_the_United_Nations')
+    const $ = dependencies.cheerio.load(res.text)
+    
+    const secretaryGeneral = $('.infobox td:contains("Incumbent") a').text()
     return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
   })
   return result
@@ -212,8 +214,8 @@ export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Prese
   return cache({maxAge: '4 weeks'}, () => {
     const res = dependencies.fetchSync('https://en.wikipedia.org/wiki/Secretary-General_of_the_United_Nations')
     const $ = dependencies.cheerio.load(res.text)
-    const incumbent = $('.infobox div:contains("Incumbent")')
-    const secretaryGeneral = incumbent.find('a').text()
+
+    const secretaryGeneral = $('.infobox td:contains("Incumbent") a').text()
     return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
   })
   return result
@@ -225,37 +227,13 @@ console.log('The UN Secretary-General is António Guterres')
 // codegen:end
 ```
 
-It will not re-run unless the input has changed, the output hash doesn't match, or until 1 year after the recorded timestamp. "The input" is a hash of the following:
+Since hitting wikipedia servers is slow and unreliable, you don't want to do it every time you lint. The codegen will be a no-op and leave the content untouched unless:
 
-- the filename the directive appears in
-- the source code _excluding_ any existing content between the `codegen:start` and `codegen:end` directives
-- the options passed to the preset
+- 4 weeks has passed since the `timestamp`
+- the output hash doesn't match the generated content (this can happen if someone manually changes the generated content)
+- the input hash doesn't match the values passed to the preset
 
-The output (i.e. the generated code between the start and end directives) is also hashed and written to the hash directive.
-
-If the the generated code doesn't match the output hash, the generator function will re-run.
-
-This means that if you change the filename, or any of the source code, it will re-run. You can control this behaviour when defining your generator function:
-
-```ts
-export const secretaryGeneralLogStatement: import('eslint-plugin-codegen').Preset =
-  ({cache, dependencies}) => {
-    return cache({maxAge: '4 weeks'}, () => {
-      const res = dependencies.fetchSync(
-        'https://en.wikipedia.org/wiki/Secretary-General_of_the_United_Nations',
-      )
-      const $ = dependencies.cheerio.load(res.text)
-      const incumbent = $('.infobox div:contains("Incumbent")')
-      const secretaryGeneral = incumbent.find('a').text()
-      return `console.log('The UN Secretary-General is ${secretaryGeneral}')`
-    })
-  }
-
-// codegen:start {preset: custom, export: secretaryGeneralLogStatement}
-// codegen:hash {input: 4119892f2e6eaf56ae5c346de91be718, output: eed0d07c81b82bff1d3e4751073b0112, timestamp: 2025-03-05T18:58:13.921Z}
-console.log('The UN Secretary-General is António Guterres')
-// codegen:end
-```
+Note that in the example above, we are using `cheerio` without having to import it - you don't even need it installed in your devDependencies (it's a dependency of eslint-plugin-codegen - so it does live in your node_modules, you just don't need to manage it or worry about tree-shaking).
 
 The helpers that are provided to the generator function via the `dependencies` prop are listed below. You can use all of them in a type-safe way in your generator function, without having to add them as dependencies or even devDependencies:
 
