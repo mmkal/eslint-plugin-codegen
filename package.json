@@ -30,9 +30,7 @@
     "prepare": "pnpm build",
     "eslint": "eslint --max-warnings 0",
     "lint": "tsc && pnpm eslint .",
-    "build": "rm -rf dist && pnpm build:lib && pnpm build:esm-modules",
-    "build:lib": "tsc -p tsconfig.lib.json",
-    "build:esm-modules": "tsup src/esm-modules.ts --dts --out-dir dist/bundled-esm-modules && echo 'module.exports = require(\"./bundled-esm-modules/esm-modules.js\")' > dist/esm-modules.js && echo 'export * from \"./bundled-esm-modules/esm-modules\"' > dist/esm-modules.d.ts",
+    "build": "rm -rf dist && tsc -p tsconfig.lib.json && tsup",
     "test": "pnpm build && vitest run",
     "e2e": "playwright test"
   },
@@ -80,6 +78,7 @@
     "arktype": "^2.1.20",
     "eslint": "^8.57.0",
     "eslint-plugin-mmkal": "^0.10.1",
+    "execa": "9.6.0",
     "minimatch": "3.0.4",
     "np": "^10.0.7",
     "pkg-pr-new": "^0.0.17",

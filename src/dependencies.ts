@@ -12,12 +12,33 @@ import * as jsYaml from 'js-yaml'
 import lodash from 'lodash'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
+import {execa, arktype} from './esm-modules'
 import {fetchSync} from './fetch-sync'
 import {makeSynchronous} from './make-synchronous'
-import * as presetsModule from './presets'
 import * as simplify from './simplify'
 
-export const dependencies: presetsModule.PresetDependencies = {
+export interface PresetDependencies {
+  fs: typeof import('fs')
+  path: typeof import('path')
+  child_process: typeof import('child_process')
+  lodash: typeof import('lodash')
+  jsYaml: typeof import('js-yaml')
+  dedent: typeof import('dedent').default
+  glob: Pick<typeof import('glob'), 'globSync'>
+  readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
+  cheerio: typeof import('cheerio')
+  makeSynchronous: typeof import('./make-synchronous').makeSynchronous
+  fetchSync: typeof import('./fetch-sync').fetchSync
+  simplify: typeof import('./simplify')
+  babelParser: typeof import('@babel/parser')
+  babelTraverse: typeof import('@babel/traverse')
+  babelGenerator: typeof import('./types/babel-generator')
+  babelTypes: typeof import('@babel/types')
+  execa: typeof import('./esm-modules').execa
+  arktype: typeof import('./esm-modules').arktype
+}
+
+export const dependencies: PresetDependencies = {
   dedent: Object.assign(dedent, {default: dedent}), // backcompat: accidentally used `import * as dedent from 'dedent'` previously
   fs,
   path,
@@ -34,4 +55,6 @@ export const dependencies: presetsModule.PresetDependencies = {
   babelTraverse,
   babelGenerator: babelGenerator as never,
   babelTypes,
+  execa,
+  arktype,
 }
