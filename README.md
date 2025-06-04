@@ -25,6 +25,7 @@ Here's an example of it being used along with VSCode's eslint plugin, with auto-
       - [Usage with eslint-plugin-markdown](#usage-with-eslint-plugin-markdown)
    - [Presets](#presets)
       - [custom](#custom)
+      - [copy](#copy)
       - [barrel](#barrel)
       - [markdownFromJsdoc](#markdownfromjsdoc)
       - [monorepoTOC](#monorepotoc)
@@ -139,7 +140,7 @@ module.exports = {
 ### Presets
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
-#### [custom](./src/presets/custom.ts#L61)
+#### [custom](./src/presets/custom.ts#L62)
 
 Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
 
@@ -284,6 +285,52 @@ module.exports.myGenerator = ({dependencies}) => {
 ##### Demo
 
 ![](./gifs/custom.gif)
+
+<!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/copy.ts, export: copy} -->
+#### [copy](./src/presets/copy.ts#L32)
+
+Copies a whole other file
+
+##### Example
+
+```typescript
+```js
+// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts}
+```js
+```
+
+##### Example
+
+```typescript
+```js
+import {z} from 'zod/v4' // in this project we use zod v4, but we're copying from a project that uses zod v3
+// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, excludeLines: ['^import']}
+```
+```
+
+##### Example
+
+```typescript
+```js
+// copy a file from a sibling project, but only if the sibling project actually exists
+// in this case this will effectively skip the copying step on machines that don't have the sibling project installed
+// e.g. on CI runners.
+// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, onlyIfExists: ../../another-project/package.json}
+```
+```
+
+##### Example
+
+```typescript
+```js
+// by default, the content will perform a "simplified" comparison with existing content, so differences from tools like prettier
+// are ignored. if you care about whitespace and similar differences, you can set the comparison option to `strict`.
+// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, comparison: strict}
+```
+```
+<!-- codegen:end -->
+
+
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/barrel.ts, export: barrel} -->
 #### [barrel](./src/presets/barrel.ts#L38)
 

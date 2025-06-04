@@ -2,6 +2,32 @@ import {definePreset} from './util/standard-schema-preset'
 
 /**
  * Copies a whole other file
+ *
+ * @example
+ * ```js
+ * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts}
+ * ```js
+ *
+ * @example
+ * ```js
+ * import {z} from 'zod/v4' // in this project we use zod v4, but we're copying from a project that uses zod v3
+ * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, excludeLines: ['^import']}
+ * ```
+ *
+ * @example
+ * ```js
+ * // copy a file from a sibling project, but only if the sibling project actually exists
+ * // in this case this will effectively skip the copying step on machines that don't have the sibling project installed
+ * // e.g. on CI runners.
+ * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, onlyIfExists: ../../another-project/package.json}
+ * ```
+ *
+ * @example
+ * ```js
+ * // by default, the content will perform a "simplified" comparison with existing content, so differences from tools like prettier
+ * // are ignored. if you care about whitespace and similar differences, you can set the comparison option to `strict`.
+ * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, comparison: strict}
+ * ```
  */
 export const copy = definePreset(
   {
