@@ -26,6 +26,9 @@ Here's an example of it being used along with VSCode's eslint plugin, with auto-
    - [Presets](#presets)
       - [custom](#custom)
       - [copy](#copy)
+      - [excludeLines](#excludelines)
+      - [onlyIfExists](#onlyifexists)
+      - [comparison](#comparison)
       - [barrel](#barrel)
       - [markdownFromJsdoc](#markdownfromjsdoc)
       - [monorepoTOC](#monorepotoc)
@@ -287,46 +290,46 @@ module.exports.myGenerator = ({dependencies}) => {
 ![](./gifs/custom.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/copy.ts, export: copy} -->
-#### [copy](./src/presets/copy.ts#L32)
+#### [copy](./src/presets/copy.ts#L53)
 
-Copies a whole other file
+Copies a whole other file. Useful for "borrowing" an implementation of a simple utility from another project, without needing to publish it. Obviously this creates duplicated code, so use judiciously!
 
-##### Example
-
-```typescript
+##### basic usage
 ```js
-// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts}
-```js
+// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts} import {z} from 'zod' export const MyObject = z.object({ foo: z.string() })
+// codegen:end
 ```
 
-##### Example
+#### excludeLines
 
-```typescript
-```js
+```ts
 import {z} from 'zod/v4' // in this project we use zod v4, but we're copying from a project that uses zod v3
 // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, excludeLines: ['^import']}
-```
+export const MyObject = z.object({foo: z.string()})
+// codegen:end
 ```
 
-##### Example
-
-```typescript
+#### onlyIfExists
 ```js
 // copy a file from a sibling project, but only if the sibling project actually exists
 // in this case this will effectively skip the copying step on machines that don't have the sibling project installed
 // e.g. on CI runners.
 // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, onlyIfExists: ../../another-project/package.json}
-```
+import {z} from 'zod'
+
+export const MyObject = z.object({foo: z.string()})
+// codegen:end
 ```
 
-##### Example
-
-```typescript
+#### comparison
 ```js
 // by default, the content will perform a "simplified" comparison with existing content, so differences from tools like prettier
 // are ignored. if you care about whitespace and similar differences, you can set the comparison option to `strict`.
 // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, comparison: strict}
-```
+import {z} from 'zod'
+
+export const MyObject = z.object({foo: z.string()})
+// codegen:end
 ```
 <!-- codegen:end -->
 
@@ -362,7 +365,7 @@ export * from './some/path/module-c'
 ![](./gifs/barrel.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-jsdoc.ts, export: markdownFromJsdoc} -->
-#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L20)
+#### [markdownFromJsdoc](./src/presets/markdown-from-jsdoc.ts#L21)
 
 Convert jsdoc for an es export from a javascript/typescript file to markdown.
 

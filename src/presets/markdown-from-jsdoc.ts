@@ -5,6 +5,7 @@ import {Node} from '@babel/types'
 import * as lodash from 'lodash'
 import * as os from 'os'
 import * as path from 'path'
+import {equivalentSimplified} from '../simplify'
 
 /**
  * Convert jsdoc for an es export from a javascript/typescript file to markdown.
@@ -147,5 +148,7 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string; headerL
     throw new Error(`Couldn't find export in ${targetFile} with jsdoc called ${exportName}`)
   }
 
-  return blocks.join('\n\n')
+  const expected = blocks.join('\n\n')
+  if (equivalentSimplified(expected, meta.existingContent)) return meta.existingContent
+  return expected
 }

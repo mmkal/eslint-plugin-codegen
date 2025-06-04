@@ -1,32 +1,53 @@
 import {definePreset} from './util/standard-schema-preset'
 
 /**
- * Copies a whole other file
+ * Copies a whole other file. Useful for "borrowing" an implementation of a simple utility from another project, without needing to publish it.
+ * Obviously this creates duplicated code, so use judiciously!
  *
- * @example
+ * ##### basic usage
  * ```js
  * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts}
- * ```js
- *
- * @example
- * ```js
- * import {z} from 'zod/v4' // in this project we use zod v4, but we're copying from a project that uses zod v3
- * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, excludeLines: ['^import']}
+ * import {z} from 'zod'
+ * export const MyObject = z.object({ foo: z.string() })
+ * // codegen:end
  * ```
  *
- * @example
+ * #### excludeLines
+ *
+ * ```ts
+ * ;
+ * import {z} from 'zod/v4' // in this project we use zod v4, but we're copying from a project that uses zod v3
+ * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, excludeLines: ['^import']}
+ * ;
+ * export const MyObject = z.object({ foo: z.string() })
+ * // codegen:end
+ * ```
+ *
+ * #### onlyIfExists
  * ```js
  * // copy a file from a sibling project, but only if the sibling project actually exists
  * // in this case this will effectively skip the copying step on machines that don't have the sibling project installed
  * // e.g. on CI runners.
  * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, onlyIfExists: ../../another-project/package.json}
+ * ;
+ * import {z} from 'zod'
+ * ;
+ * export const MyObject = z.object({ foo: z.string() });
+ * ;
+ * // codegen:end
  * ```
  *
- * @example
+ * #### comparison
  * ```js
  * // by default, the content will perform a "simplified" comparison with existing content, so differences from tools like prettier
  * // are ignored. if you care about whitespace and similar differences, you can set the comparison option to `strict`.
  * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, comparison: strict}
+ * ;
+ * import {z} from "zod"
+ * ;
+ * export const MyObject = z.object({ foo: z.string() })
+ * ;
+ * // codegen:end
  * ```
  */
 export const copy = definePreset(
@@ -44,6 +65,8 @@ export const copy = definePreset(
     comparison: '"simplified" | "strict" | undefined',
   },
   ({options, meta, context, dependencies: {fs, path, simplify}}) => {
+    // todo: add an option to allow syncing the other way - that is, if the content on the file being linted is newer,
+    // don't autofix - offer two suggestions: 1) write to the source file, 2) write to the file being linted.
     const getAbsolutePath = (filepath: string) => path.resolve(path.dirname(context.physicalFilename), filepath)
     const shouldRun = options.onlyIfExists ? fs.existsSync(getAbsolutePath(options.onlyIfExists)) : true
     if (!shouldRun) return meta.existingContent || ''
