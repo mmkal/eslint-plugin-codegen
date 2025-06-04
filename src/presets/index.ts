@@ -1,4 +1,7 @@
 import {StringValue} from 'ms'
+import type {PresetDependencies} from '../dependencies'
+
+export type {PresetDependencies} from '../dependencies'
 
 export type PresetMeta = {
   sourceCode: string
@@ -12,25 +15,6 @@ export type PresetMeta = {
   fs: typeof import('fs')
   /** @deprecated instead of `meta.path` use `dependencies.path` */
   path: typeof import('path')
-}
-
-export interface PresetDependencies {
-  fs: typeof import('fs')
-  path: typeof import('path')
-  child_process: typeof import('child_process')
-  lodash: typeof import('lodash')
-  jsYaml: typeof import('js-yaml')
-  dedent: typeof import('dedent').default
-  glob: Pick<typeof import('glob'), 'globSync'>
-  readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
-  cheerio: typeof import('cheerio')
-  makeSynchronous: typeof import('../make-synchronous').makeSynchronous
-  fetchSync: typeof import('../fetch-sync').fetchSync
-  simplify: typeof import('../simplify')
-  babelParser: typeof import('@babel/parser')
-  babelTraverse: typeof import('@babel/traverse')
-  babelGenerator: typeof import('../types/babel-generator')
-  babelTypes: typeof import('@babel/types')
 }
 
 export interface CacheOptions {

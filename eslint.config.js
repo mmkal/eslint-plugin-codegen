@@ -1,6 +1,8 @@
+// @ts-expect-error for some reason privatenumber doesn't want this to be documented (/typed?) https://github.com/privatenumber/tsx/pull/496
 require('tsx/cjs')
 const mmkal = require('eslint-plugin-mmkal')
 const localPlugin = require('./src')
+const tsupConfig = require('./tsup.config')
 
 module.exports = process.env.DOGFOOD_CODEGEN_PLUGIN // todo: make sure the "recommendedConfig" exported by this library actually works, shouldn't force ppl to use eslint-plugin-mmkal
   ? localPlugin.flatConfig.recommendedConfig
@@ -41,6 +43,10 @@ module.exports = process.env.DOGFOOD_CODEGEN_PLUGIN // todo: make sure the "reco
               name: 'fs',
               message: 'Use the `fs` value passed to the codegen function instead of importing it directly.',
             },
+            ...tsupConfig.esmLibs.map(lib => ({
+              name: lib.name,
+              message: `Import from the esm-modules.ts file instead (this library is ESM-only and will be bundled in the final package)`,
+            })),
           ],
         },
       },
