@@ -26,6 +26,11 @@ export interface PresetDependencies {
   cheerio: typeof import('cheerio')
   makeSynchronous: typeof import('../make-synchronous').makeSynchronous
   fetchSync: typeof import('../fetch-sync').fetchSync
+  simplify: typeof import('../simplify')
+  babelParser: typeof import('@babel/parser')
+  babelTraverse: typeof import('@babel/traverse')
+  babelGenerator: typeof import('../types/babel-generator')
+  babelTypes: typeof import('@babel/types')
 }
 
 export interface CacheOptions {
@@ -57,6 +62,7 @@ export type Preset<Options extends {} = {}> = (params: PresetParams<Options>) =>
 
 // codegen:start {preset: barrel}
 export * from './barrel'
+export * from './copy'
 export * from './custom'
 export * from './empty'
 export * from './labeler'
