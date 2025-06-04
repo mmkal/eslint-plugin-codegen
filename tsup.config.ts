@@ -4,9 +4,12 @@ import * as glob from 'glob'
 import * as path from 'path'
 import {defineConfig} from 'tsup'
 
+// we aren't using tsup like most people. it's *only* for a single file, which is a barrel(!) file of all the modules we want to be able to use
+// in this (CJS) package, but are ESM-only. We achieve this by tsup-ing the runtime into CJS, then globbing and copying the types.
+
 const esmModulesFilepath = 'src/esm-modules.ts'
 const libsToBundle = Array.from(
-  fs.readFileSync(esmModulesFilepath, 'utf8').matchAll(/export \* as (\S+) from ["'](\S+)["']/g),
+  fs.readFileSync(esmModulesFilepath, 'utf8').matchAll(/^export \* as (\S+) from ["'](\S+)["']/gm),
 ).map(([_, identifier, name]) => {
   const packageJson = JSON.parse(
     fs.readFileSync(`node_modules/${name}/package.json`, 'utf8'),
