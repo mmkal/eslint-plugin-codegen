@@ -1,13 +1,12 @@
 import {createHash} from 'crypto'
+import * as diff from 'diff'
 import type * as eslint from 'eslint'
-import expect from 'expect'
 import {tryCatch} from 'fp-ts/lib/Either'
 import {globSync} from 'glob'
 import * as jsYaml from 'js-yaml'
 import ms from 'ms'
 import * as os from 'os'
 import * as path from 'path'
-import stripAnsi from 'strip-ansi'
 import {dependencies} from './dependencies'
 import * as presetsModule from './presets'
 
@@ -210,17 +209,36 @@ export const codegen: eslint.Rule.RuleModule = {
           return
         }
 
-        try {
-          expect(normalise(existingContent)).toBe(normalise(result.right))
-        } catch (e: unknown) {
-          let message = `content doesn't match: ${e as string}`
-          if (process.env.NODE_ENV === 'test') message = stripAnsi(message)
-          context.report({
-            message,
-            loc: {start: position(range[0]), end: position(range[1])},
-            fix: fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL),
-          })
+        const patch = diff.createPatch(context.physicalFilename, existingContent, result.right)
+        for (const parsedPatch of diff.parsePatch(patch)) {
+          for (const hunk of parsedPatch.hunks) {
+            let message = `Content doesn't match:\n`
+            message += hunk.lines.join('\n')
+            const startPosition = position(range[0])
+
+            context.report({
+              message,
+              loc: {
+                start: {line: startPosition.line + hunk.oldStart, column: 0},
+                end: {line: startPosition.line + hunk.oldLines, column: 0},
+              },
+              // suggest: [
+              //   {fix: fixer => fixer.replaceTextRange()}
+              // ]
+            })
+          }
         }
+        // try {
+        //   expect(normalise(existingContent)).toBe(normalise(result.right))
+        // } catch (e: unknown) {
+        //   let message = `content doesn't match: ${e as string}`
+        //   if (process.env.NODE_ENV === 'test') message = stripAnsi(message)
+        //   context.report({
+        //     message,
+        //     loc: {start: position(range[0]), end: position(range[1])},
+        //     fix: fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL),
+        //   })
+        // }
       })
     }
 
