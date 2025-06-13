@@ -37,5 +37,5 @@ jobs:
           git add .
           git commit -m "bump eslint-plugin-codegen to pkg-pr-new ${{ needs.publish.outputs.hash }} version"
           # do we actually need to push here?
-          git push origin $branch_name
+          # git push origin $branch_name
       - run: pnpm pkg-pr-new publish
