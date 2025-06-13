@@ -5,19 +5,24 @@ export const _eval = definePreset({'comparison?': '"simplified" | "strict"'}, pa
   const {dependencies, meta, options} = params
   const evalFnEnd = meta.existingContent.indexOf('\n}') + 3 // 3 not to capture either a semicolon or a newline. the trim will remove the newline but preserve the semicolon if it's wanted
   const fnStrWithComments = meta.existingContent.slice(0, evalFnEnd).trim()
-  let fnStr = fnStrWithComments.endsWith(';') ? fnStrWithComments.slice(0, -1) : fnStrWithComments
-  while (fnStr.startsWith('//')) {
-    fnStr = fnStr.split('\n').slice(1).join('\n')
-  }
-  while (fnStr.startsWith('/*')) {
-    fnStr = fnStr.split('*/').slice(1).join('*/')
+  let fnStr = fnStrWithComments.trim()
+  while (fnStr.endsWith(';')) fnStr = fnStr.slice(0, -1).trim()
+  for (let i = 0; i < 100 && !fnStr.startsWith('const '); i++) {
+    // we do have babel available, should we use that???? maybe one day
+    const before = fnStr
+    fnStr = fnStr.trim()
+    if (fnStr.startsWith('//')) fnStr = fnStr.split('\n').slice(1).join('\n').trim()
+    if (fnStr.startsWith('/*')) fnStr = fnStr.split('*/').slice(1).join('*/').trim()
+    if (before === fnStr) break // the problem isn't comments or whitespace, give up
   }
   if (!fnStr.startsWith('const ')) {
-    throw new Error('Preset function must start with `const `')
+    throw new Error('Preset function must start with `const ` (e.g. `const _myFn = () => ...`)')
   }
   const functionName = fnStr.replace('const ', '').trim().split(/\b/)[0]
-  if (!functionName) {
-    throw new Error('Preset function must have a variable name')
+  if (!/^[$A-Z_a-z][\w$]*$/.test(functionName)) {
+    throw new Error(
+      'Preset function must have an identifier name (e.g. `const _myFn = () => ...`), got: ' + functionName,
+    )
   }
 
   const plainJsFnStr = stripTypes(fnStr, dependencies)
