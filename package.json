@@ -63,7 +63,8 @@
     "read-pkg-up": "^7.0.1",
     "safe-stringify": "^1.1.0",
     "strip-ansi": "6.0.1",
-    "zod": "^3.25.48"
+    "zod": "^3.25.48",
+    "zx": "^8.5.5"
   },
   "devDependencies": {
     "@eslint/config-inspector": "^0.4.11",
