@@ -100,7 +100,7 @@ export const codegen: eslint.Rule.RuleModule = {
         }
 
         const opts = {
-          preset: 'eval',
+          preset: 'custom', // todo: change to 'eval'?
           ...maybeOptions.right,
         }
         const {_eval, ...restOfPresets} = presetsModule
