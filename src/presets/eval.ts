@@ -3,16 +3,15 @@ import {definePreset} from './util/standard-schema-preset'
 
 export const _eval = definePreset({'comparison?': '"simplified" | "strict"'}, params => {
   const {dependencies, meta, options} = params
-  const evalFnEnd = meta.existingContent.indexOf('\n}') + 2
+  const evalFnEnd = meta.existingContent.indexOf('\n}') + 3 // 3 not to capture either a semicolon or a newline. the trim will remove the newline but preserve the semicolon if it's wanted
   const fnStrWithComments = meta.existingContent.slice(0, evalFnEnd).trim()
-  let fnStr = fnStrWithComments
+  let fnStr = fnStrWithComments.endsWith(';') ? fnStrWithComments.slice(0, -1) : fnStrWithComments
   while (fnStr.startsWith('//')) {
     fnStr = fnStr.split('\n').slice(1).join('\n')
   }
   while (fnStr.startsWith('/*')) {
     fnStr = fnStr.split('*/').slice(1).join('*/')
   }
-  fnStr = fnStr.slice(0, evalFnEnd)
   if (!fnStr.startsWith('const ')) {
     throw new Error('Preset function must start with `const `')
   }
