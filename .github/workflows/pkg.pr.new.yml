@@ -27,7 +27,7 @@ jobs:
       - run: corepack enable
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm add https://pkg.pr.new/mmkal/eslint-plugin-codegen/${{ needs.publish.outputs.hash }}
+      - run: pnpm add https://pkg.pr.new/mmkal/eslint-plugin-codegen@${{ needs.publish.outputs.hash }}
       - name: git
         run: |
           git config --global user.name "${{ github.actor }}"
