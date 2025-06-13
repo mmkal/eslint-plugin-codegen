@@ -12,6 +12,7 @@ import * as jsYaml from 'js-yaml'
 import lodash from 'lodash'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
+import * as zx from 'zx'
 import * as esmModules from './esm-modules'
 import {fetchSync} from './fetch-sync'
 import {makeSynchronous} from './make-synchronous'
@@ -27,6 +28,7 @@ export interface PresetDependencies {
   glob: Pick<typeof import('glob'), 'globSync'>
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
   cheerio: typeof import('cheerio')
+  zx: typeof import('zx')
   makeSynchronous: typeof import('./make-synchronous').makeSynchronous
   fetchSync: typeof import('./fetch-sync').fetchSync
   simplify: typeof import('./simplify')
@@ -50,6 +52,7 @@ export const dependencies: PresetDependencies = {
   fetchSync,
   simplify,
   cheerio,
+  zx,
   babelParser,
   babelTraverse,
   babelGenerator: babelGenerator as never,
