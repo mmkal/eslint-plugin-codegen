@@ -57,7 +57,7 @@ export const copy = definePreset(
     /** if provided, only runs if this file exists - if it's missing, the existing content is returned (defaulting to empty string) */
     'onlyIfExists?': 'string',
     /** if provided, these lines will be removed from the copied content. e.g. `excludeLines: ['^import', '// codegen:']` */
-    'excludeLines?': 'string[] ',
+    'excludeLines?': 'string[]',
     /**
      * if set to `strict` the content will update if it's not a perfect match. by default (`simplified`) it will only update
      * if the "simplified" version of the content is different.
