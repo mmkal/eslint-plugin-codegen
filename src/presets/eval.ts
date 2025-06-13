@@ -1,52 +1,55 @@
 import {Preset, PresetDependencies} from '.'
 import {definePreset} from './util/standard-schema-preset'
 
-export const evall = definePreset(
-  {
-    'comparison?': '"simplified" | "strict"',
-  },
-  params => {
-    const {dependencies, meta, options} = params
-    const evalFnEnd = meta.existingContent.indexOf('\n}') + 2
-    const fnStr = meta.existingContent.slice(0, evalFnEnd).trim()
-    if (!fnStr.startsWith('const ')) {
-      throw new Error('Preset function must start with `const `')
-    }
-    const functionName = fnStr.replace('const ', '').trim().split(/\b/)[0]
-    if (!functionName) {
-      throw new Error('Preset function must have a variable name')
-    }
+export const _eval = definePreset({'comparison?': '"simplified" | "strict"'}, params => {
+  const {dependencies, meta, options} = params
+  const evalFnEnd = meta.existingContent.indexOf('\n}') + 2
+  const fnStrWithComments = meta.existingContent.slice(0, evalFnEnd).trim()
+  let fnStr = fnStrWithComments
+  while (fnStr.startsWith('//')) {
+    fnStr = fnStr.split('\n').slice(1).join('\n')
+  }
+  while (fnStr.startsWith('/*')) {
+    fnStr = fnStr.split('*/').slice(1).join('*/')
+  }
+  fnStr = fnStr.slice(0, evalFnEnd)
+  if (!fnStr.startsWith('const ')) {
+    throw new Error('Preset function must start with `const `')
+  }
+  const functionName = fnStr.replace('const ', '').trim().split(/\b/)[0]
+  if (!functionName) {
+    throw new Error('Preset function must have a variable name')
+  }
 
-    const plainJsFnStr = stripTypes(fnStr, dependencies)
+  const plainJsFnStr = stripTypes(fnStr, dependencies)
 
-    const fnBody = [
-      plainJsFnStr, // declare the function
-      `return ${functionName}(params)`, // call it
-    ].join(';\n\n')
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
-    const fn = new Function('params', fnBody) as Preset<{}>
-    const generated = fn(params)
-    if (typeof generated !== 'string') {
-      throw new Error('Preset function must return a string. Got: ' + typeof generated)
-    }
+  const fnBody = [
+    plainJsFnStr, // declare the function
+    `return ${functionName}(params)`, // call it
+  ].join(';\n\n')
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  const fn = new Function('params', fnBody) as Preset<{}>
+  const generated = fn(params)
+  if (typeof generated !== 'string') {
+    throw new Error('Preset function must return a string. Got: ' + typeof generated)
+  }
 
-    const expected = [
-      fnStr, // keep the original function at the top
-      '',
-      fn(params),
-    ].join('\n')
+  const expected = [
+    fnStrWithComments, // keep the original function at the top
+    '',
+    fn(params),
+  ].join('\n')
 
-    if (expected === meta.existingContent) return meta.existingContent
+  if (expected === meta.existingContent) return meta.existingContent
 
-    const comparison = options.comparison || 'simplified'
-    const {equivalentSimplified} = dependencies.simplify
-    if (comparison === 'simplified' && equivalentSimplified(meta.existingContent, expected)) {
-      return meta.existingContent
-    }
+  const comparison = options.comparison || 'simplified'
+  const {equivalentSimplified} = dependencies.simplify
+  if (comparison === 'simplified' && equivalentSimplified(meta.existingContent, expected)) {
+    return meta.existingContent
+  }
 
-    return expected
-  },
-)
+  return expected
+})
 
 export function stripTypes(typeScriptCode: string, dependencies: PresetDependencies) {
   const {babelParser, babelTraverse, babelGenerator} = dependencies

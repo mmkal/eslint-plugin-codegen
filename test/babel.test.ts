@@ -1,6 +1,6 @@
 import {test, expect} from 'vitest'
 import {dependencies} from '../src/dependencies'
-import {stripTypes} from '../src/presets/evall'
+import {stripTypes} from '../src/presets/eval'
 
 test('babel strip types', () => {
   const {dedent} = dependencies
