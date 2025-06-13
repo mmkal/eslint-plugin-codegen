@@ -3,12 +3,39 @@ on:
   push: {}
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
+    outputs:
+      hash: ${{ steps.identifier.outputs.hash }}
     steps:
       - uses: actions/checkout@v4
-      - run: npm install -g corepack@0.31.0 # todo: delete if https://github.com/nodejs/corepack/issues/612 is resolved
       - run: corepack enable
       - run: pnpm install
       - run: pnpm build
+      - run: pnpm pkg-pr-new publish
+      - id: identifier
+        name: set identifier
+        run: echo "hash=$(git log --pretty=format:"%h" -n 1)" >> "$GITHUB_OUTPUT"
+  publish_mmkal:
+    # 99% of the time I want to use eslint-plugin-codegen via eslint-plugin-mmkal so let's publish that too
+    needs: [publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: mmkal/eslint-plugin-mmkal
+      - run: corepack enable
+      - run: pnpm install
+      - run: pnpm build
+      - run: pnpm add https://pkg.pr.new/mmkal/eslint-plugin-codegen@${{ needs.publish.outputs.hash }}
+      - name: git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          branch_name="pkg-pr-new-eslint-plugin-codegen-${{ needs.publish.outputs.hash }}"
+          git checkout -b $branch_name
+          git add .
+          git commit -m "bump eslint-plugin-codegen to pkg-pr-new ${{ needs.publish.outputs.hash }} version"
+          # do we actually need to push here?
+          # git push origin $branch_name
       - run: pnpm pkg-pr-new publish
