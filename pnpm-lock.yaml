@@ -98,6 +98,9 @@ importers:
       zod:
         specifier: ^3.25.48
         version: 3.25.48
+      zx:
+        specifier: ^8.5.5
+        version: 8.5.5
     devDependencies:
       '@eslint/config-inspector':
         specifier: ^0.4.11
@@ -4654,6 +4657,11 @@ packages:
 
   zod@3.25.48:
     resolution: {integrity: sha512-0X1mz8FtgEIvaxGjdIImYpZEaZMrund9pGXm3M6vM7Reba0e2eI71KPjSCGXBfwKDPwPoywf6waUKc3/tFvX2Q==}
+
+  zx@8.5.5:
+    resolution: {integrity: sha512-kzkjV3uqyEthw1IBDbA7Co2djji77vCP1DRvt58aYSMwiX4nyvAkFE8OBSEsOUbDJAst0Yo4asNvMTGG5HGPXA==}
+    engines: {node: '>= 12.17.0'}
+    hasBin: true
 
 snapshots:
 
@@ -9529,3 +9537,5 @@ snapshots:
       zod: 3.25.48
 
   zod@3.25.48: {}
+
+  zx@8.5.5: {}

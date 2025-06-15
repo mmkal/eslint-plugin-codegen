@@ -99,11 +99,13 @@ export const codegen: eslint.Rule.RuleModule = {
         }
 
         const opts = {
-          preset: 'custom',
+          preset: 'custom', // todo: change to 'eval'?
           ...maybeOptions.right,
         }
+        const {_eval, ...restOfPresets} = presetsModule
         const presets: Record<string, presetsModule.Preset | undefined> = {
-          ...presetsModule,
+          ...restOfPresets,
+          eval: _eval,
           ...context.options[0]?.presets,
         } as {}
         const preset = presets[opts.preset]
