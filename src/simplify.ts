@@ -3,11 +3,6 @@ import * as babelParser from '@babel/parser'
 import * as babelTraverse from '@babel/traverse'
 import * as recast from 'recast'
 
-/** removes all non-alphanumeric characters and converts to lowercase */
-export const simplifyContent = (content: string) => {
-  return content.replaceAll(/\W+/g, '').toLowerCase()
-}
-
 /**
  * returns true if the simplified versions of the two strings are the same
  * can be useful if you want to know if two large blocks of code are equivalent - note that
@@ -17,6 +12,7 @@ export const simplifyContent = (content: string) => {
  */
 export const equivalentSimplified = (left: string, right: string) => {
   if (left === right) return true
+  if (/\S/.test(left) !== /\S/.test(right)) return false // if one is just whitespace but the other isn't, don't consider them equivalent
   try {
     return simplifyCode(left) === simplifyCode(right)
   } catch {
