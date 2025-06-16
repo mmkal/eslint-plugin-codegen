@@ -1,7 +1,6 @@
-import * as recast from 'recast'
 import {test, expect} from 'vitest'
-import {PresetDependencies, dependencies} from '../src/dependencies'
-import {simplifyCode, simplifyCodeTraverseOptions, stripTypes} from '../src/simplify'
+import {dependencies} from '../src/dependencies'
+import {simplifyCode} from '../src/simplify'
 
 test('simplifyCode', async () => {
   const {dedent} = dependencies

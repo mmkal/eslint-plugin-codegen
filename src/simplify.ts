@@ -1,5 +1,7 @@
+import * as babelGenerator from '@babel/generator'
+import * as babelParser from '@babel/parser'
+import * as babelTraverse from '@babel/traverse'
 import * as recast from 'recast'
-import {dependencies} from './dependencies'
 
 /** removes all non-alphanumeric characters and converts to lowercase */
 export const simplifyContent = (content: string) => {
@@ -14,7 +16,12 @@ export const simplifyContent = (content: string) => {
  * exact same letters in the same order, but different meanings.
  */
 export const equivalentSimplified = (left: string, right: string) => {
-  return simplifyContent(left) === simplifyContent(right)
+  if (left === right) return true
+  try {
+    return simplifyCode(left) === simplifyCode(right)
+  } catch {
+    return false
+  }
 }
 
 export const stripTypesTraverseOptions: import('@babel/traverse').TraverseOptions = {
@@ -77,7 +84,7 @@ export const stripTypesTraverseOptions: import('@babel/traverse').TraverseOption
 
   TSEnumDeclaration(path) {
     throw new Error(
-      `Can't strip enums. Please don't use them. Found:\n\n${dependencies.babelGenerator.default(path.node, {comments: true}).code}`,
+      `Can't strip enums. Please don't use them. Found:\n\n${babelGenerator.default(path.node, {comments: true}).code}`,
     )
   },
 
@@ -86,7 +93,7 @@ export const stripTypesTraverseOptions: import('@babel/traverse').TraverseOption
       path.node.params.forEach(param => {
         if ('accessibility' in param || 'readonly' in param) {
           throw new Error(
-            `Can't strip parameter properties (public/private/protected/readonly). Please don't use them. Found:\n\n${dependencies.babelGenerator.default(path.node, {comments: true}).code}`,
+            `Can't strip parameter properties (public/private/protected/readonly). Please don't use them. Found:\n\n${babelGenerator.default(path.node, {comments: true}).code}`,
           )
         }
       })
@@ -152,34 +159,33 @@ export const simplifyCodeTraverseOptions: import('@babel/traverse').TraverseOpti
   },
 }
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
 export function stripTypes(typeScriptCode: string) {
-  const ast = dependencies.babelParser.parse(typeScriptCode, {
+  const ast = babelParser.parse(typeScriptCode, {
     sourceType: 'unambiguous',
     plugins: ['typescript'],
     attachComment: false,
   })
 
-  dependencies.babelTraverse.default(ast, stripTypesTraverseOptions)
+  babelTraverse.default(ast, stripTypesTraverseOptions)
 
-  return dependencies.babelGenerator.default(ast, {comments: true}).code
+  return babelGenerator.default(ast, {comments: true}).code
 }
 
 export function simplifyCode(code: string) {
-  let ast = dependencies.babelParser.parse(code, {
+  let ast = babelParser.parse(code, {
     sourceType: 'unambiguous',
     plugins: ['typescript'],
     attachComment: false,
   })
-  dependencies.babelTraverse.default(ast, simplifyCodeTraverseOptions)
+  babelTraverse.default(ast, simplifyCodeTraverseOptions)
 
   // modifications made are only respected by babel - so we generate using babel, parse again, then generate using recast to prettify
-  ast = dependencies.babelParser.parse(dependencies.babelGenerator.default(ast, {comments: true}).code, {
+  ast = babelParser.parse(babelGenerator.default(ast).code, {
     sourceType: 'unambiguous',
     plugins: ['typescript'],
     attachComment: false,
   })
-  dependencies.babelTraverse.default(ast, simplifyCodeTraverseOptions)
+  babelTraverse.default(ast, simplifyCodeTraverseOptions)
 
   return recast.prettyPrint(ast, {
     tabWidth: 2,
