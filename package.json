@@ -51,6 +51,7 @@
     "@types/node": "^20.0.0",
     "cheerio": "^1.0.0",
     "dedent": "^1.5.1",
+    "diff": "^8.0.2",
     "eslint-plugin-markdown": "^4.0.1",
     "expect": "^29.7.0",
     "fp-ts": "^2.1.0",
