@@ -80,7 +80,6 @@
     "arktype": "^2.1.20",
     "eslint": "^8.57.0",
     "eslint-plugin-mmkal": "^0.10.1",
-    "execa": "9.6.0",
     "minimatch": "3.0.4",
     "np": "^10.0.7",
     "pkg-pr-new": "^0.0.17",
