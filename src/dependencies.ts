@@ -11,57 +11,65 @@ import * as glob from 'glob'
 import * as isomorphicGit from 'isomorphic-git'
 import * as jsYaml from 'js-yaml'
 import lodash from 'lodash'
+import * as memfs from 'memfs'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
 import * as recast from 'recast'
+import * as unionfs from 'unionfs'
 import * as zx from 'zx'
 import * as esmModules from './esm-modules'
 import {fetchSync} from './fetch-sync'
 import {makeSynchronous} from './make-synchronous'
 import * as simplify from './simplify'
 
+/*eslint sort-keys: "error"*/
+
 export interface PresetDependencies {
-  fs: typeof import('fs')
-  path: typeof import('path')
-  child_process: typeof import('child_process')
-  lodash: typeof import('lodash')
-  jsYaml: typeof import('js-yaml')
-  dedent: typeof import('dedent').default
-  glob: Pick<typeof import('glob'), 'globSync'>
-  readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
-  cheerio: typeof import('cheerio')
-  isomorphicGit: typeof import('isomorphic-git')
-  zx: typeof import('zx')
-  makeSynchronous: typeof import('./make-synchronous').makeSynchronous
-  fetchSync: typeof import('./fetch-sync').fetchSync
-  simplify: typeof import('./simplify')
+  arktype: typeof esmModules.arktype
+  babelGenerator: typeof import('./types/babel-generator')
   babelParser: typeof import('@babel/parser')
   babelTraverse: typeof import('@babel/traverse')
-  babelGenerator: typeof import('./types/babel-generator')
   babelTypes: typeof import('@babel/types')
+  cheerio: typeof import('cheerio')
+  child_process: typeof import('child_process')
+  dedent: typeof import('dedent').default
+  fetchSync: typeof import('./fetch-sync').fetchSync
+  fs: typeof import('fs')
+  glob: Pick<typeof import('glob'), 'globSync'>
+  isomorphicGit: typeof import('isomorphic-git')
+  jsYaml: typeof import('js-yaml')
+  lodash: typeof import('lodash')
+  makeSynchronous: typeof import('./make-synchronous').makeSynchronous
+  memfs: typeof import('memfs')
+  path: typeof import('path')
+  readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
   recast: typeof import('recast')
-  arktype: typeof esmModules.arktype
+  simplify: typeof import('./simplify')
+  unionfs: typeof import('unionfs')
+  zx: typeof import('zx')
 }
 
 export const dependencies: PresetDependencies = {
-  dedent: Object.assign(dedent, {default: dedent}), // backcompat: accidentally used `import * as dedent from 'dedent'` previously
-  fs,
-  path,
-  glob,
-  jsYaml,
-  lodash,
-  readPkgUp,
-  child_process,
-  makeSynchronous,
-  fetchSync,
-  simplify,
-  cheerio,
-  isomorphicGit,
-  zx,
+  ...esmModules,
+  babelGenerator: babelGenerator as never,
   babelParser,
   babelTraverse,
-  babelGenerator: babelGenerator as never,
   babelTypes,
+  cheerio,
+  child_process,
+  dedent: Object.assign(dedent, {default: dedent}), // backcompat: accidentally used `import * as dedent from 'dedent'` previously
+  fetchSync,
+  fs,
+  glob,
+  isomorphicGit,
+  jsYaml,
+  lodash,
+  makeSynchronous,
+  memfs,
+  path,
+  readPkgUp,
   recast,
-  ...esmModules,
+  simplify,
+  unionfs,
+  zx,
 }
