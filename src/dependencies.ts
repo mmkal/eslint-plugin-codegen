@@ -1,82 +1,30 @@
-import * as babelGenerator from '@babel/generator'
-import * as babelParser from '@babel/parser'
-import * as babelTraverse from '@babel/traverse'
-import * as babelTypes from '@babel/types'
-import * as cheerio from 'cheerio'
-import * as child_process from 'child_process'
-import dedent from 'dedent'
-import esquery from 'esquery'
+export * as babelGenerator from '@babel/generator'
+export * as babelParser from '@babel/parser'
+export * as babelTraverse from '@babel/traverse'
+export * as babelTypes from '@babel/types'
+export * as cheerio from 'cheerio'
+export * as child_process from 'child_process'
+export {default as dedent} from 'dedent'
+export {default as esquery} from 'esquery'
 // eslint-disable-next-line no-restricted-imports
-import * as fs from 'fs'
-import * as glob from 'glob'
-import * as isomorphicGit from 'isomorphic-git'
-import * as jsYaml from 'js-yaml'
-import lodash from 'lodash'
-import * as memfs from 'memfs'
+export * as fs from 'fs'
+export * as glob from 'glob'
+export * as isomorphicGit from 'isomorphic-git'
+export * as jsYaml from 'js-yaml'
+export {default as lodash} from 'lodash'
+
+export * as memfs from 'memfs'
 import * as path from 'path'
-import * as readPkgUp from 'read-pkg-up'
-import * as recast from 'recast'
-import * as unionfs from 'unionfs'
-import * as zx from 'zx'
-import * as esmModules from './esm-modules'
-import {fetchSync} from './fetch-sync'
-import {makeSynchronous} from './make-synchronous'
-import * as simplify from './simplify'
 
-/*eslint sort-keys: "error"*/
+export {default as readPkgUp} from 'read-pkg-up'
+export * as recast from 'recast'
+export * as unionfs from 'unionfs'
+export * as zx from 'zx'
+export {arktype} from './esm-modules'
+export {fetchSync} from './fetch-sync'
+export {makeSynchronous} from './make-synchronous'
 
-export interface PresetDependencies {
-  arktype: typeof esmModules.arktype
-  babelGenerator: typeof import('./types/babel-generator')
-  babelParser: typeof import('@babel/parser')
-  babelTraverse: typeof import('@babel/traverse')
-  babelTypes: typeof import('@babel/types')
-  cheerio: typeof import('cheerio')
-  child_process: typeof import('child_process')
-  dedent: typeof import('dedent').default
-  esquery: typeof import('esquery')
-  fetchSync: typeof import('./fetch-sync').fetchSync
-  fs: typeof import('fs')
-  glob: Pick<typeof import('glob'), 'globSync'>
-  isomorphicGit: typeof import('isomorphic-git')
-  jsYaml: typeof import('js-yaml')
-  lodash: typeof import('lodash')
-  makeSynchronous: typeof import('./make-synchronous').makeSynchronous
-  memfs: typeof import('memfs')
-  path: typeof import('path')
-  readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
-  recast: typeof import('recast')
-  /** require an arbitrary module *from eslint-plugin-codegen* - this means you can require dependencies of the plugin even when they're not your dependencies */
-  require: <T = unknown>(path: string) => T
-  simplify: typeof import('./simplify')
-  unionfs: typeof import('unionfs')
-  zx: typeof import('zx')
-}
+export * as simplify from './simplify'
 
-export const dependencies: PresetDependencies = {
-  ...esmModules,
-  babelGenerator: babelGenerator as never,
-  babelParser,
-  babelTraverse,
-  babelTypes,
-  cheerio,
-  child_process,
-  dedent: Object.assign(dedent, {default: dedent}), // backcompat: accidentally used `import * as dedent from 'dedent'` previously
-  esquery,
-  fetchSync,
-  fs,
-  glob,
-  isomorphicGit,
-  jsYaml,
-  lodash,
-  makeSynchronous,
-  memfs,
-  path,
-  readPkgUp,
-  recast,
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require: <T>(modulePath: string) => require(modulePath) as T,
-  simplify,
-  unionfs,
-  zx,
-}
+// eslint-disable-next-line unicorn/prefer-export-from
+export {path}

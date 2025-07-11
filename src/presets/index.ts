@@ -1,7 +1,7 @@
 import {StringValue} from 'ms'
-import type {PresetDependencies} from '../dependencies'
+import * as dependencies from '../dependencies'
 
-export type {PresetDependencies} from '../dependencies'
+export type PresetDependencies = typeof dependencies
 
 export type PresetMeta = {
   sourceCode: string

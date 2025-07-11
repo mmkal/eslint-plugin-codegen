@@ -27,7 +27,11 @@ jobs:
       - run: corepack enable
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm add https://pkg.pr.new/mmkal/eslint-plugin-codegen@${{ needs.publish.outputs.hash }}
+      - name: install pkg-pr-new codegen plugin
+        run: pnpm add https://pkg.pr.new/mmkal/eslint-plugin-codegen@${{ needs.publish.outputs.hash }}
+      - name: shim
+        run: echo 'export * as codegen from "eslint-plugin-codegen"' >> src/index.ts
+      - run: pnpm build
       - name: git
         run: |
           git config --global user.name "${{ github.actor }}"

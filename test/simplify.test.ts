@@ -1,5 +1,5 @@
 import {test, expect} from 'vitest'
-import {dependencies} from '../src/dependencies'
+import * as dependencies from '../src/dependencies'
 import {simplifyCode} from '../src/simplify'
 
 test('simplifyCode', async () => {

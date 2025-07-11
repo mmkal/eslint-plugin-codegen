@@ -8,7 +8,7 @@ import ms from 'ms'
 import * as os from 'os'
 import * as path from 'path'
 import stripAnsi from 'strip-ansi'
-import {dependencies} from './dependencies'
+import * as dependencies from './dependencies'
 import * as presetsModule from './presets'
 import {equivalentSimplified} from './simplify'
 

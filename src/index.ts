@@ -5,7 +5,7 @@ import {codegen} from './rule'
 
 // idea: codegen/fs rule. type fs.anything and it generates an import for fs. same for path and os.
 
-export type {Preset} from './presets'
+export type {Preset, PresetDependencies} from './presets'
 export type {DefinePreset} from './presets/util/standard-schema-preset'
 
 const processor = createProcessor()
@@ -40,3 +40,5 @@ export * from './flat-config'
 export * as presets from './presets'
 
 export * as flatConfig from './config'
+
+export * as dependencies from './dependencies'
