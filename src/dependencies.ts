@@ -27,5 +27,7 @@ export {makeSynchronous} from './make-synchronous'
 
 export * as simplify from './simplify'
 
+export * as quickLru from 'quick-lru'
+
 // eslint-disable-next-line unicorn/prefer-export-from
 export {path}
