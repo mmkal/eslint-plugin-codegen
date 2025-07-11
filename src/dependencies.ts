@@ -21,7 +21,7 @@ export * as recast from 'recast'
 export * as unionfs from 'unionfs'
 export * as zx from 'zx'
 export {arktype} from './esm-modules'
-export {fetchSync} from './fetch-sync'
+export {fetchSync, gitCloneMem} from './fetch-sync'
 export {makeSynchronous} from './make-synchronous'
 
 export * as simplify from './simplify'
