@@ -14,6 +14,7 @@ export * as jsYaml from 'js-yaml'
 export {default as lodash} from 'lodash'
 
 export * as memfs from 'memfs'
+export * as moize from 'moize'
 import * as path from 'path'
 
 export {default as readPkgUp} from 'read-pkg-up'
