@@ -17,6 +17,9 @@ export const codegen: eslint.Rule.RuleModule = {
   meta: {fixable: true},
   create(context: eslint.Rule.RuleContext) {
     const validate = () => {
+      const logs: string[] = []
+      const getMessage = (message: string) => (logs.length ? [...logs, '\n', message].join('\n') : message)
+
       const sourceCode = context.sourceCode.text
         .split(os.EOL)
         .map(line => `${line}`.replace('// eslint-plugin-codegen:trim', ''))
@@ -80,7 +83,7 @@ export const codegen: eslint.Rule.RuleModule = {
         if (!endMatch) {
           const afterStartMatch = startIndex + startMatch[0].length
           context.report({
-            message: `couldn't find end marker (expected regex ${markers.end})`,
+            message: getMessage(`couldn't find end marker (expected regex ${markers.end})`),
             loc: startMarkerLoc,
             fix: fixer =>
               fixer.replaceTextRange(
@@ -97,7 +100,9 @@ export const codegen: eslint.Rule.RuleModule = {
         )
         if (maybeOptions._tag === 'Left') {
           context.report({
-            message: `Error parsing options. Please use inline YAML e.g. \`{someString: hello, someNumber: 123, someArray: [hi, 123, true]}\`. ${String(maybeOptions.left)}`,
+            message: getMessage(
+              `Error parsing options. Please use inline YAML e.g. \`{someString: hello, someNumber: 123, someArray: [hi, 123, true]}\`. ${String(maybeOptions.left)}`,
+            ),
             loc: startMarkerLoc,
           })
           return
@@ -116,7 +121,7 @@ export const codegen: eslint.Rule.RuleModule = {
         const preset = presets[opts.preset]
         if (typeof preset !== 'function') {
           context.report({
-            message: `Unknown preset ${opts.preset}. Available presets: ${Object.keys(presets).join(', ')}`,
+            message: getMessage(`Unknown preset ${opts.preset}. Available presets: ${Object.keys(presets).join(', ')}`),
             loc: startMarkerLoc,
           })
           return
@@ -130,6 +135,7 @@ export const codegen: eslint.Rule.RuleModule = {
           existingContent,
           existingContentPosition: [range[0], range[1]],
           sourceCode,
+          log: message => logs.push(message),
           glob: globSync as never,
           fs: dependencies.fs,
           path,
@@ -212,7 +218,7 @@ export const codegen: eslint.Rule.RuleModule = {
         )
 
         if (result._tag === 'Left') {
-          context.report({message: result.left, loc: startMarkerLoc})
+          context.report({message: getMessage(result.left), loc: startMarkerLoc})
           return
         }
 
@@ -226,7 +232,7 @@ export const codegen: eslint.Rule.RuleModule = {
           let message = `content doesn't match: ${e as string}`
           if (process.env.NODE_ENV === 'test') message = stripAnsi(message)
           context.report({
-            message,
+            message: getMessage(message),
             loc: {start: position(range[0]), end: position(range[1])},
             fix: fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL),
           })

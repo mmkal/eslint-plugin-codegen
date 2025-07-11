@@ -7,6 +7,7 @@ export type PresetMeta = {
   sourceCode: string
   existingContent: string
   existingContentPosition: [start: number, end: number]
+  log: (message: string) => void
   /** @deprecated instead of `meta.filename` use `context.physicalFilename` */
   filename: string
   /** @deprecated instead of `meta.glob` use `dependencies.glob.globSync` */
