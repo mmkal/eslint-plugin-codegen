@@ -5,6 +5,7 @@ import * as babelTypes from '@babel/types'
 import * as cheerio from 'cheerio'
 import * as child_process from 'child_process'
 import dedent from 'dedent'
+import esquery from 'esquery'
 // eslint-disable-next-line no-restricted-imports
 import * as fs from 'fs'
 import * as glob from 'glob'
@@ -33,6 +34,7 @@ export interface PresetDependencies {
   cheerio: typeof import('cheerio')
   child_process: typeof import('child_process')
   dedent: typeof import('dedent').default
+  esquery: typeof import('esquery')
   fetchSync: typeof import('./fetch-sync').fetchSync
   fs: typeof import('fs')
   glob: Pick<typeof import('glob'), 'globSync'>
@@ -44,6 +46,8 @@ export interface PresetDependencies {
   path: typeof import('path')
   readPkgUp: Pick<typeof import('read-pkg-up'), 'sync'>
   recast: typeof import('recast')
+  /** require an arbitrary module *from eslint-plugin-codegen* - this means you can require dependencies of the plugin even when they're not your dependencies */
+  require: <T = unknown>(path: string) => T
   simplify: typeof import('./simplify')
   unionfs: typeof import('unionfs')
   zx: typeof import('zx')
@@ -58,6 +62,7 @@ export const dependencies: PresetDependencies = {
   cheerio,
   child_process,
   dedent: Object.assign(dedent, {default: dedent}), // backcompat: accidentally used `import * as dedent from 'dedent'` previously
+  esquery,
   fetchSync,
   fs,
   glob,
@@ -69,6 +74,8 @@ export const dependencies: PresetDependencies = {
   path,
   readPkgUp,
   recast,
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require: <T>(modulePath: string) => require(modulePath) as T,
   simplify,
   unionfs,
   zx,

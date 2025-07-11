@@ -41,3 +41,7 @@ test('simplifyCode', async () => {
 
   expect(simplifyCode(leftCode)).toBe(simplifyCode(rightCode))
 })
+
+test('snapshots', async () => {
+  expect(simplifyCode(`const a = 123_456`)).toMatchInlineSnapshot(`"const a = 123456;"`)
+})

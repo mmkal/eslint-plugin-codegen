@@ -153,6 +153,12 @@ export const simplifyCodeTraverseOptions: import('@babel/traverse').TraverseOpti
       path.node.shorthand = true
     }
   },
+  // remove underscores from numbers
+  NumericLiteral(path) {
+    if (path.node.extra && typeof path.node.extra.raw === 'string' && path.node.extra.raw.includes('_')) {
+      path.node.extra.raw = path.node.extra.raw.replaceAll('_', '')
+    }
+  },
 }
 
 export function stripTypes(typeScriptCode: string) {
