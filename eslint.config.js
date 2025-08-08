@@ -7,6 +7,7 @@ const tsupConfig = require('./tsup.config')
 module.exports = process.env.DOGFOOD_CODEGEN_PLUGIN // todo: make sure the "recommendedConfig" exported by this library actually works, shouldn't force ppl to use eslint-plugin-mmkal
   ? localPlugin.flatConfig.recommendedConfig
   : [
+      {ignores: ['src/vendor/**']},
       ...mmkal.recommendedFlatConfigs.map(cfg => {
         if (cfg.plugins?.codegen) {
           return {

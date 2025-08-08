@@ -11,3 +11,4 @@ yarn.lock
 .vscode-test
 test-results
 .DS_Store
+src/vendor

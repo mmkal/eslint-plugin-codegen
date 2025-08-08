@@ -9,7 +9,8 @@ export {default as esquery} from 'esquery'
 // eslint-disable-next-line no-restricted-imports
 export * as fs from 'fs'
 export * as glob from 'glob'
-export * as isomorphicGit from 'isomorphic-git'
+export * as isomorphicGit from './vendor/isogit/isomorphic-git-sync'
+export * as isomorphicGitSync from './vendor/isogit/isomorphic-git-sync'
 export * as jsYaml from 'js-yaml'
 export {default as lodash} from 'lodash'
 
