@@ -15,7 +15,7 @@ export const standardSchema = definePreset(
   z.object({
     include: z.enum(['contract', 'errors', 'utils']).array().default(['contract', 'errors', 'utils']),
   }),
-  ({options}) => {
+  ({options, meta, dependencies}) => {
     const src = options.include
       .map(include => {
         if (include === 'contract') return standardSchemaV1ContractSrc
@@ -24,6 +24,7 @@ export const standardSchema = definePreset(
       })
       .join('\n')
 
+    if (dependencies.simplify.equivalentSimplified(src, meta.existingContent)) return meta.existingContent || ''
     return src
   },
 )
