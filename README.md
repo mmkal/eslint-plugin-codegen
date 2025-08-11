@@ -145,7 +145,9 @@ module.exports = {
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/custom.ts, export: custom} -->
 #### [custom](./src/presets/custom.ts#L62)
 
-Define your own codegen function, which will receive all options specified. Import the `Preset` type from this library to define a strongly-typed preset function:
+Define your own codegen function, which will receive all options specified.
+
+Import the `Preset` type from this library to define a strongly-typed preset function:
 
 ##### Example
 
@@ -164,7 +166,12 @@ This can be used in other files by specifying the `source` option like:
 
 `<!-- codegen:start {source: ./lib/my-custom-preset.js, export: jsonPrinter, myCustomProp: hello}`
 
-<br /> Note that some helpers passed via `dependencies`, such as `glob`, `fs`, `path`, `child_process`, `lodash`, `jsYaml`, `dedent`, and `readPkgUp`, corresponding to those node modules respectively. These can be useful to allow access to those libraries without them being production dependencies. This also allows your lint process to use these node-only dependencies, even in a file that is not run in node - only the calls would be included in any bundled output, not the dependencies themselves.
+<br />
+
+Note that some helpers passed via `dependencies`, such as `glob`, `fs`, `path`, `child_process`, `lodash`, `jsYaml`, `dedent`, and `readPkgUp`, corresponding to those
+node modules respectively. These can be useful to allow access to those libraries without them being production dependencies.
+This also allows your lint process to use these node-only dependencies, even in a file that is not run in node - only the calls would be included in any
+bundled output, not the dependencies themselves.
 
 ##### Params
 
@@ -268,13 +275,17 @@ module.exports.myGenerator = ({dependencies}) => {
 ![](./gifs/custom.gif)
 
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/copy.ts, export: copy} -->
-#### [copy](./src/presets/copy.ts#L53)
+#### [copy](./src/presets/copy.ts#L49)
 
-Copies a whole other file. Useful for "borrowing" an implementation of a simple utility from another project, without needing to publish it. Obviously this creates duplicated code, so use judiciously!
+Copies a whole other file. Useful for "borrowing" an implementation of a simple utility from another project, without needing to publish it.
+Obviously this creates duplicated code, so use judiciously!
 
 ##### basic usage
 ```js
-// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts} import {z} from 'zod' export const MyObject = z.object({ foo: z.string() })
+// codegen:start {preset: copy, source: ../../another-project/src/some-file.ts}
+import {z} from 'zod'
+
+export const MyObject = z.object({foo: z.string()})
 // codegen:end
 ```
 
@@ -283,6 +294,7 @@ Copies a whole other file. Useful for "borrowing" an implementation of a simple 
 ```ts
 import {z} from 'zod/v4' // in this project we use zod v4, but we're copying from a project that uses zod v3
 // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, excludeLines: ['^import']}
+
 export const MyObject = z.object({foo: z.string()})
 // codegen:end
 ```
@@ -430,7 +442,12 @@ Generate a table of contents from the current markdown file, based on markdown h
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/markdown-from-tests.ts, export: markdownFromTests} -->
 #### [markdownFromTests](./src/presets/markdown-from-tests.ts#L25)
 
-Use a test file to generate library usage documentation. Note: this has been tested with vitest and jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested. JSDoc/inline comments above tests will be added as a "preamble", making this a decent way to quickly document API usage of a library, and to be sure that the usage is real and accurate.
+Use a test file to generate library usage documentation.
+
+Note: this has been tested with vitest and jest. It _might_ also work fine with mocha, and maybe ava, but those haven't been tested.
+
+JSDoc/inline comments above tests will be added as a "preamble", making this a decent way to quickly document API usage of a library,
+and to be sure that the usage is real and accurate.
 
 ##### Example
 
@@ -454,7 +471,11 @@ Use a test file to generate library usage documentation. Note: this has been tes
 <!-- codegen:start {preset: markdownFromJsdoc, source: src/presets/labeler.ts, export: labeler} -->
 #### [labeler](./src/presets/labeler.ts#L26)
 
-Generates a yaml config for the [GitHub Pull Request Labeler Action](https://github.com/actions/labeler). Creates a label per package name, which will be applied to any file modified under the leaf package path. When packages are added or removed from the repo, or renamed, the yaml config will stay in sync with them. Additional labels can be added outside of the generated code block. See https://github.com/mmkal/ts/tree/main/.github/labeler.yml for an example.
+Generates a yaml config for the [GitHub Pull Request Labeler Action](https://github.com/actions/labeler).
+Creates a label per package name, which will be applied to any file modified under the leaf package path.
+When packages are added or removed from the repo, or renamed, the yaml config will stay in sync with them.
+Additional labels can be added outside of the generated code block.
+See https://github.com/mmkal/ts/tree/main/.github/labeler.yml for an example.
 
 ##### Example
 ```yaml
