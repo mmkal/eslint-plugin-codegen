@@ -13,11 +13,11 @@ import * as recast from 'recast'
 export const equivalentSimplified = (left: string, right: string) => {
   if (left === right) return true
   if (/\S/.test(left) !== /\S/.test(right)) return false // if one is just whitespace but the other isn't, don't consider them equivalent
-  
+
   // hack, we're going to strip out comments but hash directives are important
   const startDirectives = [left, right].map(line => `${line.trim()}\n`.match(/^\/\/ codegen:.*\n/)?.[0])
-  if (startDirectives.some(Boolean) &&  startDirectives[0] !== startDirectives[1]) return false
-  
+  if (startDirectives.some(Boolean) && startDirectives[0] !== startDirectives[1]) return false
+
   try {
     return simplifyCode(left) === simplifyCode(right)
   } catch {
