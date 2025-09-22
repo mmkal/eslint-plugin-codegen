@@ -55,4 +55,6 @@ export * from './markdown-from-jsdoc'
 export * from './markdown-from-tests'
 export * from './markdown-toc'
 export * from './monorepo-toc'
+export * from './standard-schema'
+export * from './str'
 // codegen:end
