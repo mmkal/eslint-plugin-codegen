@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-codegen",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "engines": {
     "node": ">=18.0.0"
   },
