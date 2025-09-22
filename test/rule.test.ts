@@ -96,7 +96,7 @@ tester.run('codegen', codegen.rules.codegen, {
         // codegen:start {abc: !Tag: not valid yaml!}
         // codegen:end
       `,
-      errors: [{message: /Error parsing options. YAMLException/}],
+      errors: [{message: /Error parsing options. .* YAMLException/}],
     },
     {
       name: 'duplicate start markers',
