@@ -87,7 +87,7 @@ tester.run('codegen', codegen.rules.codegen, {
         // codegen:start {preset: doesNotExist}
         // codegen:end
       `,
-      errors: [{message: /unknown preset doesNotExist. Available presets: .*/}],
+      errors: [{message: /Unknown preset doesNotExist. Available presets: .*/}],
     },
     {
       name: 'invalid yaml',
