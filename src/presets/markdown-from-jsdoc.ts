@@ -123,7 +123,7 @@ export const markdownFromJsdoc: Preset<{source: string; export?: string; headerL
 
       if (sec.type === 'description') {
         // line breaks that run into letters aren't respected by jsdoc, so shouldn't be in markdown either
-        return sec.content.replaceAll(/\r?\n\s*([A-Za-z])/g, ' $1')
+        return sec.content //.replaceAll(/\r?\n\s*([A-Za-z])/g, ' $1')
       }
 
       if (sec.type === 'see') {

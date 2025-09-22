@@ -8,18 +8,18 @@ import {definePreset} from './util/standard-schema-preset'
  * ```js
  * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts}
  * import {z} from 'zod'
- * export const MyObject = z.object({ foo: z.string() })
+ *
+ * export const MyObject = z.object({foo: z.string()})
  * // codegen:end
  * ```
  *
  * #### excludeLines
  *
  * ```ts
- * ;
  * import {z} from 'zod/v4' // in this project we use zod v4, but we're copying from a project that uses zod v3
  * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, excludeLines: ['^import']}
- * ;
- * export const MyObject = z.object({ foo: z.string() })
+ *
+ * export const MyObject = z.object({foo: z.string()})
  * // codegen:end
  * ```
  *
@@ -29,11 +29,9 @@ import {definePreset} from './util/standard-schema-preset'
  * // in this case this will effectively skip the copying step on machines that don't have the sibling project installed
  * // e.g. on CI runners.
  * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, onlyIfExists: ../../another-project/package.json}
- * ;
  * import {z} from 'zod'
- * ;
- * export const MyObject = z.object({ foo: z.string() });
- * ;
+ *
+ * export const MyObject = z.object({foo: z.string()})
  * // codegen:end
  * ```
  *
@@ -42,11 +40,9 @@ import {definePreset} from './util/standard-schema-preset'
  * // by default, the content will perform a "simplified" comparison with existing content, so differences from tools like prettier
  * // are ignored. if you care about whitespace and similar differences, you can set the comparison option to `strict`.
  * // codegen:start {preset: copy, source: ../../another-project/src/some-file.ts, comparison: strict}
- * ;
- * import {z} from "zod"
- * ;
- * export const MyObject = z.object({ foo: z.string() })
- * ;
+ * import {z} from 'zod'
+ *
+ * export const MyObject = z.object({foo: z.string()})
  * // codegen:end
  * ```
  */
