@@ -12,6 +12,7 @@ import * as jsYaml from 'js-yaml'
 import lodash from 'lodash'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
+import * as recast from 'recast'
 import * as zx from 'zx'
 import * as esmModules from './esm-modules'
 import {fetchSync} from './fetch-sync'
@@ -36,6 +37,7 @@ export interface PresetDependencies {
   babelTraverse: typeof import('@babel/traverse')
   babelGenerator: typeof import('./types/babel-generator')
   babelTypes: typeof import('@babel/types')
+  recast: typeof import('recast')
   arktype: typeof esmModules.arktype
 }
 
@@ -57,5 +59,6 @@ export const dependencies: PresetDependencies = {
   babelTraverse,
   babelGenerator: babelGenerator as never,
   babelTypes,
+  recast,
   ...esmModules,
 }
