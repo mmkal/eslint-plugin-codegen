@@ -63,6 +63,10 @@ export declare namespace StandardSchemaV1 {
   export type InferOutput<Schema extends StandardSchemaV1> = NonNullable<Schema['~standard']['types']>['output']
 }
 
+export const looksLikePromise = (error: unknown): error is Promise<unknown> => {
+  return !!error && typeof error === 'object' && 'then' in error && typeof error.then === 'function'
+}
+
 export const looksLikeStandardSchemaFailure = (error: unknown): error is StandardSchemaV1.FailureResult => {
   return !!error && typeof error === 'object' && 'issues' in error && Array.isArray(error.issues)
 }
@@ -71,9 +75,12 @@ export const looksLikeStandardSchema = (thing: unknown): thing is StandardSchema
   return !!thing && typeof thing === 'object' && '~standard' in thing && typeof thing['~standard'] === 'object'
 }
 
-export const prettifyStandardSchemaError = (error: unknown): string | null => {
+export const prettifyErrorIfStandardSchema = (error: unknown): string | null => {
   if (!looksLikeStandardSchemaFailure(error)) return null
+  return prettifyStandardSchemaError(error)
+}
 
+export const prettifyStandardSchemaError = (error: StandardSchemaV1.FailureResult): string | null => {
   const issues = [...error.issues]
     .map(issue => {
       const path = issue.path || []
