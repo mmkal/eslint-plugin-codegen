@@ -1,9 +1,12 @@
 import type {StandardSchemaV1} from './contract'
 import {looksLikeStandardSchemaFailure} from './utils'
 
-export const prettifyStandardSchemaError = (error: unknown): string | null => {
+export const prettifyErrorIfStandardSchemaFailure = (error: unknown): string | null => {
   if (!looksLikeStandardSchemaFailure(error)) return null
+  return prettifyStandardSchemaError(error)
+}
 
+export const prettifyStandardSchemaError = (error: StandardSchemaV1.FailureResult): string => {
   const issues = [...error.issues]
     .map(issue => {
       const path = issue.path || []

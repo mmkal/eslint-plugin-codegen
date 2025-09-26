@@ -47,9 +47,6 @@ importers:
       '@types/lodash':
         specifier: ^4.14.202
         version: 4.14.202
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.9.4
       cheerio:
         specifier: ^1.0.0
         version: 1.0.0
@@ -117,6 +114,9 @@ importers:
       '@types/ms':
         specifier: 2.1.0
         version: 2.1.0
+      '@types/node':
+        specifier: ^20.9.4
+        version: 20.9.4
       '@vscode/test-electron':
         specifier: ^2.3.8
         version: 2.3.8
