@@ -10,6 +10,7 @@ import * as fs from 'fs'
 import * as glob from 'glob'
 import * as jsYaml from 'js-yaml'
 import lodash from 'lodash'
+import * as magicString from 'magic-string'
 import * as path from 'path'
 import * as readPkgUp from 'read-pkg-up'
 import * as recast from 'recast'
@@ -39,6 +40,7 @@ export interface PresetDependencies {
   babelTypes: typeof import('@babel/types')
   recast: typeof import('recast')
   arktype: typeof esmModules.arktype
+  magicString: typeof import('magic-string')
 }
 
 export const dependencies: PresetDependencies = {
@@ -60,5 +62,6 @@ export const dependencies: PresetDependencies = {
   babelGenerator: babelGenerator as never,
   babelTypes,
   recast,
+  magicString,
   ...esmModules,
 }
