@@ -222,15 +222,15 @@ export const codegen: eslint.Rule.RuleModule = {
             message += hunk.lines.join('\n')
             const startPosition = position(range[0])
 
+            const fix: Parameters<typeof context.report>[0]['fix'] = fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL)
             context.report({
               message,
               loc: {
                 start: {line: startPosition.line + hunk.oldStart, column: 0},
                 end: {line: startPosition.line + hunk.oldLines, column: 0},
               },
-              // suggest: [
-              //   {fix: fixer => fixer.replaceTextRange()}
-              // ]
+              fix,
+              // todo: fix or suggest based on an option
             })
           }
         }
