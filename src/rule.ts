@@ -9,7 +9,6 @@ import * as os from 'os'
 import * as path from 'path'
 import {dependencies} from './dependencies'
 import * as presetsModule from './presets'
-import {equivalentSimplified} from './simplify'
 
 export const codegen: eslint.Rule.RuleModule = {
   // @ts-expect-error types are wrong?
@@ -215,14 +214,15 @@ export const codegen: eslint.Rule.RuleModule = {
           return
         }
 
-        const patch = diff.createPatch(context.physicalFilename, existingContent, result.right)
+        const patch = diff.createPatch(context.physicalFilename, existingContent.trimEnd(), result.right.trimEnd())
         for (const parsedPatch of diff.parsePatch(patch)) {
           for (const hunk of parsedPatch.hunks) {
             let message = `Content doesn't match:\n`
             message += hunk.lines.join('\n')
             const startPosition = position(range[0])
 
-            const fix: Parameters<typeof context.report>[0]['fix'] = fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL)
+            const fix: Parameters<typeof context.report>[0]['fix'] = fixer =>
+              fixer.replaceTextRange(range, normalise(result.right) + os.EOL)
             context.report({
               message,
               loc: {
