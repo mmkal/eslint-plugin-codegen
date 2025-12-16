@@ -40,3 +40,5 @@ export * from './flat-config'
 export * as presets from './presets'
 
 export * as flatConfig from './config'
+
+export * as dependencies from './dependencies'

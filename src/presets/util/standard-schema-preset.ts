@@ -1,6 +1,11 @@
 import {Preset} from '../..'
 import {arktype} from '../../esm-modules'
-import {StandardSchemaV1, looksLikeStandardSchemaFailure, prettifyStandardSchemaError} from '../../standard-schema'
+import {
+  StandardSchemaV1,
+  looksLikePromise,
+  looksLikeStandardSchemaFailure,
+  prettifyStandardSchemaError,
+} from '../../standard-schema'
 
 type $ = {}
 /** define a preset using an arktype schema definition. note that you don't have to import arktype */
@@ -32,11 +37,11 @@ const definePresetFromStandardSchema = <Input extends {}, Output extends {} = In
 ): Preset<Output> => {
   return params => {
     const result = schema['~standard'].validate(params.options)
-    if (result instanceof Promise) {
+    if (looksLikePromise(result)) {
       throw new Error('Standard Schema validation is async')
     }
     if (looksLikeStandardSchemaFailure(result)) {
-      throw new Error(`Invalid options: ${prettifyStandardSchemaError(result.issues)}`)
+      throw new Error(`Invalid options: ${prettifyStandardSchemaError(result)}`)
     }
     return fn({...params, options: result.value as never})
   }

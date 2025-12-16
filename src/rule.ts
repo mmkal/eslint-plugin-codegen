@@ -9,6 +9,7 @@ import * as os from 'os'
 import * as path from 'path'
 import {dependencies} from './dependencies'
 import * as presetsModule from './presets'
+import {equivalentSimplified} from './simplify'
 
 export const codegen: eslint.Rule.RuleModule = {
   // @ts-expect-error types are wrong?
@@ -94,14 +95,17 @@ export const codegen: eslint.Rule.RuleModule = {
           err => err,
         )
         if (maybeOptions._tag === 'Left') {
-          context.report({message: `Error parsing options. ${maybeOptions.left as string}`, loc: startMarkerLoc})
+          context.report({
+            message: `Error parsing options. Please use inline YAML e.g. \`{someString: hello, someNumber: 123, someArray: [hi, 123, true]}\`. ${String(maybeOptions.left)}`,
+            loc: startMarkerLoc,
+          })
           return
         }
 
         const opts = {
           preset: 'custom', // todo: change to 'eval'?
           ...maybeOptions.right,
-        }
+        } as {preset: string} & Record<string, unknown>
         const {_eval, ...restOfPresets} = presetsModule
         const presets: Record<string, presetsModule.Preset | undefined> = {
           ...restOfPresets,
@@ -111,7 +115,7 @@ export const codegen: eslint.Rule.RuleModule = {
         const preset = presets[opts.preset]
         if (typeof preset !== 'function') {
           context.report({
-            message: `unknown preset ${opts.preset}. Available presets: ${Object.keys(presets).join(', ')}`,
+            message: `Unknown preset ${opts.preset}. Available presets: ${Object.keys(presets).join(', ')}`,
             loc: startMarkerLoc,
           })
           return
@@ -190,7 +194,7 @@ export const codegen: eslint.Rule.RuleModule = {
           } as const
         }
 
-        const parameters: presetsModule.PresetParams = {
+        const parameters: presetsModule.PresetParams<Record<string, unknown>> = {
           meta,
           options: opts,
           context,
@@ -230,6 +234,23 @@ export const codegen: eslint.Rule.RuleModule = {
             })
           }
         }
+        /*
+        try {
+          expect(normalise(existingContent)).toBe(normalise(result.right))
+        } catch (e: unknown) {
+          const compareSimplified = !opts.comparison || opts.comparison === 'simplified'
+          if (compareSimplified && equivalentSimplified(existingContent, result.right)) {
+            return
+          }
+          let message = `content doesn't match: ${e as string}`
+          if (process.env.NODE_ENV === 'test') message = stripAnsi(message)
+          context.report({
+            message,
+            loc: {start: position(range[0]), end: position(range[1])},
+            fix: fixer => fixer.replaceTextRange(range, normalise(result.right) + os.EOL),
+          })
+        }
+        */
         // try {
         //   expect(normalise(existingContent)).toBe(normalise(result.right))
         // } catch (e: unknown) {
